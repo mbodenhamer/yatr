@@ -1,0 +1,14 @@
+Sphinx
+check-manifest
+coverage
+detox
+fmap
+ipdb
+ipdbplugin
+ipython
+lxml
+nose
+pip-tools
+tox
+twine
+xunitmerge
