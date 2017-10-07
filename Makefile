@@ -73,6 +73,7 @@ pip-compile:
 PY36 = source .tox/py36/bin/activate
 QUICK_TEST = nosetests -s -v --pdb --pdb-failures
 UNIT_TEST = $(QUICK_TEST) -w ${PACKAGE}
+INSTALL = pip install .
 
 test:
 	@$(PYDEV) coverage erase
@@ -80,13 +81,13 @@ test:
 	@$(PYDEV) coverage html
 
 quick-test:
-	@$(PYDEV) $(QUICK_TEST)
+	@$(PYDEV) bash -c "$(INSTALL); $(QUICK_TEST)"
 
 unit-test:
 	@$(PYDEV) $(UNIT_TEST)
 
 py3-quick-test:
-	@$(PYDEV) bash -c "$(PY36); $(QUICK_TEST)"
+	@$(PYDEV) bash -c "$(PY36); $(INSTALL); $(QUICK_TEST)"
 
 py3-unit-test:
 	@$(PYDEV) bash -c "$(PY36); $(UNIT_TEST)"
