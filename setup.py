@@ -17,7 +17,7 @@ setup(
     author_email = 'mbodenhamer@mbodenhamer.com',
     description = 'Yet Another Task Runner',
     long_description = read('README.rst'),
-    url = 'https://github.com/mbodenhamer/dockerman',
+    url = 'https://github.com/mbodenhamer/yatr',
     packages = find_packages(),
     install_requires = requirements('requirements.in'),
     entry_points = {
