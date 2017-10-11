@@ -1,10 +1,10 @@
-from yatr import Task
+from yatr import Context
 
 #-------------------------------------------------------------------------------
-# Task
+# Context
 
-def test_task():
-    Task
+def test_context():
+    Context
 
 #-------------------------------------------------------------------------------
 

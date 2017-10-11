@@ -1,10 +1,10 @@
-from yatr import Task
+from yatr import Document
 
 #-------------------------------------------------------------------------------
-# Task
+# Document
 
-def test_task():
-    Task
+def test_env():
+    Document
 
 #-------------------------------------------------------------------------------
 
