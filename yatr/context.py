@@ -1,6 +1,4 @@
-import shlex
 from jinja2 import Template
-from subprocess import Popen, PIPE
 
 from syn.base import Base, Attr, create_hook
 from syn.type import Dict
@@ -16,9 +14,11 @@ CONTEXT_REGISTRY = {}
 
 class Context(Base):
     context_name = None
-    _attrs = dict(name = Attr(STR),
+    _attrs = dict(name = Attr(STR, ''),
+                  inside = Attr(STR, ''),
                   env = Attr(Dict(STR), init=lambda self: dict()),
-                  opts = Attr(Dict(STR), init=lambda self: dict()))
+                  opts = Attr(dict, init=lambda self: dict()))
+    _opts = dict(init_validate = True)
 
     @classmethod
     @create_hook
@@ -36,13 +36,14 @@ class Context(Base):
         return cls_(**kwargs)
 
     def resolve_macros(self, env, **kwargs):
-        for key in self.env:
-            self.env[key] = Template(self.env[key]).render(env)
+        for key , value in self.env.items():
+            self.env[key] = Template(value).render(env)
 
-        for key in self.opts:
-            self.opts[key] = Template(self.opts[key]).render(env)
+        for key, value in self.opts.items():
+            if isinstance(value, STR):
+                self.opts[key] = Template(value).render(env)
 
-    def run(self, env, **kwargs):
+    def run_command(self, command, env, **kwargs):
         raise NotImplementedError
             
 
@@ -52,16 +53,25 @@ class Context(Base):
 #-----------------------------------------------------------
 # Bash
 
+# TODO
+
+# 1. No Popen here;  just implement run_command for each context, and do Popen in Command.run
+# 2. Pass env to run_command, for nested subclass lookups;  use attribute "inside"
+# 3. Validation in each Context subclass; check for invalid opts, etc.
+
 
 class Bash(Context):
     context_name = 'bash'
 
-    def run(self, command, env, **kwargs):
+    def run_command(self, command, env, **kwargs):
         cmd = 'bash -c "{}"'.format(command)
-        p = Popen(shlex.split(cmd), stdout=PIPE, stderr=PIPE)
-        out, err = p.communicate()
-        return out, err
         
+        if self.inside:
+            ctx = env.contexts[self.inside]
+            cmd = ctx.run_command(cmd, env, **kwargs)
+
+        return cmd
+
 
 #-----------------------------------------------------------
 

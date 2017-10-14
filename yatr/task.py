@@ -1,4 +1,6 @@
+import shlex
 from jinja2 import Template
+from subprocess import Popen, PIPE
 
 from syn.base import Base, Attr
 from syn.type import List
@@ -20,15 +22,21 @@ class Command(Base):
         if self.context:
             self.context = Template(self.context).render(env)
 
-    def run(self, env, **kwargs):
+    def run_command(self, env, **kwargs):
         context_name = kwargs.get('context', self.context)
         if not context_name:
             context = env.default_context
         else:
             context = env.contexts[context_name]
 
-        context.run(self.command, env, **kwargs)
+        return context.run_command(self.command, **kwargs)
 
+    def run(self, env, **kwargs):
+        cmd = self.run_command(env, **kwargs)
+        p = Popen(shlex.split(cmd), stdout=PIPE, stderr=PIPE)
+        out, err = p.communicate()
+        return out, err
+        
 
 #-------------------------------------------------------------------------------
 # Task
