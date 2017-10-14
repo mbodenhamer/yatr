@@ -44,7 +44,10 @@ class Context(Base):
                 self.opts[key] = Template(value).render(env)
 
     def run_command(self, command, env, **kwargs):
-        raise NotImplementedError
+        if self.inside:
+            ctx = env.contexts[self.inside]
+            command = ctx.run_command(command, env, **kwargs)
+        return command
             
 
 #-------------------------------------------------------------------------------
@@ -53,24 +56,18 @@ class Context(Base):
 #-----------------------------------------------------------
 # Bash
 
-# TODO
-
-# 1. No Popen here;  just implement run_command for each context, and do Popen in Command.run
-# 2. Pass env to run_command, for nested subclass lookups;  use attribute "inside"
-# 3. Validation in each Context subclass; check for invalid opts, etc.
-
 
 class Bash(Context):
     context_name = 'bash'
 
     def run_command(self, command, env, **kwargs):
         cmd = 'bash -c "{}"'.format(command)
-        
-        if self.inside:
-            ctx = env.contexts[self.inside]
-            cmd = ctx.run_command(cmd, env, **kwargs)
+        return super(Bash, self).run_command(cmd, env, **kwargs)
 
-        return cmd
+    def validate(self):
+        super(Bash, self).validate()
+
+        # TODO: check for invalid opts, etc.
 
 
 #-----------------------------------------------------------

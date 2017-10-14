@@ -1,5 +1,3 @@
-from nose.tools import assert_raises
-
 from yatr import Context
 from yatr.context import Bash
 
@@ -7,9 +5,6 @@ from yatr.context import Bash
 # Context
 
 def test_context():
-    c = Context()
-    assert_raises(NotImplementedError, c.run_command, 'foo', None)
-
     c2 = Context.from_yaml('foo', {})
     assert type(c2) is Context
 
