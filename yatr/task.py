@@ -76,8 +76,15 @@ class Task(Base):
         return [cmd.run_command(env, **kwargs) for cmd in self.commands]
 
     def run(self, env, **kwargs):
+        outs = []
+        errs = []
+
         for cmd in self.commands:
-            cmd.run(env, **kwargs)
+            out, err = cmd.run(env, **kwargs)
+            outs.append(out)
+            errs.append(err)
+
+        return outs, errs
 
 
 #-------------------------------------------------------------------------------

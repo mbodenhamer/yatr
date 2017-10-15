@@ -44,6 +44,7 @@ class Context(Base):
                 self.opts[key] = Template(value).render(env)
 
     def run_command(self, command, env, **kwargs):
+        # TODO: remove .name here and in Task
         if self.inside:
             ctx = env.contexts[self.inside]
             command = ctx.run_command(command, env, **kwargs)

@@ -1,7 +1,7 @@
 import os
 import imp
 import yaml
-from syn.base import Base, Attr
+from syn.base import Base, Attr, init_hook
 from syn.type import List, Dict
 from syn.five import STR
 
@@ -41,10 +41,13 @@ class Document(Base):
     _opts = dict(init_validate = True)
 
     @classmethod
-    def from_yaml(cls, path):
+    def from_file(cls, path):
         with open(path, 'r') as f:
             dct = yaml.load(f)
-        
+            return cls.from_yaml(dct)
+
+    @classmethod
+    def from_yaml(cls, dct):
         kwargs = {}
         get_delete(dct, kwargs, 'import', [], 'imports')
         get_delete(dct, kwargs, 'include', [], 'includes')
@@ -67,11 +70,18 @@ class Document(Base):
 
         return cls(**kwargs)
 
+    @init_hook
     def process(self, **kwargs):
         for path in self.imports:
+            if not os.path.exists(path):
+                raise ValidationError("Module path does not exist: {}"
+                                      .format(path))
             self.process_import(path, **kwargs)
 
         for path in self.includes:
+            if not os.path.isfile(path):
+                raise ValidationError("Include path does not exist: {}"
+                                      .format(path))
             self.process_include(path, **kwargs)
 
         for name in self.secrets:
@@ -106,21 +116,7 @@ class Document(Base):
 
     def validate(self):
         super(Document, self).validate()
-
-        # imports
-        for path in self.imports:
-            if not os.path.exists(path):
-                raise ValidationError("Module path does not exist: {}"
-                                      .format(path))
-
-        # includes
-        for path in self.includes:
-            if not os.path.isfile(path):
-                raise ValidationError("Include path does not exist: {}"
-                                      .format(path))
-                
-        # TODO: validate macros (make sure Template doesn't barf on init)
-
+        self.env.validate()
 
 
 #-------------------------------------------------------------------------------

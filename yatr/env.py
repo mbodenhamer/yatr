@@ -81,6 +81,15 @@ class Env(Base):
 
         self.default_context = env.default_context
 
+    def validate(self):
+        super(Env, self).validate()
+        
+        for name, ctx in self.contexts.items():
+            ctx.validate()
+
+        for name, task in self.tasks.items():
+            task.validate()
+
 
 #-------------------------------------------------------------------------------
 # __all__
