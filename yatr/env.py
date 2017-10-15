@@ -22,6 +22,7 @@ class Env(Base):
                   secret_values = Attr(Dict(STR), init=lambda self: dict()),
     
                   default_context = Attr(Context))
+    _opts = dict(init_validate = True)
 
     @init_hook
     def _init_populate(self):

@@ -1,16 +1,47 @@
-from yatr import Command, Task
+from nose.tools import assert_raises
+from yatr import Command, Task, Env, ValidationError
 
 #-------------------------------------------------------------------------------
 # Command
 
 def test_command():
-    Command
+    env = Env()
+    c = Command('ls', context='bash')
+    assert c.run_command(env) == 'bash -c "ls"'
+    c.resolve_macros({})
+    assert c.run_command(env) == 'bash -c "ls"'
+
+    env = Env()
+    c = Command('ls')
+    assert c.run_command(env) == 'ls'
+
+    env = Env(macros=dict(a='foo', b='bash'))
+    c = Command('ls {{a}}', context='{{b}}')
+    c.resolve_macros(env.macro_env())
+    assert c.run_command(env) == 'bash -c "ls foo"'
 
 #-------------------------------------------------------------------------------
 # Task
 
 def test_task():
-    Task
+    t = Task(name='foo', commands=[Command('{{a}}'),
+                                   Command('{{b}}')])
+    env = Env(macros=dict(a='ls', b='pwd'))
+
+    t.resolve_macros(env.macro_env())
+    assert t.run_commands(env) == ['ls', 'pwd']
+
+    
+    t = Task(name='foo', commands=[Command('ls')])
+    assert t == Task.from_yaml('foo', 'ls')
+
+    t = Task(name='foo', commands=[Command('ls'), Command('pwd')])
+    assert t == Task.from_yaml('foo', ['ls', 'pwd'])
+
+    t = Task(name='foo', commands=[Command('ls', context='bash')])
+    assert t == Task.from_yaml('foo', dict(command='ls', context='bash'))
+
+    assert_raises(ValidationError, Task.from_yaml, 'foo', 1)
 
 #-------------------------------------------------------------------------------
 
