@@ -15,6 +15,7 @@ from .base import ValidationError
 class Command(Base):
     _attrs = dict(command = Attr(STR),
                   context = Attr(STR, '')) # string used to look up context object in env
+    _opts = dict(init_validate = True)
 
     def resolve_macros(self, env, **kwargs):
         self.command = Template(self.command).render(env)
@@ -45,6 +46,7 @@ class Command(Base):
 class Task(Base):
     _attrs = dict(name = Attr(STR),
                   commands = Attr(List(Command)))
+    _opts = dict(init_validate = True)
 
     @classmethod
     def from_yaml(cls, name, dct):

@@ -25,14 +25,19 @@ class Env(Base):
 
     @init_hook
     def _init_populate(self):
+        if isinstance(self.macros, list):
+            self.update_macros(self.macros)
         self.macros.update(INITIAL_MACROS)
         self.contexts.update(BUILTIN_CONTEXTS)
 
         if not hasattr(self, 'default_context'):
-            self.default_context = self.contexts['bash']
+            self.default_context = self.contexts['null']
 
     def macro_env(self, **kwargs):
-        dct = dict(self.macros)
+        if isinstance(self.macros, list):
+            dct = {} # should only be here on object initialization
+        else:
+            dct = dict(self.macros)
         dct.update(self.secret_values)
         return dct
 
@@ -47,8 +52,11 @@ class Env(Base):
                 value = Template(template).render(env)
                 out[name] = value
                 env[name] = value
-                
-        self.macros.update(out)
+        
+        if isinstance(self.macros, list):
+            self.macros = dict(env)
+        else:
+            self.macros.update(out)
 
     def update_contexts(self, contexts, **kwargs):
         env = self.macro_env(**kwargs)

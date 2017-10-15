@@ -1,12 +1,14 @@
 from yatr import Context
-from yatr.context import Bash
+from yatr.context import Null, Bash
 
 #-------------------------------------------------------------------------------
 # Context
 
 def test_context():
-    c2 = Context.from_yaml('foo', {})
-    assert type(c2) is Context
+    c = Context.from_yaml('foo', {})
+    assert type(c) is Null
+    
+    assert c.run_command('ls', None) == 'ls'
 
 #-------------------------------------------------------------------------------
 # Bash
