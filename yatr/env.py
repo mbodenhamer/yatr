@@ -52,8 +52,7 @@ class Env(Base):
             env[name] = value
 
     def update_macros(self, macros, **kwargs):
-        # TODO: fix bug in syn.type to allow for empty dict to validate
-        if Dict(STR).query(macros) or macros == {}:
+        if Dict(STR).query(macros):
             for name in macros:
                 if name not in self.macro_ordering:
                     self.macro_ordering.append(name)

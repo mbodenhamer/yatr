@@ -36,6 +36,7 @@ def test_env():
                              b='ac',
                              c='dac',
                              d='dace')
+    assert e1.macro_ordering.index('d') == 3
 
     e2.macros['a'] = 'c'
     e1c.update(e2)
