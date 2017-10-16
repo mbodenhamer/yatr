@@ -23,9 +23,9 @@ def test_bash():
 
     assert b.env == dict(a='1', b='{{bar}}')
     assert b.opts == dict(v=True, foo='{{a}}')
-    b.resolve_macros(dict(a='4', bar='foo'))
-    assert b.env == dict(a='1', b='foo')
-    assert b.opts == dict(v=True, foo='4')
+    env, opts = b.resolve_macros(dict(a='4', bar='foo'))
+    assert env == dict(a='1', b='foo')
+    assert opts == dict(v=True, foo='4')
     
     assert b.run_command('ls', None) == 'bash -c "ls"'
 

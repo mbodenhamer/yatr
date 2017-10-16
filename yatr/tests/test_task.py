@@ -8,8 +8,6 @@ def test_command():
     env = Env()
     c = Command('ls', context='bash')
     assert c.run_command(env) == 'bash -c "ls"'
-    c.resolve_macros({})
-    assert c.run_command(env) == 'bash -c "ls"'
 
     env = Env()
     c = Command('ls')
@@ -17,28 +15,27 @@ def test_command():
 
     env = Env(macros=dict(a='foo', b='bash'))
     c = Command('ls {{a}}', context='{{b}}')
-    c.resolve_macros(env.macro_env())
     assert c.run_command(env) == 'bash -c "ls foo"'
+    assert c.command == 'ls {{a}}'
 
 #-------------------------------------------------------------------------------
 # Task
 
 def test_task():
-    t = Task(name='foo', commands=[Command('{{a}}'),
-                                   Command('{{b}}')])
-    env = Env(macros=dict(a='ls', b='pwd'))
+    t = Task(commands=[Command('{{a}}'),
+                       Command('{{b}}')])
 
-    t.resolve_macros(env.macro_env())
+    env = Env(macros=dict(a='ls', b='pwd'))
     assert t.run_commands(env) == ['ls', 'pwd']
 
     
-    t = Task(name='foo', commands=[Command('ls')])
+    t = Task(commands=[Command('ls')])
     assert t == Task.from_yaml('foo', 'ls')
 
-    t = Task(name='foo', commands=[Command('ls'), Command('pwd')])
+    t = Task(commands=[Command('ls'), Command('pwd')])
     assert t == Task.from_yaml('foo', ['ls', 'pwd'])
 
-    t = Task(name='foo', commands=[Command('ls', context='bash')])
+    t = Task(commands=[Command('ls', context='bash')])
     assert t == Task.from_yaml('foo', dict(command='ls', context='bash'))
 
     assert_raises(ValidationError, Task.from_yaml, 'foo', 1)

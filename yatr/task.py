@@ -1,12 +1,11 @@
 import shlex
-from jinja2 import Template
 from subprocess import Popen, PIPE
 
 from syn.base import Base, Attr
 from syn.type import List
 from syn.five import STR
 
-from .base import ValidationError
+from .base import ValidationError, resolve
 
 #-------------------------------------------------------------------------------
 # Command
@@ -19,20 +18,20 @@ class Command(Base):
                  args = ('command',))
 
     def resolve_macros(self, env, **kwargs):
-        self.command = Template(self.command).render(env)
-
-        if self.context:
-            self.context = Template(self.context).render(env)
+        command = resolve(self.command, env)
+        context = resolve(kwargs.get('context', self.context), env)
+        return command, context
 
     def run_command(self, env, **kwargs):
-        context_name = kwargs.get('context', self.context)
+        dct = env.macro_env(**kwargs)
+        command, context_name = self.resolve_macros(dct, **kwargs)
+
         if not context_name:
             context = env.default_context
         else:
             context = env.contexts[context_name]
 
-        dct = env.macro_env(**kwargs)
-        return context.run_command(self.command, dct, **kwargs)
+        return context.run_command(command, env, **kwargs)
 
     def run(self, env, **kwargs):
         cmd = self.run_command(env, **kwargs)
@@ -46,18 +45,17 @@ class Command(Base):
 
 
 class Task(Base):
-    _attrs = dict(name = Attr(STR),
-                  commands = Attr(List(Command)))
+    _attrs = dict(commands = Attr(List(Command)))
     _opts = dict(init_validate = True)
 
     @classmethod
     def from_yaml(cls, name, dct):
         if isinstance(dct, STR):
-            return cls(name=name, commands=[Command(dct)])
+            return cls(commands=[Command(dct)])
 
         elif List(STR).query(dct):
             cmds = [Command(s) for s in dct]
-            return cls(name=name, commands=cmds)
+            return cls(commands=cmds)
 
         elif isinstance(dct, dict):
             if set(dct.keys()) == {'context', 'command'}:
@@ -67,10 +65,6 @@ class Task(Base):
                 return ret
 
         raise ValidationError('Invalid data for task: {}'.format(name))
-
-    def resolve_macros(self, env, **kwargs):
-        for cmd in self.commands:
-            cmd.resolve_macros(env, **kwargs)
 
     def run_commands(self, env, **kwargs):
         return [cmd.run_command(env, **kwargs) for cmd in self.commands]

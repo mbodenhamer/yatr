@@ -1,8 +1,8 @@
-from jinja2 import Template
-
 from syn.base import Base, Attr, create_hook
 from syn.type import Dict
 from syn.five import STR
+
+from .base import resolve
 
 #-------------------------------------------------------------------------------
 
@@ -14,8 +14,7 @@ CONTEXT_REGISTRY = {}
 
 class Context(Base):
     context_name = None
-    _attrs = dict(name = Attr(STR, ''),
-                  inside = Attr(STR, ''),
+    _attrs = dict(inside = Attr(STR, ''),
                   env = Attr(Dict(STR), init=lambda self: dict()),
                   opts = Attr(dict, init=lambda self: dict()))
     _opts = dict(init_validate = True)
@@ -28,23 +27,27 @@ class Context(Base):
 
     @classmethod
     def from_yaml(cls, name, dct):
-        kwargs = dict(name=name)
+        kwargs = {}
         kwargs['env'] = dct.get('env', {})
         kwargs['opts'] = dct.get('opts', {})
 
+        # TODO: if invalid context specified, raise ValidationError
         cls_ = CONTEXT_REGISTRY.get(dct.get('instanceof', 'null'), cls)
         return cls_(**kwargs)
 
     def resolve_macros(self, env, **kwargs):
+        env_ = dict(self.env)
         for key , value in self.env.items():
-            self.env[key] = Template(value).render(env)
+            env_[key] = resolve(value, env)
 
+        opts = dict(self.opts)
         for key, value in self.opts.items():
             if isinstance(value, STR):
-                self.opts[key] = Template(value).render(env)
+                opts[key] = resolve(value, env)
+
+        return env_, opts
 
     def run_command(self, command, env, **kwargs):
-        # TODO: remove .name here and in Task
         if self.inside:
             ctx = env.contexts[self.inside]
             command = ctx.run_command(command, env, **kwargs)
@@ -98,10 +101,10 @@ class SSH(Context):
 
 #-----------------------------------------------------------
 
-BUILTIN_CONTEXTS = dict(null = Null(name='null'),
-                        bash = Bash(name='bash'),
-                        docker = Docker(name='docker'),
-                        ssh = SSH(name='ssh'))
+BUILTIN_CONTEXTS = dict(null = Null(),
+                        bash = Bash(),
+                        docker = Docker(),
+                        ssh = SSH())
 
 #-------------------------------------------------------------------------------
 # __all__

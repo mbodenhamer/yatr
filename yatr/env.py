@@ -60,17 +60,11 @@ class Env(Base):
             self.macros.update(out)
 
     def update_contexts(self, contexts, **kwargs):
-        env = self.macro_env(**kwargs)
-
         for name, ctx in contexts.items():
-            ctx.resolve_macros(env, **kwargs)
             self.contexts[name] = ctx
 
     def update_tasks(self, tasks, **kwargs):
-        env = self.macro_env(**kwargs)
-
         for name, task in tasks.items():
-            task.resolve_macros(env, **kwargs)
             self.tasks[name] = task
 
     def update(self, env, **kwargs):
