@@ -15,7 +15,7 @@ CONTEXT_REGISTRY = {}
 class Context(Base):
     context_name = None
     _attrs = dict(inside = Attr(STR, ''),
-                  env = Attr(Dict(STR), init=lambda self: dict()),
+                  envvars = Attr(Dict(STR), init=lambda self: dict()),
                   opts = Attr(dict, init=lambda self: dict()))
     _opts = dict(init_validate = True)
 
@@ -28,7 +28,7 @@ class Context(Base):
     @classmethod
     def from_yaml(cls, name, dct):
         kwargs = {}
-        kwargs['env'] = dct.get('env', {})
+        kwargs['envvars'] = dct.get('env', {})
         kwargs['opts'] = dct.get('opts', {})
 
         # TODO: if invalid context specified, raise ValidationError
@@ -36,16 +36,16 @@ class Context(Base):
         return cls_(**kwargs)
 
     def resolve_macros(self, env, **kwargs):
-        env_ = dict(self.env)
-        for key , value in self.env.items():
-            env_[key] = resolve(value, env)
+        envvars = dict(self.envvars)
+        for key , value in self.envvars.items():
+            envvars[key] = env.resolve(value)
 
         opts = dict(self.opts)
         for key, value in self.opts.items():
             if isinstance(value, STR):
-                opts[key] = resolve(value, env)
+                opts[key] = env.resolve(value)
 
-        return env_, opts
+        return envvars, opts
 
     def run_command(self, command, env, **kwargs):
         if self.inside:

@@ -25,25 +25,25 @@ def test_env():
 
     e0 = deepcopy(e1)
     e0.resolve_macros()
-    assert e0.macros == dict(a='b',
-                             b='bc',
-                             c='dbc')
+    assert e0.env == dict(a='b',
+                          b='bc',
+                          c='dbc')
 
     e1.update(e2)
     e1c = deepcopy(e1)
     e1.resolve_macros()
-    assert e1.macros == dict(a='a',
-                             b='ac',
-                             c='dac',
-                             d='dace')
+    assert e1.env == dict(a='a',
+                          b='ac',
+                          c='dac',
+                          d='dace')
 
     e2.macros['a'] = 'c'
     e1c.update(e2)
     e1c.resolve_macros()
-    assert e1c.macros == dict(a='c',
-                              b='cc',
-                              c='dcc',
-                              d='dcce')
+    assert e1c.env == dict(a='c',
+                           b='cc',
+                           c='dcc',
+                           d='dcce')
 
 
 #-------------------------------------------------------------------------------

@@ -15,11 +15,18 @@ INITIAL_MACROS = {}
 
 
 class Env(Base):
-    _attrs = dict(macros = Attr(Dict(STR), init=lambda self: dict()),
-                  contexts = Attr(Dict(Context), init=lambda self: dict()),
-                  tasks = Attr(Dict(Task), init=lambda self: dict()),
-                  secret_values = Attr(Dict(STR), init=lambda self: dict()),
-                  default_context = Attr(Context))
+    _attrs = dict(macros = Attr(Dict(STR), init=lambda self: dict(),
+                                doc='Macro definitions'),
+                  contexts = Attr(Dict(Context), init=lambda self: dict(),
+                                  doc='Execution context definitions'),
+                  tasks = Attr(Dict(Task), init=lambda self: dict(),
+                               doc='Task definitions'),
+                  secret_values = Attr(Dict(STR), init=lambda self: dict(),
+                                       doc='Secret value store'),
+                  env = Attr(Dict(STR), init=lambda self: dict(),
+                             doc='Current name resolution environment'),
+                  default_context = Attr(Context, doc='Execution context to use '
+                                         'if none is specified in task definition'))
     _opts = dict(init_validate = True)
 
     @init_hook
@@ -38,9 +45,11 @@ class Env(Base):
     def resolve_macros(self, **kwargs):
         env = self.macro_env(**kwargs)
         for name, template in ordered_macros(self.macros):
-            value = resolve(template, env)
-            self.macros[name] = value
-            env[name] = value
+            env[name] = resolve(template, env)
+        self.env = env
+
+    def resolve(self, template):
+        return resolve(template, self.env)
 
     def update(self, env, **kwargs):
         self.secret_values.update(env.secret_values)

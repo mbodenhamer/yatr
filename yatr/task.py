@@ -5,7 +5,7 @@ from syn.base import Base, Attr
 from syn.type import List
 from syn.five import STR
 
-from .base import ValidationError, resolve
+from .base import ValidationError
 
 #-------------------------------------------------------------------------------
 # Command
@@ -18,13 +18,12 @@ class Command(Base):
                  args = ('command',))
 
     def resolve_macros(self, env, **kwargs):
-        command = resolve(self.command, env)
-        context = resolve(kwargs.get('context', self.context), env)
+        command = env.resolve(self.command)
+        context = env.resolve(kwargs.get('context', self.context))
         return command, context
 
     def run_command(self, env, **kwargs):
-        dct = env.macro_env(**kwargs)
-        command, context_name = self.resolve_macros(dct, **kwargs)
+        command, context_name = self.resolve_macros(env, **kwargs)
 
         if not context_name:
             context = env.default_context
@@ -73,6 +72,7 @@ class Task(Base):
         outs = []
         errs = []
 
+        env.resolve_macros(**kwargs)
         for cmd in self.commands:
             out, err = cmd.run(env, **kwargs)
             outs.append(out)

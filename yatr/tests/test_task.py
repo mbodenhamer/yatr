@@ -14,6 +14,7 @@ def test_command():
     assert c.run_command(env) == 'ls'
 
     env = Env(macros=dict(a='foo', b='bash'))
+    env.resolve_macros()
     c = Command('ls {{a}}', context='{{b}}')
     assert c.run_command(env) == 'bash -c "ls foo"'
     assert c.command == 'ls {{a}}'
@@ -26,6 +27,7 @@ def test_task():
                        Command('{{b}}')])
 
     env = Env(macros=dict(a='ls', b='pwd'))
+    env.resolve_macros()
     assert t.run_commands(env) == ['ls', 'pwd']
 
     
