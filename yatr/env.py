@@ -1,9 +1,8 @@
-from syn.base_utils import topological_sorting
 from syn.base import Base, Attr, init_hook
-from syn.type import Dict, List
+from syn.type import Dict
 from syn.five import STR
 
-from .base import resolve, ordering_relations, nested_order_relations 
+from .base import resolve, ordered_macros
 from .context import Context, BUILTIN_CONTEXTS
 from .task import Task
 
@@ -17,7 +16,6 @@ INITIAL_MACROS = {}
 
 class Env(Base):
     _attrs = dict(macros = Attr(Dict(STR), init=lambda self: dict()),
-                  macro_ordering = Attr(List(STR), init=lambda self: list()),
                   contexts = Attr(Dict(Context), init=lambda self: dict()),
                   tasks = Attr(Dict(Task), init=lambda self: dict()),
                   secret_values = Attr(Dict(STR), init=lambda self: dict()),
@@ -26,18 +24,11 @@ class Env(Base):
 
     @init_hook
     def _init_populate(self):
-        self._init_macro_order()
-
+        self.macros.update(INITIAL_MACROS)
         self.contexts.update(BUILTIN_CONTEXTS)
+
         if not hasattr(self, 'default_context'):
             self.default_context = self.contexts['null']
-
-    def _init_macro_order(self):
-        self.update_macros(self.macros, init=True)
-
-        self.macros.update(INITIAL_MACROS)
-        for name in INITIAL_MACROS:
-            self.macro_ordering.insert(0, name)
 
     def macro_env(self, **kwargs):
         dct = dict(self.macros)
@@ -46,46 +37,16 @@ class Env(Base):
 
     def resolve_macros(self, **kwargs):
         env = self.macro_env(**kwargs)
-        for name in self.macro_ordering:
-            value = resolve(self.macros[name], env)
+        for name, template in ordered_macros(self.macros):
+            value = resolve(template, env)
             self.macros[name] = value
             env[name] = value
 
-    def update_macros(self, macros, **kwargs):
-        if Dict(STR).query(macros):
-            for name in macros:
-                if name not in self.macro_ordering:
-                    self.macro_ordering.append(name)
-            self.macros.update(macros)
-            
-        elif List(Dict(STR)).query(macros):
-            rels = ordering_relations(self.macro_ordering)
-            rels.extend(nested_order_relations(macros))
-
-            if kwargs.get('init', False):
-                self.macros = {}
-
-            for dct in macros:
-                self.macros.update(dct)
-
-            self.macro_ordering = topological_sorting(self.macros, rels)
-        
-        else:
-            raise TypeError('Invalid macros type: {}'.format(macros))
-
-    def update_contexts(self, contexts, **kwargs):
-        for name, ctx in contexts.items():
-            self.contexts[name] = ctx
-
-    def update_tasks(self, tasks, **kwargs):
-        for name, task in tasks.items():
-            self.tasks[name] = task
-
     def update(self, env, **kwargs):
         self.secret_values.update(env.secret_values)
-        self.update_macros(env.macros, **kwargs)
-        self.update_contexts(env.contexts, **kwargs)
-        self.update_tasks(env.tasks, **kwargs)
+        self.macros.update(env.macros)
+        self.contexts.update(env.contexts)
+        self.tasks.update(env.tasks)
 
         self.default_context = env.default_context
 

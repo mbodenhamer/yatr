@@ -17,9 +17,9 @@ def test_env():
         assert not e.tasks
         assert not e.secret_values
 
-    e1 = Env(macros = [dict(a='b'),
-                       dict(b='{{a}}c'),
-                       dict(c='d{{b}}')])
+    e1 = Env(macros = dict(a='b',
+                           b='{{a}}c',
+                           c='d{{b}}'))
     e2 = Env(macros = dict(a='a',
                            d='{{c}}e'))
 
@@ -36,7 +36,6 @@ def test_env():
                              b='ac',
                              c='dac',
                              d='dace')
-    assert e1.macro_ordering.index('d') == 3
 
     e2.macros['a'] = 'c'
     e1c.update(e2)

@@ -1,7 +1,5 @@
-from jinja2 import Template
-from itertools import product
-from syn.base_utils import Precedes
-from syn.five import xrange
+from jinja2 import Template, Environment, meta
+from syn.base_utils import Precedes, topological_sorting
 
 #-------------------------------------------------------------------------------
 
@@ -14,28 +12,25 @@ class ValidationError(Exception):
 def resolve(template, env):
     if '{{' in template:
         return Template(template).render(env)
-    elif '{' in template:
-        return template.format(**env)
     return template
 
-def ordering_relations(lst):
-    if len(lst) < 2:
-        return []
+def variables(template):
+    env = Environment()
+    return meta.find_undeclared_variables(env.parse(template))
 
+def order_relations_from_macros(macros):
     out = []
-    for k in xrange(len(lst) - 1):
-        out.append(Precedes(lst[k], lst[k+1]))
+    for name, template in macros.items():
+        for var in variables(template):
+            out.append(Precedes(var, name))
     return out
 
-def nested_order_relations(lst):
-    if len(lst) < 2:
-        return []
+def ordered_macros(macros):
+    rels = order_relations_from_macros(macros)
+    names = topological_sorting(macros, rels)
 
-    out = []
-    for k in xrange(len(lst) -1):
-        for a, b in product(lst[k], lst[k+1]):
-            out.append(Precedes(a, b))
-    return out
+    for name in names:
+        yield name, macros[name]
 
 #-------------------------------------------------------------------------------
 # __all__
