@@ -12,7 +12,7 @@ def resolve(template, env):
     if '{{' in template:
         return Template(template).render(env)
     elif '{' in template:
-        return template.format(env)
+        return template.format(**env)
     return template
 
 #-------------------------------------------------------------------------------
