@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from yatr import Env
 from yatr import env as ye
 from syn.base_utils import assign
@@ -21,18 +23,27 @@ def test_env():
     e2 = Env(macros = dict(a='a',
                            d='{{c}}e'))
 
-    e1.update(e2)
-    assert e1.macros == dict(a='a',
+    e0 = deepcopy(e1)
+    e0.resolve_macros()
+    assert e0.macros == dict(a='b',
                              b='bc',
-                             c='dbc',
-                             d='dbce')
+                             c='dbc')
+
+    e1.update(e2)
+    e1c = deepcopy(e1)
+    e1.resolve_macros()
+    assert e1.macros == dict(a='a',
+                             b='ac',
+                             c='dac',
+                             d='dace')
 
     e2.macros['a'] = 'c'
-    e1.update(e2)
-    assert e1.macros == dict(a='c',
-                             b='bc',
-                             c='dbc',
-                             d='dbce')
+    e1c.update(e2)
+    e1c.resolve_macros()
+    assert e1c.macros == dict(a='c',
+                              b='cc',
+                              c='dcc',
+                              d='dcce')
 
 
 #-------------------------------------------------------------------------------

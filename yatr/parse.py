@@ -90,6 +90,7 @@ class Document(Base):
         env = Env(macros=self.macros, contexts=self.contexts, tasks=self.tasks,
                   secret_values=self.secret_values)
         self.env.update(env, **kwargs)
+        self.env.resolve_macros(**kwargs)
 
     def process_import(self, path, **kwargs):
         mod = imp.load_source('yatr_module_import', path)
