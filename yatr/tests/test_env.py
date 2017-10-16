@@ -1,4 +1,5 @@
 from copy import deepcopy
+from nose.tools import assert_raises
 
 from yatr import Env
 from yatr import env as ye
@@ -22,6 +23,7 @@ def test_env():
                            c='d{{b}}'))
     e2 = Env(macros = dict(a='a',
                            d='{{c}}e'))
+    e3 = Env(macros = dict(a = '{{d}}'))
 
     e0 = deepcopy(e1)
     e0.resolve_macros()
@@ -39,12 +41,15 @@ def test_env():
 
     e2.macros['a'] = 'c'
     e1c.update(e2)
+    e1c2 = deepcopy(e1c)
     e1c.resolve_macros()
     assert e1c.env == dict(a='c',
                            b='cc',
                            c='dcc',
                            d='dcce')
 
+    e1c2.update(e3)
+    assert_raises(ValueError, e1c2.resolve_macros)
 
 #-------------------------------------------------------------------------------
 

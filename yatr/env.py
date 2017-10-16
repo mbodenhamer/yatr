@@ -44,6 +44,7 @@ class Env(Base):
 
     def resolve_macros(self, **kwargs):
         env = self.macro_env(**kwargs)
+        # TODO: better error message if there is a cycle
         for name, template in ordered_macros(self.macros):
             env[name] = resolve(template, env)
         self.env = env
