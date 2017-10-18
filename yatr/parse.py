@@ -31,8 +31,7 @@ class Document(Base):
     _attrs = dict(imports = Attr(List(STR), init=lambda self:list()),
                   includes = Attr(List(STR), init=lambda self: list()),
                   secrets = Attr(List(STR), init=lambda self: list()),
-                  macros = Attr((Dict(STR), List(Dict(STR))), 
-                                init=lambda self: dict()),
+                  macros = Attr(Dict((STR, int)), init=lambda self: dict()),
                   contexts = Attr(Dict(Context), init=lambda self: dict()),
                   tasks = Attr(Dict(Task), init=lambda self: dict()),
                   secret_values = Attr(Dict(STR), init=lambda self: dict()),
@@ -41,7 +40,7 @@ class Document(Base):
     _opts = dict(init_validate = True)
 
     @classmethod
-    def from_file(cls, path):
+    def from_path(cls, path):
         with open(path, 'r') as f:
             dct = yaml.load(f)
             return cls.from_yaml(dct)
@@ -103,16 +102,15 @@ class Document(Base):
     def process_include(self, path, **kwargs):
         # TODO: support for ':' in path to restrict include scope
         # TODO: when implementing :-support, will need to modify path validation
-        doc = Document.from_yaml(path)
+        doc = Document.from_path(path)
         doc.process(**kwargs)
         self.env.update(doc.env, **kwargs)
 
     def process_secret(self, name, **kwargs):
-        test = kwargs.get('test', False)
-        if test:
-            self.secret_values[name] = name + '_secret'
-        else:
-            raise NotImplementedError('Secrets currently unsupported')
+        raise NotImplementedError('Secrets currently unsupported')
+
+    def run(self, name, **kwargs):
+        return self.tasks[name].run(self.env, **kwargs)
 
     def validate(self):
         super(Document, self).validate()

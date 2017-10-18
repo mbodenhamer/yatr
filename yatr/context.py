@@ -84,6 +84,14 @@ class Bash(Context):
 
 
 #-----------------------------------------------------------
+# CD
+
+# Example: cd .. to then rsync the repo
+class CD(Context):
+    context_name = 'cd'
+
+
+#-----------------------------------------------------------
 # Docker
 
 
@@ -103,6 +111,7 @@ class SSH(Context):
 
 BUILTIN_CONTEXTS = dict(null = Null(),
                         bash = Bash(),
+                        cd = CD(),
                         docker = Docker(),
                         ssh = SSH())
 

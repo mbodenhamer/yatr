@@ -17,8 +17,8 @@ def test_task():
     else:
         strs = outs
 
-    assert strs[0].decode('utf-8').split()[0] == 'Python'
-    assert strs[0].decode('utf-8').split()[1] == sys.version.split()[0]
+    assert strs[0].split()[0] == 'Python'
+    assert strs[0].split()[1] == sys.version.split()[0]
 
 #-------------------------------------------------------------------------------
 

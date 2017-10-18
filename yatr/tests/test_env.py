@@ -23,7 +23,7 @@ def test_env():
                            c='d{{b}}'))
     e2 = Env(macros = dict(a='a',
                            d='{{c}}e'))
-    e3 = Env(macros = dict(a = '{{d}}'))
+    e3 = Env(macros = dict(a='{{d}}'))
 
     e0 = deepcopy(e1)
     e0.resolve_macros()

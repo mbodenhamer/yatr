@@ -15,7 +15,7 @@ INITIAL_MACROS = {}
 
 
 class Env(Base):
-    _attrs = dict(macros = Attr(Dict(STR), init=lambda self: dict(),
+    _attrs = dict(macros = Attr(Dict((STR, int)), init=lambda self: dict(),
                                 doc='Macro definitions'),
                   contexts = Attr(Dict(Context), init=lambda self: dict(),
                                   doc='Execution context definitions'),

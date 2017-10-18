@@ -36,6 +36,9 @@ class Command(Base):
         cmd = self.run_command(env, **kwargs)
         p = Popen(shlex.split(cmd), stdout=PIPE, stderr=PIPE)
         out, err = p.communicate()
+        out = out.decode('utf-8') if out else ''
+        err = err.decode('utf-8') if err else ''
+        # TODO: return return code
         return out, err
         
 

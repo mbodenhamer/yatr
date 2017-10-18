@@ -13,3 +13,7 @@ def main():
         INITIAL_MACROS[key] = arg
 
     # execute
+
+    # TODO: if validate, do nothing other than doc.env.resolve_macros()
+
+    # TODO: show command, which dumps specified variables or all (if none specified)
