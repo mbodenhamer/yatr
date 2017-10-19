@@ -29,36 +29,38 @@ def test_get_delete():
 # Document
 
 def test_document():
-    d = Document()
+    d = Document(dirname=DIR)
     assert not d.tasks
 
-    d = Document.from_yaml({})
+    d = Document.from_yaml({}, DIR)
     assert not d.tasks
 
     d = Document.from_yaml(dict(contexts=dict(bash1=dict(instanceof='bash')),
-                                tasks=dict(dir='pwd')))
+                                tasks=dict(dir='pwd')),
+                           DIR)
     outs, errs = d.run('dir')
     assert errs == ['']
     assert outs == [os.getcwd() + '\n']
 
     path = os.path.join(DIR, 'mod1.py')
-    assert_raises(ImportError, Document.from_yaml, {'import': [path]})
+    assert_raises(ImportError, Document.from_yaml, {'import': [path]}, DIR)
 
     assert 'foo' not in yc.CONTEXT_REGISTRY
     path = os.path.join(DIR, 'mod2.py')
-    d = Document.from_yaml({'import': [path]})
+    d = Document.from_yaml({'import': [path]}, DIR)
     assert 'foo' in d.env.contexts
     assert 'foo' in yc.CONTEXT_REGISTRY
 
     path = os.path.join(DIR, 'yatrfile1.yml')
     d = Document.from_yaml(dict(include=[path],
-                                macros=dict(a=3)))
+                                macros=dict(a=3)),
+                           DIR)
     assert d.env.macros == dict(a=3, b=2)
 
-    assert_raises(ValidationError, Document.from_yaml, dict(foo='a'))
-    assert_raises(ValidationError, Document.from_yaml, dict(include=['/foo/bar']))
-    assert_raises(ValidationError, Document.from_yaml, {'import': ['/foo/bar']})
-    assert_raises(NotImplementedError, Document.from_yaml, dict(secrets=['a']))
+    assert_raises(ValidationError, Document.from_yaml, dict(foo='a'), DIR)
+    assert_raises(ValidationError, Document.from_yaml, dict(include=['/foo/bar']), DIR)
+    assert_raises(ValidationError, Document.from_yaml, {'import': ['/foo/bar']}, DIR)
+    assert_raises(NotImplementedError, Document.from_yaml, dict(secrets=['a']), DIR)
 
 #-------------------------------------------------------------------------------
 

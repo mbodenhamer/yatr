@@ -1,0 +1,8 @@
+include:
+  - yatrfile1.yml
+
+macros:
+  c: "{{b}}ghi"
+
+tasks:
+  print: "echo {{c}} {{_1}}"

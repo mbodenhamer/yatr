@@ -75,7 +75,6 @@ class Task(Base):
         outs = []
         errs = []
 
-        env.resolve_macros(**kwargs)
         for cmd in self.commands:
             out, err = cmd.run(env, **kwargs)
             outs.append(out)

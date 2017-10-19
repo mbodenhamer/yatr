@@ -1,10 +1,11 @@
+import shlex
 from subprocess import Popen, PIPE
 from yatr import __version__ as yver
 
 #-------------------------------------------------------------------------------
 
 def test_invocation():
-    p = Popen('yatr', stdout=PIPE)
+    p = Popen(shlex.split('yatr --version'), stdout=PIPE)
     out = p.communicate()[0].decode('utf-8').strip()
     assert out == 'yatr {}'.format(yver)
     assert p.returncode == 0

@@ -1,6 +1,7 @@
 import os
 import imp
 import yaml
+from syn.base_utils import chdir
 from syn.base import Base, Attr, init_hook
 from syn.type import List, Dict
 from syn.five import STR
@@ -36,6 +37,7 @@ class Document(Base):
                   tasks = Attr(Dict(Task), init=lambda self: dict()),
                   secret_values = Attr(Dict(STR), init=lambda self: dict()),
                   env = Attr(Env, init=lambda self: Env(), internal=True),
+                  dirname = Attr(STR, doc='Relative path for includes'),
                  )
     _opts = dict(init_validate = True)
 
@@ -43,10 +45,10 @@ class Document(Base):
     def from_path(cls, path):
         with open(path, 'r') as f:
             dct = yaml.load(f)
-            return cls.from_yaml(dct)
+            return cls.from_yaml(dct, os.path.abspath(os.path.dirname(path)))
 
     @classmethod
-    def from_yaml(cls, dct):
+    def from_yaml(cls, dct, dirname):
         kwargs = {}
         get_delete(dct, kwargs, 'import', [], 'imports')
         get_delete(dct, kwargs, 'include', [], 'includes')
@@ -67,21 +69,23 @@ class Document(Base):
             kwargs['tasks'][key] = \
                 Task.from_yaml(key, kwargs['tasks'][key])
 
+        kwargs['dirname'] = dirname
         return cls(**kwargs)
 
     @init_hook
     def process(self, **kwargs):
-        for path in self.imports:
-            if not os.path.exists(path):
-                raise ValidationError("Module path does not exist: {}"
-                                      .format(path))
-            self.process_import(path, **kwargs)
+        with chdir(self.dirname):
+            for path in self.imports:
+                if not os.path.exists(path):
+                    raise ValidationError("Module path does not exist: {}"
+                                          .format(path))
+                self.process_import(path, **kwargs)
 
-        for path in self.includes:
-            if not os.path.isfile(path):
-                raise ValidationError("Include path does not exist: {}"
-                                      .format(path))
-            self.process_include(path, **kwargs)
+            for path in self.includes:
+                if not os.path.isfile(path):
+                    raise ValidationError("Include path does not exist: {}"
+                                          .format(path))
+                self.process_include(path, **kwargs)
 
         for name in self.secrets:
             self.process_secret(name, **kwargs)
