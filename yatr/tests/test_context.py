@@ -1,4 +1,6 @@
-from yatr import Context, Env
+from nose.tools import assert_raises
+
+from yatr import Context, Env, ValidationError
 from yatr.context import Null, Bash
 
 #-------------------------------------------------------------------------------
@@ -30,6 +32,24 @@ def test_bash():
     assert opts == dict(v=True, foo='4')
     
     assert b.run_command('ls', env) == 'bash -c "ls"'
+
+#-------------------------------------------------------------------------------
+# SSH
+
+def test_ssh():
+    env = Env()
+    assert_raises(ValidationError, Context.from_yaml,
+                  'foo', dict(instanceof='ssh'))
+                                      
+    s = Context.from_yaml('foo', dict(instanceof='ssh',
+                                      opts=dict(user='foo',
+                                                hostname='bar')))
+    assert s.run_command('ls', env) == 'ssh foo@bar "ls"'
+
+    env.contexts['foo'] = s
+    sb = Context.from_yaml('bar', dict(instanceof='bash',
+                                       inside='foo'))
+    assert sb.run_command('ls', env) == 'ssh foo@bar "bash -c \"ls\""'
 
 #-------------------------------------------------------------------------------
 
