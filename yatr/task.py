@@ -38,8 +38,7 @@ class Command(Base):
         out, err = p.communicate()
         out = out.decode('utf-8') if out else ''
         err = err.decode('utf-8') if err else ''
-        # TODO: return return code
-        return out, err
+        return out, err, p.returncode
         
 
 #-------------------------------------------------------------------------------
@@ -74,13 +73,15 @@ class Task(Base):
     def run(self, env, **kwargs):
         outs = []
         errs = []
+        codes = []
 
         for cmd in self.commands:
-            out, err = cmd.run(env, **kwargs)
+            out, err, code = cmd.run(env, **kwargs)
             outs.append(out)
             errs.append(err)
+            codes.append(code)
 
-        return outs, errs
+        return outs, errs, codes
 
 
 #-------------------------------------------------------------------------------

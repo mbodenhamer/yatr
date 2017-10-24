@@ -83,7 +83,7 @@ def _main(*args):
             print('{} = {}'.format(name, doc.env.env[name]))
 
     if opts.task:
-        outs, errs = doc.run(opts.task)
+        outs, errs, codes = doc.run(opts.task)
         for out in outs:
             sys.stdout.write(out)
         sys.stdout.flush()

@@ -10,7 +10,7 @@ def test_task():
     t = Task(name='foo', commands=[c])
 
     env = Env()
-    outs, errs = t.run(env)
+    outs, errs, codes = t.run(env)
 
     if PY2:
         strs = errs
