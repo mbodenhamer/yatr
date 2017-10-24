@@ -1,11 +1,8 @@
-import shlex
-from subprocess import Popen, PIPE
-
 from syn.base import Base, Attr
 from syn.type import List
 from syn.five import STR
 
-from .base import ValidationError
+from .base import ValidationError, command
 
 #-------------------------------------------------------------------------------
 # Command
@@ -34,12 +31,7 @@ class Command(Base):
 
     def run(self, env, **kwargs):
         cmd = self.run_command(env, **kwargs)
-        p = Popen(shlex.split(cmd), stdout=PIPE, stderr=PIPE)
-        out, err = p.communicate()
-        out = out.decode('utf-8') if out else ''
-        err = err.decode('utf-8') if err else ''
-        return out, err, p.returncode
-        
+        return command(cmd)
 
 #-------------------------------------------------------------------------------
 # Task

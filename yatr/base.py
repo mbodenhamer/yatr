@@ -1,3 +1,5 @@
+import shlex
+from subprocess import Popen, PIPE
 from jinja2 import Template, Environment, meta
 from syn.base_utils import Precedes, topological_sorting
 
@@ -31,6 +33,13 @@ def ordered_macros(macros):
 
     for name in names:
         yield name, macros[name]
+
+def command(cmd, shell=False):
+    p = Popen(shlex.split(cmd), stdout=PIPE, stderr=PIPE, shell=shell)
+    out, err = p.communicate()
+    out = out.decode('utf-8') if out else ''
+    err = err.decode('utf-8') if err else ''
+    return out, err, p.returncode
 
 #-------------------------------------------------------------------------------
 # __all__
