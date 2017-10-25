@@ -1,4 +1,7 @@
+import os
 import shlex
+import hashlib
+import requests
 from subprocess import Popen, PIPE
 from jinja2 import Template, Environment, meta
 from syn.base_utils import Precedes, topological_sorting
@@ -40,6 +43,29 @@ def command(cmd, shell=False):
     out = out.decode('utf-8') if out else ''
     err = err.decode('utf-8') if err else ''
     return out, err, p.returncode
+
+def download(url, path):
+    req = requests.get(url)
+    with open(path, 'wb') as f:
+        for data in req.iter_content():
+            f.write(data)
+
+def resolve_url(url, cachedir=None, force=False):
+    if '://' in url:
+        if cachedir is None:
+            cachedir = os.path.expanduser('~/.yatr')
+
+            if not os.path.isdir(cachedir):
+                os.mkdir(cachedir)
+
+        fname = hashlib.sha224(url.encode('utf-8')).hexdigest()
+        fpath = os.path.join(cachedir, fname)
+
+        if not os.path.isfile(fpath) or force:
+            download(url, fpath)
+
+        return fpath
+    return url
 
 #-------------------------------------------------------------------------------
 # __all__
