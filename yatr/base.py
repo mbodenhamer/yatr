@@ -5,6 +5,7 @@ import requests
 from subprocess import Popen, PIPE
 from jinja2 import Template, Environment, meta
 from syn.base_utils import Precedes, topological_sorting
+from syn.five import STR
 
 #-------------------------------------------------------------------------------
 
@@ -15,8 +16,9 @@ class ValidationError(Exception):
 # Utilities
 
 def resolve(template, env):
-    if '{{' in template:
-        return Template(template).render(env)
+    if isinstance(template, STR):
+        if '{{' in template:
+            return Template(template).render(env)
     return template
 
 def variables(template):
@@ -35,7 +37,8 @@ def ordered_macros(macros):
     names = topological_sorting(macros, rels)
 
     for name in names:
-        yield name, macros[name]
+        if name in macros:
+            yield name, macros[name]
 
 def command(cmd, shell=False):
     p = Popen(shlex.split(cmd), stdout=PIPE, stderr=PIPE, shell=shell)

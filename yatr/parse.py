@@ -1,13 +1,12 @@
 import os
 import imp
 import yaml
-from functools import partial
 from syn.base_utils import chdir
 from syn.base import Base, Attr, init_hook
 from syn.type import List, Dict
 from syn.five import STR
 
-from .base import ValidationError, resolve_url
+from .base import ValidationError, resolve_url, resolve, ordered_macros
 from .context import Context
 from .task import Task
 from .env import Env
@@ -75,15 +74,21 @@ class Document(Base):
 
     @init_hook
     def process(self, **kwargs):
+        pre_macros = dict(self.macros)
+        for name, macro in ordered_macros(pre_macros):
+            pre_macros[name] = resolve(macro, pre_macros)
+
+        def process(path):
+            return resolve_url(resolve(path, pre_macros))
+
         with chdir(self.dirname):
-            resolve = partial(resolve_url, force=self.pull)
-            for path in map(resolve, self.imports):
+            for path in map(process, self.imports):
                 if not os.path.exists(path):
                     raise ValidationError("Module path does not exist: {}"
                                           .format(path))
                 self.process_import(path, **kwargs)
 
-            for path in map(resolve, self.includes):
+            for path in map(process, self.includes):
                 if not os.path.isfile(path):
                     raise ValidationError("Include path does not exist: {}"
                                           .format(path))
