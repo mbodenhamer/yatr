@@ -5,6 +5,7 @@ Changelog
 ~~~~~~~~~~~~~~~~~~
 
 * Added conditional task execution.
+* Added URL support for includes and imports.
 
 0.0.1 (2017-10-18)
 ~~~~~~~~~~~~~~~~~~
