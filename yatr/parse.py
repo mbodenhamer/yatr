@@ -1,12 +1,13 @@
 import os
 import imp
 import yaml
+from functools import partial
 from syn.base_utils import chdir
 from syn.base import Base, Attr, init_hook
 from syn.type import List, Dict
 from syn.five import STR
 
-from .base import ValidationError
+from .base import ValidationError, resolve_url
 from .context import Context
 from .task import Task
 from .env import Env
@@ -38,6 +39,7 @@ class Document(Base):
                   secret_values = Attr(Dict(STR), init=lambda self: dict()),
                   env = Attr(Env, init=lambda self: Env(), internal=True),
                   dirname = Attr(STR, doc='Relative path for includes'),
+                  pull = Attr(bool, False, 'Force-pull URLs'),
                  )
     _opts = dict(init_validate = True)
 
@@ -48,8 +50,7 @@ class Document(Base):
             return cls.from_yaml(dct, os.path.abspath(os.path.dirname(path)))
 
     @classmethod
-    def from_yaml(cls, dct, dirname):
-        kwargs = {}
+    def from_yaml(cls, dct, dirname, **kwargs):
         get_delete(dct, kwargs, 'import', [], 'imports')
         get_delete(dct, kwargs, 'include', [], 'includes')
         get_delete(dct, kwargs, 'secrets', [])
@@ -75,13 +76,14 @@ class Document(Base):
     @init_hook
     def process(self, **kwargs):
         with chdir(self.dirname):
-            for path in self.imports:
+            resolve = partial(resolve_url, force=self.pull)
+            for path in map(resolve, self.imports):
                 if not os.path.exists(path):
                     raise ValidationError("Module path does not exist: {}"
                                           .format(path))
                 self.process_import(path, **kwargs)
 
-            for path in self.includes:
+            for path in map(resolve, self.includes):
                 if not os.path.isfile(path):
                     raise ValidationError("Include path does not exist: {}"
                                           .format(path))
