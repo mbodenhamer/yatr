@@ -33,13 +33,17 @@ class Command(Base):
         cmd = self.run_command(env, **kwargs)
         return command(cmd)
 
+
 #-------------------------------------------------------------------------------
 # Task
 
 
 class Task(Base):
-    _attrs = dict(commands = Attr(List(Command)))
-    _opts = dict(init_validate = True)
+    _attrs = dict(commands = Attr(List(Command)),
+                  condition = Attr(Command, optional=True),
+                  condition_type = Attr(bool, True))
+    _opts = dict(init_validate = True,
+                 optional_none = True)
 
     @classmethod
     def from_yaml(cls, name, dct):
@@ -51,10 +55,19 @@ class Task(Base):
             return cls(commands=cmds)
 
         elif isinstance(dct, dict):
-            if set(dct.keys()) == {'context', 'command'}:
+            if set(dct.keys()).issuperset({'command'}):
                 ret = Task.from_yaml(name, dct['command'])
-                for cmd in ret.commands:
-                    cmd.context = dct['context']
+
+                if 'context' in dct:
+                    for cmd in ret.commands:
+                        cmd.context = dct['context']
+
+                if 'if' in dct:
+                    ret.condition = Command(dct['if'])
+                    ret.condition_type = True
+                elif 'ifnot' in dct:
+                    ret.condition = Command(dct['ifnot'])
+                    ret.condition_type = False
                 return ret
 
         raise ValidationError('Invalid data for task: {}'.format(name))
@@ -66,6 +79,12 @@ class Task(Base):
         outs = []
         errs = []
         codes = []
+
+        if self.condition:
+            out, err, code = self.condition.run(env, **kwargs)
+            if ((self.condition_type is True and code != 0) or
+                (self.condition_type is False and code == 0)):
+                return outs, errs, codes
 
         for cmd in self.commands:
             out, err, code = cmd.run(env, **kwargs)
