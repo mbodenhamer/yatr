@@ -1,12 +1,16 @@
 import os
 import sys
+from mock import MagicMock
 from nose.tools import assert_raises
 from syn.base_utils import capture, assign, chdir
 from yatr.main import _main, main, search_rootward
 from yatr import __version__ as yver
+from yatr import base as ybase
 
 DIR = os.path.abspath(os.path.dirname(__file__))
+TEST1 = os.path.join(DIR, 'test1.yml')
 TEST3 = os.path.join(DIR, 'test3.yml')
+URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
 
 #-------------------------------------------------------------------------------
 # main
@@ -28,6 +32,7 @@ def test_main():
             _main('-f', os.path.join(DIR, 'yatrfile1.yml'), '--validate')
         assert out.getvalue() == 'Validation successful\n'
 
+        # Test --dump and task command-line arg passing
         with chdir(os.path.join(DIR, 'foo')):
             with capture() as (out, err):
                 _main('--dump')
@@ -37,6 +42,7 @@ def test_main():
                 _main('print', '5')
             assert out.getvalue() == 'abcdefghi 5\n'
 
+        # Test task referencing in task definition
         with capture() as (out, err):
             _main('-f', TEST3, 'a')
         assert out.getvalue() == 'abc\n'
@@ -45,7 +51,18 @@ def test_main():
             _main('-f', TEST3, 'b')
         assert out.getvalue() == 'abc\ndef\n'
 
-        # Example
+        # Test --pull
+        with assign(ybase, 'download', MagicMock()):
+            ybase.resolve_url(URL)
+            assert ybase.download.call_count == 0
+
+            _main('-f', TEST1)
+            assert ybase.download.call_count == 0
+
+            _main('-f', TEST1, '--pull')
+            assert ybase.download.call_count == 1
+
+        # Verify example
         with chdir(os.path.join(DIR, 'example')):
             with capture() as (out, err):
                 _main('--dump-path')

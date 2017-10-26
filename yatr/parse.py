@@ -43,10 +43,12 @@ class Document(Base):
     _opts = dict(init_validate = True)
 
     @classmethod
-    def from_path(cls, path):
+    def from_path(cls, path, **kwargs):
         with open(path, 'r') as f:
             dct = yaml.load(f)
-            return cls.from_yaml(dct, os.path.abspath(os.path.dirname(path)))
+            return cls.from_yaml(dct,
+                                 os.path.abspath(os.path.dirname(path)), 
+                                 **kwargs)
 
     @classmethod
     def from_yaml(cls, dct, dirname, **kwargs):
@@ -79,7 +81,7 @@ class Document(Base):
             pre_macros[name] = resolve(macro, pre_macros)
 
         def process(path):
-            return resolve_url(resolve(path, pre_macros))
+            return resolve_url(resolve(path, pre_macros), force=self.pull)
 
         with chdir(self.dirname):
             for path in map(process, self.imports):

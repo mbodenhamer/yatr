@@ -4,7 +4,7 @@ from yatr.base import resolve_url
 
 DIR = os.path.abspath(os.path.dirname(__file__))
 YF1 = os.path.join(DIR, 'yatrfile1.yml')
-URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/python/project.yml'
+URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
 
 #-------------------------------------------------------------------------------
 # Utilities

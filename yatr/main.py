@@ -22,6 +22,8 @@ parser.add_argument('--dump', dest='dump_vars', default=False,
                     action='store_true', help='Dump macro values')
 parser.add_argument('--dump-path', dest='dump_path', default=False,
                     action='store_true', help='Print yatrfile path')
+parser.add_argument('--pull', dest='pull', default=False, action='store_true',
+                    help='Force download of URL includes and imports')
 parser.add_argument('task', metavar='<task>', type=str, default='', nargs='?',
                     help='The task to run')
 parser.add_argument('args', metavar='ARGS', nargs='*',
@@ -70,7 +72,7 @@ def _main(*args):
         INITIAL_MACROS[key] = arg
 
     path = find_yatrfile_path(opts.yatrfile)
-    doc = Document.from_path(path)
+    doc = Document.from_path(path, pull=opts.pull)
     doc.env.resolve_macros()
 
     if opts.dump_path:

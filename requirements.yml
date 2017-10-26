@@ -12,6 +12,7 @@ dev:
     - ipdbplugin
     - ipython
     - lxml
+    - mock
     - nose
     - pip-tools
     - Sphinx
