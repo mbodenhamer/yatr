@@ -51,16 +51,58 @@ Example(s)
 
 Suppose you have the following ``yatrfile.yml`` in your current working directory
 ::
-    tasks:
 
 
-asdf
+
+As illustrated in this example, yatr currently supports three top-level keys in the yatrfile: ``include``, ``macros``, and ``tasks``.  
+
+The ``include`` section must be a list of strings, each of which must be either a filesystem path or a URL specifying the location of another yatrfile.  When a yatrfile is "included" in this manner, its macros and tasks are added to the macros and tasks defined by the main yatrfile.  Nested includes are supported, with the rule that conflicts in macro or task names are resolved by favoring the definition closest to the main yatrfile.  
+
+For example, suppose ``yatr`` is invoked on a yatrfile named ``C.yml``, which includes ``B.yml``, which includes ``A.yml``, as follows:
+
+``A.yml``::
+
+    macros:
+      a: foo
+      b: def
+      c: xyz
+
+``B.yml``::
+
+    include:
+      - A.yml
+
+    macros:
+      a: bar
+      b: ghi
+
+``C.yml``::
+
+    include:
+      - B.yml
+
+    macros:
+      a: baz
+
+In this case, the macro values would resolve as follows::
+
+    $ yatr -f C.yml --dump
+    a = baz
+    b = ghi
+    c = xyz
+
+
+
+-include may use macros
+
 
 .. _Future Features:
 
 Future Features
 ---------------
 
-The following features are planned for future releases:
+As an inspection of the source code might reveal, three additional top-level keys are also allowed in a yatrfile:  ``import``, ``secrets``, and ``contexts``.  The ``import`` section, much like ``include``, specifies a list of paths or URLs.  However, unlike ``include``, which specifies other yatrfiles, the ``import`` section specifies Python modules to import that will extend the functionality of yatr.  While implemented at a basic level, the future shape of this feature is uncertain and thus its use is not recommended at this time.  However, the goal of this feature is to enable the functionality of yatr to be extended in arbitrarily-complex ways when necessary, while preserving the simplicity of the default YAML specification for the other 95% of use cases that do not require such complexity.
 
-* Extension via custom Jinja2 filters.
+The ``secrets`` section specifies a list of names corresponding to secrets that should not be stored on disk in plaintext.  In future releases, yatr will attempt to find these values in the user keyring, and then prompt the user to enter their values via stdin if not present.  There will also be an option to store these values in the user keyring to avoid having to re-enter them on future task invocations.  No support for secrets is implemented at present, however.
+
+The ``contexts`` section allows the specification of custom execution contexts in which tasks are invoked.  For example, one might define a custom shell execution context that specifies the values of various environment variables to avoid cluttering up a task definition with extra macros or statements.  This feature is not currently supported, and its future is uncertain.

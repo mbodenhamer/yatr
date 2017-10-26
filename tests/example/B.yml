@@ -1,0 +1,6 @@
+include:
+  - A.yml
+
+macros:
+  a: bar
+  b: ghi

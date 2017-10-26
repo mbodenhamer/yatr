@@ -1,0 +1,5 @@
+include:
+  - B.yml
+
+macros:
+  a: baz

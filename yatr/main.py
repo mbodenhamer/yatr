@@ -67,6 +67,8 @@ def _main(*args):
         return
 
     # populate position arg macros
+    for key in list(INITIAL_MACROS.keys()):
+        del INITIAL_MACROS[key]
     for k, arg in enumerate(opts.args):
         key = '_{}'.format(k+1)
         INITIAL_MACROS[key] = arg

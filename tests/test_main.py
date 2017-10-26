@@ -69,13 +69,17 @@ def test_main():
                 _main('--dump-path')
             assert out.getvalue() == \
                 '{}\n'.format(os.path.join(DIR, 'example/yatrfile.yml'))
+            
+            # Test nested include
+            with capture() as (out, err):
+                _main('-f', 'C.yml', '--dump')
+            assert out.getvalue() == 'a = baz\nb = ghi\nc = xyz\n'
 
-            # import ipdb; ipdb.set_trace()
-            # _main('foo')
-
+            # Test included task
             with capture() as (out, err):
                 _main('foo')
             assert out.getvalue() == 'bar\n'
+
 
 #-------------------------------------------------------------------------------
 
