@@ -64,6 +64,7 @@ def test_main():
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):
+            # Test --dump-path
             with capture() as (out, err):
                 _main('--dump-path')
             assert out.getvalue() == \
