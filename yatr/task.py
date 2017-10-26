@@ -91,16 +91,23 @@ class Task(Base):
                 return outs, errs, codes
 
         for cmd in self.commands:
-            out, err, code = cmd.run(env, **kwargs)
-            outs.append(out)
-            errs.append(err)
-            codes.append(code)
+            if cmd.command in env.tasks:
+                outs_, errs_, codes_ = env.tasks[cmd.command].run(env, **kwargs)
+                outs.extend(outs_)
+                errs.extend(errs_)
+                codes.extend(codes_)
 
-            if err and write_stderr:
-                sys.stderr.write(err)
-                sys.stderr.flush()
+            else:
+                out, err, code = cmd.run(env, **kwargs)
+                outs.append(out)
+                errs.append(err)
+                codes.append(code)
 
-            if exit_on_error and code != 0:
+                if err and write_stderr:
+                    sys.stderr.write(err)
+                    sys.stderr.flush()
+
+            if exit_on_error and any(c != 0 for c in codes):
                 break
 
         return outs, errs, codes

@@ -76,16 +76,16 @@ def _main(*args):
     if opts.dump_path:
         print(path)
 
-    if opts.validate:
-        # We will get an error of some sort before this if it isn't valid
-        print("Validation successful")
-        return
-
     if opts.dump_vars:
         # TODO: add support for filtering out unwanted variables
         # TODO: add support for not including possible secrets in output
         for name in sorted(doc.env.env):
             print('{} = {}'.format(name, doc.env.env[name]))
+
+    if opts.validate:
+        # We will get an error of some sort before this if it isn't valid
+        print("Validation successful")
+        return
 
     if opts.task:
         outs, errs, codes = doc.run(opts.task)

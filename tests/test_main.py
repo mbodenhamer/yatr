@@ -6,6 +6,7 @@ from yatr.main import _main, main, search_rootward
 from yatr import __version__ as yver
 
 DIR = os.path.abspath(os.path.dirname(__file__))
+TEST3 = os.path.join(DIR, 'test3.yml')
 
 #-------------------------------------------------------------------------------
 # main
@@ -35,6 +36,14 @@ def test_main():
             with capture() as (out, err):
                 _main('print', '5')
             assert out.getvalue() == 'abcdefghi 5\n'
+
+        with capture() as (out, err):
+            _main('-f', TEST3, 'a')
+        assert out.getvalue() == 'abc\n'
+
+        with capture() as (out, err):
+            _main('-f', TEST3, 'b')
+        assert out.getvalue() == 'abc\ndef\n'
 
         # Example
         with chdir(os.path.join(DIR, 'example')):

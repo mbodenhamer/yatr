@@ -1,0 +1,5 @@
+tasks:
+  a: echo abc
+  b:
+    - a
+    - echo def
