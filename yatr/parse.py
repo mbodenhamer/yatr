@@ -116,14 +116,16 @@ class Document(Base):
         # TODO: support for ':' in path to restrict include scope
         # TODO: when implementing :-support, will need to modify path validation
         doc = Document.from_path(path)
-        doc.process(**kwargs)
         self.env.update(doc.env, **kwargs)
 
     def process_secret(self, name, **kwargs):
         raise NotImplementedError('Secrets currently unsupported')
 
     def run(self, name, **kwargs):
-        return self.tasks[name].run(self.env, **kwargs)
+        try:
+            return self.env.tasks[name].run(self.env, **kwargs)
+        except KeyError:
+            raise RuntimeError('No such task: {}'.format(name))
 
     def validate(self):
         super(Document, self).validate()

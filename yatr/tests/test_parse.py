@@ -57,6 +57,7 @@ def test_document():
                                 macros=dict(a=3)),
                            DIR)
     assert d.env.macros == dict(a=3, b=2)
+    assert_raises(RuntimeError, d.run, 'foobarbaz')
 
     assert_raises(ValidationError, Document.from_yaml, dict(foo='a'), DIR)
     assert_raises(ValidationError, Document.from_yaml, dict(include=['/foo/bar']), DIR)

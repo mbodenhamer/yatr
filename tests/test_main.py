@@ -70,6 +70,13 @@ def test_main():
             assert out.getvalue() == \
                 '{}\n'.format(os.path.join(DIR, 'example/yatrfile.yml'))
 
+            # import ipdb; ipdb.set_trace()
+            # _main('foo')
+
+            with capture() as (out, err):
+                _main('foo')
+            assert out.getvalue() == 'bar\n'
+
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__': # pragma: no cover
