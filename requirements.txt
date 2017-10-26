@@ -15,7 +15,7 @@ ipaddress==1.0.18         # via docker
 jinja2==2.9.6             # via syn
 markupsafe==1.0           # via jinja2
 pyyaml==3.12              # via syn
-requests==2.18.4          # via docker
+requests==2.18.4
 six==1.11.0               # via docker, docker-pycreds, syn, syn.utils, websocket-client
 syn.utils==0.0.1          # via dockerman
 syn==0.0.14               # via dockerman, syn.utils
