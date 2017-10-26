@@ -39,8 +39,9 @@ def test_main():
         # Example
         with chdir(os.path.join(DIR, 'example')):
             with capture() as (out, err):
-                _main('--validate')
-            assert out.getvalue() == 'Validation successful\n'
+                _main('--dump-path')
+            assert out.getvalue() == \
+                '{}\n'.format(os.path.join(DIR, 'example/yatrfile.yml'))
 
 #-------------------------------------------------------------------------------
 

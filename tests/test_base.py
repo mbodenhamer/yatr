@@ -14,7 +14,7 @@ def test_resolve_url():
     Document.from_path(YF1).env.resolve_macros()
 
     path = resolve_url(URL)
-    assert path.startswith('/root')
+    assert path.startswith(os.path.expanduser('~'))
     Document.from_path(path).env.resolve_macros()
 
 #-------------------------------------------------------------------------------

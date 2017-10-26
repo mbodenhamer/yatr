@@ -20,6 +20,8 @@ parser.add_argument('--validate', dest='validate', default=False,
                     action='store_true', help='Only validate the yatrfile')
 parser.add_argument('--dump', dest='dump_vars', default=False,
                     action='store_true', help='Dump macro values')
+parser.add_argument('--dump-path', dest='dump_path', default=False,
+                    action='store_true', help='Print yatrfile path')
 parser.add_argument('task', metavar='<task>', type=str, default='', nargs='?',
                     help='The task to run')
 parser.add_argument('args', metavar='ARGS', nargs='*',
@@ -70,6 +72,9 @@ def _main(*args):
     path = find_yatrfile_path(opts.yatrfile)
     doc = Document.from_path(path)
     doc.env.resolve_macros()
+
+    if opts.dump_path:
+        print(path)
 
     if opts.validate:
         # We will get an error of some sort before this if it isn't valid
