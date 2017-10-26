@@ -88,6 +88,9 @@ def _main(*args):
             sys.stdout.write(out)
         sys.stdout.flush()
 
+        if codes:
+            sys.exit(max(codes))
+
 #-------------------------------------------------------------------------------
 
 def main():

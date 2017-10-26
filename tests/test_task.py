@@ -49,6 +49,13 @@ def test_task():
     assert errs == ['']
     assert codes == [0]
 
+    t = Task(name='foo', commands=[Command('false'),
+                                   Command('true')])
+    outs, errs, codes = t.run(env)
+    assert outs == ['']
+    assert errs == ['']
+    assert codes == [1]
+
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__': # pragma: no cover

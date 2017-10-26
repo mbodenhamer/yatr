@@ -1,3 +1,4 @@
+import sys
 from syn.base import Base, Attr
 from syn.type import List
 from syn.five import STR
@@ -80,6 +81,9 @@ class Task(Base):
         errs = []
         codes = []
 
+        exit_on_error = kwargs.get('exit_on_error', True)
+        write_stderr = kwargs.get('write_stderr', True)
+
         if self.condition:
             out, err, code = self.condition.run(env, **kwargs)
             if ((self.condition_type is True and code != 0) or
@@ -91,6 +95,13 @@ class Task(Base):
             outs.append(out)
             errs.append(err)
             codes.append(code)
+
+            if err and write_stderr:
+                sys.stderr.write(err)
+                sys.stderr.flush()
+
+            if exit_on_error and code != 0:
+                break
 
         return outs, errs, codes
 

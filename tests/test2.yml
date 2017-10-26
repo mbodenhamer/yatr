@@ -1,0 +1,5 @@
+tasks:
+  good: "true"
+  bad: 
+    - "false"
+    - "true"
