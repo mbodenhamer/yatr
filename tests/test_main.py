@@ -35,6 +35,12 @@ def test_main():
             _main('print', '5')
         assert out.getvalue() == 'abcdefghi 5\n'
 
+    # Example
+    with chdir(os.path.join(DIR, 'example')):
+        with capture() as (out, err):
+            _main('--validate')
+        assert out.getvalue() == 'Validation successful\n'
+
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__': # pragma: no cover

@@ -1,2 +1,5 @@
+include:
+  - "{{urlbase}}/test/test1.yml"
+
 macros:
   urlbase: https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles
