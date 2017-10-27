@@ -80,6 +80,30 @@ def test_main():
                 _main('foo')
             assert out.getvalue() == 'bar\n'
 
+            # Test example tasks
+            with capture() as (out, err):
+                _main('cwd')
+            assert out.getvalue() == os.getcwd() + '\n'
+
+            with capture() as (out, err):
+                _main('bar', 'foo')
+            assert out.getvalue() == 'bar\nbar baz foo\n'
+
+            with capture() as (out, err):
+                _main('cond1')
+            assert out.getvalue() == 'bar\n'
+
+            with capture() as (out, err):
+                _main('cond2')
+            assert out.getvalue() == ''
+
+            with capture() as (out, err):
+                _main('cond3')
+            assert out.getvalue() == ''
+
+            with capture() as (out, err):
+                _main('cond4')
+            assert out.getvalue() == 'bar\n'
 
 #-------------------------------------------------------------------------------
 
