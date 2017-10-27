@@ -8,6 +8,7 @@ ipdbplugin
 ipython
 lxml
 mock
+mock
 nose
 pip-tools
 tox

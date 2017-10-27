@@ -9,6 +9,7 @@ source /root/.bashrc
 pyenv activate $venv
 python --version
 pip install nose $dist
+depman -f /app/requirements.yml -t pip satisfy test
 $(which python) /usr/local/bin/nosetests -w /tests \
     --with-xunit --xunit-file=${xunit}
 pyenv deactivate
