@@ -124,7 +124,7 @@ In this case, the macro values would resolve as follows::
     c = xyz
 
 
-Name conflicts of tasks from includes are resolved the same way as macros.
+Name conflicts of tasks from includes are resolved the same way as for macros.
 
 Include paths or URLs may use macros, as the main example above demonstrates, having an include defined in terms of the ``urlbase`` macro.  However, any such macros must be defined in the yatrfile itself, and cannot be defined in an included yatrfile or depend on the macros defined in an included yatrfile for their proper resolution.
 
