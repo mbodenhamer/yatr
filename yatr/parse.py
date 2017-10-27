@@ -77,7 +77,7 @@ class Document(Base):
     @init_hook
     def process(self, **kwargs):
         pre_macros = dict(self.macros)
-        for name, macro in ordered_macros(pre_macros):
+        for name, macro in ordered_macros(pre_macros, lenient=True):
             pre_macros[name] = resolve(macro, pre_macros)
 
         def process(path):

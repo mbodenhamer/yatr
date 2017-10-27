@@ -134,19 +134,27 @@ Tasks may be defined as a single command string.  For example, if your current w
     $ yatr cwd
     /foo/baz
 
+
 After includes are processed, macros are not resolved until task runtime, as the main example demonstrates.  That yatrfile specifies the inclusion of a file named `test2.yml`_, which defines a task named ``foo``.  However, ``foo`` is defined in terms of a macro named ``b``, which is not defined in ``test2.yml``.  The macro ``b`` is defined in the main yatrfile, however, which induces the following behavior::
 
     $ yatr foo
     bar
 
+
 Tasks may also be defined as a list of command strings, to be executed one after the other::
+
+    $ yatr bar
+    foo
+    bar baz xyz
+
+
+Task name reference...
+In that example, command line args...::
 
     $ yatr bar foo
     foo
     bar baz foo
 
-In that example, command line args...
-Task name reference...
 
 Lastly, tasks may be defined to execute conditionally upon the successful execution of a command::
 
@@ -156,6 +164,7 @@ Lastly, tasks may be defined to execute conditionally upon the successful execut
     $ yatr cond3
     $ yatr cond4
     bar
+
 
 adslfkj
 

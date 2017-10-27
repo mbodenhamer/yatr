@@ -64,6 +64,9 @@ def test_document():
     assert_raises(ValidationError, Document.from_yaml, {'import': ['/foo/bar']}, DIR)
     assert_raises(NotImplementedError, Document.from_yaml, dict(secrets=['a']), DIR)
 
+    d = Document.from_yaml(dict(macros=dict(a='{{b}}')), os.getcwd())
+    assert_raises(ValidationError, d.env.resolve_macros)
+
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__': # pragma: no cover

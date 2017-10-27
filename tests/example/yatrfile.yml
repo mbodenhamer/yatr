@@ -11,7 +11,7 @@ tasks:
 
   bar:
     - foo
-    - "echo {{c}} {{_1}}"
+    - "echo {{c}} {{_1|default('xyz')}}"
 
   cond1:
     command: foo

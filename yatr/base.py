@@ -32,13 +32,17 @@ def order_relations_from_macros(macros):
             out.append(Precedes(var, name))
     return out
 
-def ordered_macros(macros):
+def ordered_macros(macros, lenient=False):
     rels = order_relations_from_macros(macros)
     names = topological_sorting(macros, rels)
 
     for name in names:
         if name in macros:
             yield name, macros[name]
+        else:
+            if not lenient:
+                raise ValidationError('Referenced macro {} not defined'
+                                      .format(name))
 
 def command(cmd, shell=False):
     p = Popen(shlex.split(cmd), stdout=PIPE, stderr=PIPE, shell=shell)

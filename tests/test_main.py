@@ -4,6 +4,7 @@ from mock import MagicMock
 from nose.tools import assert_raises
 from syn.base_utils import capture, assign, chdir
 from yatr.main import _main, main, search_rootward
+from yatr.base import ValidationError
 from yatr import __version__ as yver
 from yatr import base as ybase
 
@@ -84,6 +85,10 @@ def test_main():
             with capture() as (out, err):
                 _main('cwd')
             assert out.getvalue() == os.getcwd() + '\n'
+
+            with capture() as (out, err):
+                _main('bar')
+            assert out.getvalue() == 'bar\nbar baz xyz\n'
 
             with capture() as (out, err):
                 _main('bar', 'foo')
