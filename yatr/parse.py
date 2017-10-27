@@ -123,7 +123,8 @@ class Document(Base):
 
     def run(self, name, **kwargs):
         try:
-            return self.env.tasks[name].run(self.env, **kwargs)
+            with chdir(self.dirname):
+                return self.env.tasks[name].run(self.env, **kwargs)
         except KeyError:
             raise RuntimeError('No such task: {}'.format(name))
 

@@ -40,7 +40,7 @@ def test_document():
                            DIR)
     outs, errs, codes = d.run('dir')
     assert errs == ['']
-    assert outs == [os.getcwd() + '\n']
+    assert outs == [DIR + '\n']
     assert codes == [0]
 
     path = os.path.join(DIR, 'mod1.py')
