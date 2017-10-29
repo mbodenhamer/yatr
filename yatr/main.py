@@ -108,7 +108,10 @@ def _main(*args):
             print('{} = {}'.format(name, doc.env.env[name]))
 
     if opts.validate:
-        # We will get an error of some sort before this if it isn't valid
+        # Check that there are no undefined macros in task definitions
+        for task in doc.env.tasks.values():
+            task.run_commands(doc.env)
+
         print("Validation successful")
         return
 

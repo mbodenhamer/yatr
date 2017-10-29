@@ -1,0 +1,3 @@
+tasks:
+  good: pwd
+  bad: "{{a}}"

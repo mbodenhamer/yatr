@@ -1,5 +1,6 @@
 import os
 import sys
+from jinja2 import UndefinedError
 from mock import MagicMock
 from nose.tools import assert_raises
 from syn.base_utils import capture, assign, chdir
@@ -11,6 +12,7 @@ from yatr.base import read, tempdir, ValidationError
 DIR = os.path.abspath(os.path.dirname(__file__))
 TEST1 = os.path.join(DIR, 'test1.yml')
 TEST3 = os.path.join(DIR, 'test3.yml')
+TEST4 = os.path.join(DIR, 'test4.yml')
 OUT = os.path.join(DIR, 'output')
 URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
 
@@ -68,6 +70,13 @@ def test_main():
             with tempdir() as d:
                 assert_raises(ValidationError, _main, '-f', TEST1, '--cache-dir', d)
             assert ybase.download.call_count == 2
+
+        # Test --validate
+        with capture() as (out, err):
+            _main('-f', TEST4)
+        assert out.getvalue() == ''
+        assert err.getvalue() == ''
+        assert_raises(UndefinedError, _main, '-f', TEST4, '--validate')
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):
