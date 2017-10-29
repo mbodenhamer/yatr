@@ -11,11 +11,11 @@ URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/
 
 def test_resolve_url():
     assert resolve_url(YF1) == YF1
-    Document.from_path(YF1).env.resolve_macros()
+    Document.from_path(YF1).post_process()
 
     path = resolve_url(URL)
     assert path.startswith(os.path.expanduser('~'))
-    Document.from_path(path).env.resolve_macros()
+    Document.from_path(path).post_process()
 
 #-------------------------------------------------------------------------------
 

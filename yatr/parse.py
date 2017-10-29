@@ -110,6 +110,10 @@ class Document(Base):
                   secret_values=self.secret_values)
         self.env.update(env, **kwargs)
 
+    def post_process(self, **kwargs):
+        self.env.resolve_macros()
+        self.validate()
+
     def process_import(self, path, **kwargs):
         mod = imp.load_source('yatr_module_import', path)
         

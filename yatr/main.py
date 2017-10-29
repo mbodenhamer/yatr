@@ -96,7 +96,7 @@ def _main(*args):
             macro, value = s.split('=')
             doc.env.macros[macro] = value
     
-    doc.env.resolve_macros()
+    doc.post_process()
 
     if opts.dump_path:
         print(path)
