@@ -5,6 +5,7 @@ Changelog
 ~~~~~~~~~~~~~~~~~~
 
 * Fixed process management for running tasks.
+* Added -m option
 
 0.0.2 (2017-10-26)
 ~~~~~~~~~~~~~~~~~~

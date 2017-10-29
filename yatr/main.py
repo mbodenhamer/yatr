@@ -14,6 +14,9 @@ parser = ArgumentParser(prog='yatr', description=DESCRIPTION)
 parser.add_argument('-f', '--yatrfile', dest='yatrfile', type=str,
                     default='', metavar='<yatrfile>',
                     help='The yatrfile to load')
+parser.add_argument('-m', '--macro', dest='macros',
+                    action='append', metavar='<macro>=<value>',
+                    help='Set/override macro with specified value')
 parser.add_argument('--version', dest='show_version', default=False,
                     action='store_true', help='Print version')
 parser.add_argument('--validate', dest='validate', default=False,
@@ -62,19 +65,28 @@ def find_yatrfile_path(path):
 def _main(*args):
     opts = parser.parse_args(args)
     
+    # Show version if requested
     if opts.show_version:
         print('yatr {}'.format(yver))
         return
 
-    # populate position arg macros
+    # Populate position arg macros
     for key in list(INITIAL_MACROS.keys()):
         del INITIAL_MACROS[key]
     for k, arg in enumerate(opts.args):
         key = '_{}'.format(k+1)
         INITIAL_MACROS[key] = arg
 
+    # Load yatrfile
     path = find_yatrfile_path(opts.yatrfile)
     doc = Document.from_path(path, pull=opts.pull)
+    
+    # Process command-line macro overrides
+    if opts.macros:
+        for s in opts.macros:
+            macro, value = s.split('=')
+            doc.env.macros[macro] = value
+    
     doc.env.resolve_macros()
 
     if opts.dump_path:

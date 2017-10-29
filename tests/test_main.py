@@ -54,6 +54,7 @@ def test_main():
             os.remove(OUT)
 
         # Test --pull
+        ybase.resolve_url(URL)
         with assign(ybase, 'download', MagicMock()):
             ybase.resolve_url(URL)
             assert ybase.download.call_count == 0
@@ -72,6 +73,14 @@ def test_main():
             assert out.getvalue() == \
                 '{}\n'.format(os.path.join(DIR, 'example/yatrfile.yml'))
             
+            with capture() as (out, err):
+                _main('-f', 'C.yml', '--dump')
+            assert out.getvalue() == 'a = baz\nb = ghi\nc = xyz\n'
+            
+            with capture() as (out, err):
+                _main('-f', 'C.yml', '-m' 'a=zab', '-m', 'd=jkl', '--dump')
+            assert out.getvalue() == 'a = zab\nb = ghi\nc = xyz\nd = jkl\n'
+
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__': # pragma: no cover
