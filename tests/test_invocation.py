@@ -64,6 +64,9 @@ def test_invocation():
         out, code = get_output('yatr cond4')
         assert out == 'bar\n'
 
+        out, code = get_output('yatr -v cond4')
+        assert out == 'false\necho bar\nbar\n'
+
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__': # pragma: no cover

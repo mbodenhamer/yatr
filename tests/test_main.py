@@ -82,6 +82,10 @@ def test_main():
                 _main('-p', 'bar', 'foo')
             assert out.getvalue() == 'echo bar\necho bar baz foo\n'
 
+            with capture() as (out, err):
+                _main('-p', 'cond4')
+            assert out.getvalue() == 'ifnot: false\n\techo bar\n'
+
             # Test --dump
             with capture() as (out, err):
                 _main('-f', 'C.yml', '--dump')

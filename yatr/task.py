@@ -35,9 +35,13 @@ class Command(Base):
         preview = kwargs.get('preview', False)
         silent = kwargs.get('silent', False)
 
+        pre = ''
+        if preview:
+            pre = kwargs.get('preview_pre', '')
+
         cmd = self.run_command(env, **kwargs)
         if verbose:
-            sys.stdout.write(cmd + '\n')
+            sys.stdout.write(pre + cmd + '\n')
             sys.stdout.flush()
         
         if not preview:
@@ -90,11 +94,14 @@ class Task(Base):
         exit_on_error = kwargs.get('exit_on_error', True)
 
         if self.condition:
+            kwargs['preview_pre'] = 'if: ' if self.condition_type else 'ifnot: '
             codes_ = self.condition.run(env, **kwargs)
             code = max(codes_)
-            if ((self.condition_type is True and code != 0) or
-                (self.condition_type is False and code == 0)):
+            if (((self.condition_type is True and code != 0) or
+                 (self.condition_type is False and code == 0)) and 
+                code is not None):
                 return []
+            kwargs['preview_pre'] = '\t'
 
         for cmd in self.commands:
             if cmd.command in env.tasks:
