@@ -6,7 +6,8 @@ from syn.base import Base, Attr, init_hook
 from syn.type import List, Dict
 from syn.five import STR
 
-from .base import ValidationError, resolve_url, resolve, ordered_macros
+from .base import ValidationError, resolve_url, resolve, ordered_macros,\
+    DEFAULT_CACHE_DIR
 from .context import Context
 from .task import Task
 from .env import Env
@@ -38,6 +39,7 @@ class Document(Base):
                   secret_values = Attr(Dict(STR), init=lambda self: dict()),
                   env = Attr(Env, init=lambda self: Env(), internal=True),
                   dirname = Attr(STR, doc='Relative path for includes'),
+                  cachedir = Attr(STR, '', 'Directory to store downloaded files'),
                   pull = Attr(bool, False, 'Force-pull URLs'),
                  )
     _opts = dict(init_validate = True)
@@ -76,12 +78,17 @@ class Document(Base):
 
     @init_hook
     def process(self, **kwargs):
+        cachedir = DEFAULT_CACHE_DIR
+        if self.cachedir:
+            cachedir = self.cachedir
+
         pre_macros = dict(self.macros)
         for name, macro in ordered_macros(pre_macros, lenient=True):
             pre_macros[name] = resolve(macro, pre_macros)
 
         def process(path):
-            return resolve_url(resolve(path, pre_macros), force=self.pull)
+            return resolve_url(resolve(path, pre_macros), 
+                               cachedir=cachedir, force=self.pull)
 
         with chdir(self.dirname):
             for path in map(process, self.imports):

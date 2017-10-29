@@ -23,9 +23,9 @@ Usage
 -----
 ::
 
-    usage: yatr [-h] [-f <yatrfile>] [--version] [--validate] [--dump]
-            [--dump-path] [--pull]
-            [<task>] [ARGS [ARGS ...]]
+    usage: yatr [-h] [-f <yatrfile>] [-m <macro>=<value>] [--cache-dir <DIR>]
+		[--version] [--validate] [--dump] [--dump-path] [--pull]
+		[<task>] [ARGS [ARGS ...]]
 
     Yet Another Task Runner.
 
@@ -37,6 +37,9 @@ Usage
       -h, --help            show this help message and exit
       -f <yatrfile>, --yatrfile <yatrfile>
 			    The yatrfile to load
+      -m <macro>=<value>, --macro <macro>=<value>
+			    Set/override macro with specified value
+      --cache-dir <DIR>     Path of cache directory
       --version             Print version
       --validate            Only validate the yatrfile
       --dump                Dump macro values
@@ -136,7 +139,7 @@ Macro values may also be set or overridden at the command line by supplying the 
 
 Include paths or URLs may use macros, as the main example above demonstrates, having an include defined in terms of the ``urlbase`` macro.  However, any such macros must be defined in the yatrfile itself, and cannot be defined in an included yatrfile or depend on the macros defined in an included yatrfile for their proper resolution.
 
-If an include path is a URL, yatr will attempt to download the file and save it in a cache directory.  The cache directory is currently set to ``~/.yatr/``, but future releases will make this configurable.  If the URL file already exists in the cache directory, yatr will load the cached file without downloading.  To force yatr to re-download all URL includes specified by the yatrfile, supply the ``--pull`` option at the command line.
+If an include path is a URL, yatr will attempt to download the file and save it in a cache directory.  By default, the cache directory is set to ``~/.yatr/``, but this may be changed through the ``--cache-dir`` option.  If the URL file already exists in the cache directory, yatr will load the cached file without downloading.  To force yatr to re-download all URL includes specified by the yatrfile, supply the ``--pull`` option at the command line.
 
 Tasks are defined in the ``tasks`` section of the yatrfile.  Tasks may be defined as a single command string.  In this example, the task ``cwd`` is simply defined as the system command ``pwd``.  If your current working directory happens to be ``/foo/baz``, then::
 

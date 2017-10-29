@@ -4,6 +4,7 @@ import sys
 from argparse import ArgumentParser
 from .env import INITIAL_MACROS
 from .parse import Document
+from .base import DEFAULT_CACHE_DIR
 from . import __version__ as yver
 
 #-------------------------------------------------------------------------------
@@ -17,6 +18,9 @@ parser.add_argument('-f', '--yatrfile', dest='yatrfile', type=str,
 parser.add_argument('-m', '--macro', dest='macros',
                     action='append', metavar='<macro>=<value>',
                     help='Set/override macro with specified value')
+parser.add_argument('--cache-dir', dest='cachedir', type=str,
+                    default=DEFAULT_CACHE_DIR, metavar='<DIR>',
+                    help='Path of cache directory')
 parser.add_argument('--version', dest='show_version', default=False,
                     action='store_true', help='Print version')
 parser.add_argument('--validate', dest='validate', default=False,
@@ -79,7 +83,7 @@ def _main(*args):
 
     # Load yatrfile
     path = find_yatrfile_path(opts.yatrfile)
-    doc = Document.from_path(path, pull=opts.pull)
+    doc = Document.from_path(path, pull=opts.pull, cachedir=opts.cachedir)
     
     # Process command-line macro overrides
     if opts.macros:

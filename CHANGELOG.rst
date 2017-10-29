@@ -5,7 +5,8 @@ Changelog
 ~~~~~~~~~~~~~~~~~~
 
 * Fixed process management for running tasks.
-* Added -m option
+* Added ``-m`` option.
+* Added ``--cache-dir`` option.
 
 0.0.2 (2017-10-26)
 ~~~~~~~~~~~~~~~~~~

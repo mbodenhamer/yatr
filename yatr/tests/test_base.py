@@ -33,8 +33,8 @@ def test_get_output():
     assert out == ''
     assert code == 1
 
-    out, code = get_output('python -c "1/0"')
-    assert 'ZeroDivisionError' in out
+    out, code = get_output('python -c "raise Exception(\\"Test\\")"')
+    assert 'Exception' in out
     assert code == 1
 
 #-------------------------------------------------------------------------------

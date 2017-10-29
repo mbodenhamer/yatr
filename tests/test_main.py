@@ -6,7 +6,7 @@ from syn.base_utils import capture, assign, chdir
 from yatr.main import _main, main, search_rootward
 from yatr import __version__ as yver
 from yatr import base as ybase
-from yatr.base import read
+from yatr.base import read, tempdir, ValidationError
 
 DIR = os.path.abspath(os.path.dirname(__file__))
 TEST1 = os.path.join(DIR, 'test1.yml')
@@ -64,6 +64,10 @@ def test_main():
 
             _main('-f', TEST1, '--pull')
             assert ybase.download.call_count == 1
+
+            with tempdir() as d:
+                assert_raises(ValidationError, _main, '-f', TEST1, '--cache-dir', d)
+            assert ybase.download.call_count == 2
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):

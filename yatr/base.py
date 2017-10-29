@@ -1,12 +1,15 @@
 import os
+import shutil
 import hashlib
 import requests
-from tempfile import mkstemp
+from tempfile import mkstemp, mkdtemp
 from contextlib import contextmanager
 from subprocess import call, check_output, CalledProcessError, STDOUT
 from jinja2 import Template, Environment, meta
 from syn.base_utils import Precedes, topological_sorting
 from syn.five import STR
+
+DEFAULT_CACHE_DIR = '~/.yatr'
 
 #-------------------------------------------------------------------------------
 
@@ -71,13 +74,12 @@ def download(url, path):
         for data in req.iter_content():
             f.write(data)
 
-def resolve_url(url, cachedir=None, force=False):
+def resolve_url(url, cachedir=DEFAULT_CACHE_DIR, force=False):
     if '://' in url:
-        if cachedir is None:
-            cachedir = os.path.expanduser('~/.yatr')
+        cachedir = os.path.expanduser(cachedir)
 
-            if not os.path.isdir(cachedir):
-                os.mkdir(cachedir)
+        if not os.path.isdir(cachedir):
+            os.mkdir(cachedir)
 
         fname = hashlib.sha224(url.encode('utf-8')).hexdigest()
         fpath = os.path.join(cachedir, fname)
@@ -99,6 +101,14 @@ def tempfile(*args, **kwargs):
         yield path
     finally:
         os.remove(path)
+
+@contextmanager
+def tempdir(*args, **kwargs):
+    try:
+        path = mkdtemp(*args, **kwargs)
+        yield path
+    finally:
+        shutil.rmtree(path)
 
 #-------------------------------------------------------------------------------
 # __all__
