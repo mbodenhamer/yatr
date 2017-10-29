@@ -1,3 +1,5 @@
+from jinja2 import UndefinedError
+from nose.tools import assert_raises
 from yatr.base import resolve, variables, ordered_macros, get_output
 
 #-------------------------------------------------------------------------------
@@ -5,7 +7,8 @@ from yatr.base import resolve, variables, ordered_macros, get_output
 
 def test_resolve():
     assert resolve('abc', {}) == 'abc'
-    assert resolve('ab{{c}}', {}) == 'ab'
+    assert_raises(UndefinedError, resolve, 'ab{{c}}', {})
+    assert resolve('ab{{c}}', {}, lenient=True) == 'ab'
     assert resolve('ab{{c}}', dict(c='d')) == 'abd'
 
 def test_variables():

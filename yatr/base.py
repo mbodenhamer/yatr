@@ -5,7 +5,7 @@ import requests
 from tempfile import mkstemp, mkdtemp
 from contextlib import contextmanager
 from subprocess import call, check_output, CalledProcessError, STDOUT
-from jinja2 import Template, Environment, meta
+from jinja2 import Template, Environment, meta, StrictUndefined
 from syn.base_utils import Precedes, topological_sorting
 from syn.five import STR
 
@@ -19,10 +19,14 @@ class ValidationError(Exception):
 #-------------------------------------------------------------------------------
 # Utilities
 
-def resolve(template, env):
+def resolve(template, env, lenient=False):
     if isinstance(template, STR):
         if '{{' in template:
-            return Template(template).render(env)
+            if lenient:
+                return Template(template).render(env)
+            else:
+                jenv = Environment(undefined=StrictUndefined)
+                return jenv.from_string(template).render(env)
     return template
 
 def variables(template):

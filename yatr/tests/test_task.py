@@ -1,3 +1,4 @@
+from jinja2 import UndefinedError
 from nose.tools import assert_raises
 from yatr import Command, Task, Env, ValidationError
 
@@ -25,6 +26,9 @@ def test_command():
 def test_task():
     t = Task(commands=[Command('{{a}}'),
                        Command('{{b}}')])
+
+    env = Env()
+    assert_raises(UndefinedError, t.run_commands, env)
 
     env = Env(macros=dict(a='ls', b='pwd'))
     env.resolve_macros()

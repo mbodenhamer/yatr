@@ -84,7 +84,7 @@ class Document(Base):
 
         pre_macros = dict(self.macros)
         for name, macro in ordered_macros(pre_macros, lenient=True):
-            pre_macros[name] = resolve(macro, pre_macros)
+            pre_macros[name] = resolve(macro, pre_macros, lenient=True)
 
         def process(path):
             return resolve_url(resolve(path, pre_macros), 
