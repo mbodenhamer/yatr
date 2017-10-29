@@ -31,8 +31,9 @@ class Command(Base):
         return context.run_command(command, env, **kwargs)
 
     def run(self, env, **kwargs):
+        silent = kwargs.get('silent', False)
         cmd = self.run_command(env, **kwargs)
-        return command(cmd)
+        return command(cmd, silent)
 
 
 #-------------------------------------------------------------------------------
@@ -77,40 +78,28 @@ class Task(Base):
         return [cmd.run_command(env, **kwargs) for cmd in self.commands]
 
     def run(self, env, **kwargs):
-        outs = []
-        errs = []
         codes = []
-
         exit_on_error = kwargs.get('exit_on_error', True)
-        write_stderr = kwargs.get('write_stderr', True)
 
         if self.condition:
-            out, err, code = self.condition.run(env, **kwargs)
+            code = self.condition.run(env, **kwargs)
             if ((self.condition_type is True and code != 0) or
                 (self.condition_type is False and code == 0)):
-                return outs, errs, codes
+                return []
 
         for cmd in self.commands:
             if cmd.command in env.tasks:
-                outs_, errs_, codes_ = env.tasks[cmd.command].run(env, **kwargs)
-                outs.extend(outs_)
-                errs.extend(errs_)
+                codes_ = env.tasks[cmd.command].run(env, **kwargs)
                 codes.extend(codes_)
 
             else:
-                out, err, code = cmd.run(env, **kwargs)
-                outs.append(out)
-                errs.append(err)
+                code = cmd.run(env, **kwargs)
                 codes.append(code)
-
-                if err and write_stderr:
-                    sys.stderr.write(err)
-                    sys.stderr.flush()
 
             if exit_on_error and any(c != 0 for c in codes):
                 break
 
-        return outs, errs, codes
+        return codes
 
 
 #-------------------------------------------------------------------------------

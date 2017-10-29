@@ -4,13 +4,14 @@ from mock import MagicMock
 from nose.tools import assert_raises
 from syn.base_utils import capture, assign, chdir
 from yatr.main import _main, main, search_rootward
-from yatr.base import ValidationError
 from yatr import __version__ as yver
 from yatr import base as ybase
+from yatr.base import read
 
 DIR = os.path.abspath(os.path.dirname(__file__))
 TEST1 = os.path.join(DIR, 'test1.yml')
 TEST3 = os.path.join(DIR, 'test3.yml')
+OUT = os.path.join(DIR, 'output')
 URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
 
 #-------------------------------------------------------------------------------
@@ -33,24 +34,24 @@ def test_main():
             _main('-f', os.path.join(DIR, 'yatrfile1.yml'), '--validate')
         assert out.getvalue() == 'Validation successful\n'
 
-        # Test --dump and task command-line arg passing
-        with chdir(os.path.join(DIR, 'foo')):
-            with capture() as (out, err):
-                _main('--dump')
-            assert out.getvalue() == 'a = abc\nb = abcdef\nc = abcdefghi\n'
+        try:
+            # Test --dump and task command-line arg passing
+            with chdir(os.path.join(DIR, 'foo')):
+                with capture() as (out, err):
+                    _main('--dump')
+                assert out.getvalue() == 'a = abc\nb = abcdef\nc = abcdefghi\n'
 
-            with capture() as (out, err):
                 _main('print', '5')
-            assert out.getvalue() == 'abcdefghi 5\n'
+                assert read(OUT) == 'abcdefghi 5\n'
 
-        # Test task referencing in task definition
-        with capture() as (out, err):
+            # Test task referencing in task definition
             _main('-f', TEST3, 'a')
-        assert out.getvalue() == 'abc\n'
+            assert read(OUT) == 'abc\n'
 
-        with capture() as (out, err):
             _main('-f', TEST3, 'b')
-        assert out.getvalue() == 'abc\ndef\n'
+            assert read(OUT) == 'abc\ndef\n'
+        finally:
+            os.remove(OUT)
 
         # Test --pull
         with assign(ybase, 'download', MagicMock()):
@@ -71,45 +72,6 @@ def test_main():
             assert out.getvalue() == \
                 '{}\n'.format(os.path.join(DIR, 'example/yatrfile.yml'))
             
-            # Test nested include
-            with capture() as (out, err):
-                _main('-f', 'C.yml', '--dump')
-            assert out.getvalue() == 'a = baz\nb = ghi\nc = xyz\n'
-
-            # Test included task
-            with capture() as (out, err):
-                _main('foo')
-            assert out.getvalue() == 'bar\n'
-
-            # Test example tasks
-            with capture() as (out, err):
-                _main('cwd')
-            assert out.getvalue() == os.getcwd() + '\n'
-
-            with capture() as (out, err):
-                _main('bar')
-            assert out.getvalue() == 'bar\nbar baz xyz\n'
-
-            with capture() as (out, err):
-                _main('bar', 'foo')
-            assert out.getvalue() == 'bar\nbar baz foo\n'
-
-            with capture() as (out, err):
-                _main('cond1')
-            assert out.getvalue() == 'bar\n'
-
-            with capture() as (out, err):
-                _main('cond2')
-            assert out.getvalue() == ''
-
-            with capture() as (out, err):
-                _main('cond3')
-            assert out.getvalue() == ''
-
-            with capture() as (out, err):
-                _main('cond4')
-            assert out.getvalue() == 'bar\n'
-
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__': # pragma: no cover

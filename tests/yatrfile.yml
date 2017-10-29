@@ -5,4 +5,4 @@ macros:
   c: "{{b}}ghi"
 
 tasks:
-  print: "echo {{c}} {{_1}}"
+  print: "echo {{c}} {{_1}} > output"

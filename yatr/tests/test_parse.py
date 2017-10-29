@@ -38,9 +38,7 @@ def test_document():
     d = Document.from_yaml(dict(contexts=dict(bash1=dict(instanceof='bash')),
                                 tasks=dict(dir='pwd')),
                            DIR)
-    outs, errs, codes = d.run('dir')
-    assert errs == ['']
-    assert outs == [DIR + '\n']
+    codes = d.run('dir', silent=True)
     assert codes == [0]
 
     path = os.path.join(DIR, 'mod1.py')

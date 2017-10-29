@@ -1,60 +1,45 @@
 import os
 import sys
-from syn.five import PY2
 from yatr import Command, Task, Env
+from yatr.base import read, tempfile
 
 #-------------------------------------------------------------------------------
 # Task
 
 def test_task():
-    c = Command('python --version')
-    t = Task(name='foo', commands=[c])
-
     env = Env()
-    outs, errs, codes = t.run(env)
+    with tempfile() as f:
+        c = Command('python --version > ' + f + ' 2>&1')
+        t = Task(name='foo', commands=[c])
+        
+        codes = t.run(env)
+        strs = read(f)
 
-    if PY2:
-        strs = errs
-    else:
-        strs = outs
+        assert codes == [0]
+        assert strs.split()[0] == 'Python'
+        assert strs.split()[1] == sys.version.split()[0]
+        
+        t = Task.from_yaml('foo', {'command': 'pwd 2>&1 > ' + f,
+                                   'if': 'true'})
+        codes = t.run(env)
+        assert read(f) == os.getcwd() + '\n'
+        assert codes == [0]
 
-    assert strs[0].split()[0] == 'Python'
-    assert strs[0].split()[1] == sys.version.split()[0]
+        t = Task.from_yaml('foo', {'command': 'pwd 2>&1 > ' + f,
+                                   'if': 'false'})
+        codes = t.run(env)
+        assert codes == []
 
-    t = Task.from_yaml('foo', {'command': 'pwd',
-                               'if': 'true'})
-    outs, errs, codes = t.run(env)
-    assert outs == [os.getcwd() + '\n']
-    assert errs == ['']
-    assert codes == [0]
+        t = Task.from_yaml('foo', {'command': 'pwd 2>&1 > ' + f,
+                                   'ifnot': 'true'})
+        codes = t.run(env)
+        assert codes == []
 
-    t = Task.from_yaml('foo', {'command': 'pwd',
-                               'if': 'false'})
-    outs, errs, codes = t.run(env)
-    assert outs == []
-    assert errs == []
-    assert codes == []
-
-    t = Task.from_yaml('foo', {'command': 'pwd',
-                               'ifnot': 'true'})
-    outs, errs, codes = t.run(env)
-    assert outs == []
-    assert errs == []
-    assert codes == []
-
-    t = Task.from_yaml('foo', {'command': 'pwd',
-                               'ifnot': 'false'})
-    outs, errs, codes = t.run(env)
-    assert outs == [os.getcwd() + '\n']
-    assert errs == ['']
-    assert codes == [0]
-
-    t = Task(name='foo', commands=[Command('false'),
-                                   Command('true')])
-    outs, errs, codes = t.run(env)
-    assert outs == ['']
-    assert errs == ['']
-    assert codes == [1]
+        t = Task.from_yaml('foo', {'command': 'pwd 2>&1 > ' + f,
+                                   'ifnot': 'false'})
+        codes = t.run(env)
+        assert read(f) == os.getcwd() + '\n'
+        assert codes == [0]
 
 #-------------------------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-from yatr.base import resolve, variables, ordered_macros
+from yatr.base import resolve, variables, ordered_macros, get_output
 
 #-------------------------------------------------------------------------------
 # Utilities
@@ -23,6 +23,15 @@ def test_ordered_macros():
     assert list(ordered_macros(dct)) == [('a', 'b'), 
                                          ('b', '{{a}}'),
                                          ('c', '{{b}}')]
+
+def test_get_output():
+    out, code = get_output('true')
+    assert out == ''
+    assert code == 0
+
+    out, code = get_output('false')
+    assert out == ''
+    assert code == 1
 
 #-------------------------------------------------------------------------------
 

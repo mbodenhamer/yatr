@@ -1,8 +1,9 @@
 import os
-import shlex
 import hashlib
 import requests
-from subprocess import Popen, PIPE
+from tempfile import mkstemp
+from contextlib import contextmanager
+from subprocess import call, check_output, CalledProcessError, STDOUT
 from jinja2 import Template, Environment, meta
 from syn.base_utils import Precedes, topological_sorting
 from syn.five import STR
@@ -44,12 +45,25 @@ def ordered_macros(macros, lenient=False):
                 raise ValidationError('Referenced macro {} not defined'
                                       .format(name))
 
-def command(cmd, shell=False):
-    p = Popen(shlex.split(cmd), stdout=PIPE, stderr=PIPE, shell=shell)
-    out, err = p.communicate()
+def get_output(cmd):
+    try:
+        code = 0
+        out = check_output(cmd, shell=True, stderr=STDOUT)
+    except CalledProcessError as e:
+        code = e.returncode
+        out = e.output
+        if out:
+            print(out)
+
     out = out.decode('utf-8') if out else ''
-    err = err.decode('utf-8') if err else ''
-    return out, err, p.returncode
+    return out, code
+
+def command(cmd, silent=False):
+    if silent:
+        out, code = get_output(cmd)
+    else:
+        code = call(cmd, shell=True)
+    return code
 
 def download(url, path):
     req = requests.get(url)
@@ -73,6 +87,18 @@ def resolve_url(url, cachedir=None, force=False):
 
         return fpath
     return url
+
+def read(path):
+    with open(path, 'r') as f:
+        return f.read()
+
+@contextmanager
+def tempfile(*args, **kwargs):
+    try:
+        _, path = mkstemp(*args, **kwargs)
+        yield path
+    finally:
+        os.remove(path)
 
 #-------------------------------------------------------------------------------
 # __all__

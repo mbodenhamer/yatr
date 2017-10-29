@@ -92,11 +92,7 @@ def _main(*args):
         return
 
     if opts.task:
-        outs, errs, codes = doc.run(opts.task)
-        for out in outs:
-            sys.stdout.write(out)
-        sys.stdout.flush()
-
+        codes = doc.run(opts.task)
         if codes:
             sys.exit(max(codes))
 
