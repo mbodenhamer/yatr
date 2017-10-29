@@ -31,9 +31,17 @@ class Command(Base):
         return context.run_command(command, env, **kwargs)
 
     def run(self, env, **kwargs):
+        verbose = kwargs.get('verbose', False)
+        preview = kwargs.get('preview', False)
         silent = kwargs.get('silent', False)
+
         cmd = self.run_command(env, **kwargs)
-        return command(cmd, silent)
+        if verbose:
+            sys.stdout.write(cmd + '\n')
+            sys.stdout.flush()
+        
+        if not preview:
+            return command(cmd, silent)
 
 
 #-------------------------------------------------------------------------------
@@ -96,7 +104,7 @@ class Task(Base):
                 code = cmd.run(env, **kwargs)
                 codes.append(code)
 
-            if exit_on_error and any(c != 0 for c in codes):
+            if exit_on_error and any(c != 0 for c in codes if c is not None):
                 break
 
         return codes

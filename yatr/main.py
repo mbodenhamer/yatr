@@ -21,6 +21,11 @@ parser.add_argument('-m', '--macro', dest='macros',
 parser.add_argument('--cache-dir', dest='cachedir', type=str,
                     default=DEFAULT_CACHE_DIR, metavar='<DIR>',
                     help='Path of cache directory')
+parser.add_argument('-v', '--verbose', dest='verbose', default=False,
+                    action='store_true', help='Print commands to be run')
+parser.add_argument('-p', '--preview', dest='preview', default=False,
+                    action='store_true', help='Preview commands to be run '
+                    'without running them (implies -v)')
 parser.add_argument('--version', dest='show_version', default=False,
                     action='store_true', help='Print version')
 parser.add_argument('--validate', dest='validate', default=False,
@@ -107,8 +112,11 @@ def _main(*args):
         print("Validation successful")
         return
 
+    if opts.preview:
+        opts.verbose = True
+
     if opts.task:
-        codes = doc.run(opts.task)
+        codes = doc.run(opts.task, preview=opts.preview, verbose=opts.verbose)
         if codes:
             sys.exit(max(codes))
 

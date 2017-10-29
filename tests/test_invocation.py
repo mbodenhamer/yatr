@@ -48,6 +48,9 @@ def test_invocation():
 
         out, code = get_output('yatr bar foo')
         assert out == 'bar\nbar baz foo\n'
+
+        out, code = get_output('yatr -v bar foo')
+        assert out == 'echo bar\nbar\necho bar baz foo\nbar baz foo\n'
         
         out, code = get_output('yatr cond1')
         assert out == 'bar\n'

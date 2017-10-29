@@ -77,13 +77,21 @@ def test_main():
             assert out.getvalue() == \
                 '{}\n'.format(os.path.join(DIR, 'example/yatrfile.yml'))
             
+            # Test -p
+            with capture() as (out, err):
+                _main('-p', 'bar', 'foo')
+            assert out.getvalue() == 'echo bar\necho bar baz foo\n'
+
+            # Test --dump
             with capture() as (out, err):
                 _main('-f', 'C.yml', '--dump')
             assert out.getvalue() == 'a = baz\nb = ghi\nc = xyz\n'
             
+            # Test -m
             with capture() as (out, err):
                 _main('-f', 'C.yml', '-m' 'a=zab', '-m', 'd=jkl', '--dump')
             assert out.getvalue() == 'a = zab\nb = ghi\nc = xyz\nd = jkl\n'
+
 
 #-------------------------------------------------------------------------------
 

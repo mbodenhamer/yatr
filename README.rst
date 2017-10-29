@@ -23,8 +23,8 @@ Usage
 -----
 ::
 
-    usage: yatr [-h] [-f <yatrfile>] [-m <macro>=<value>] [--cache-dir <DIR>]
-		[--version] [--validate] [--dump] [--dump-path] [--pull]
+    usage: yatr [-h] [-f <yatrfile>] [-m <macro>=<value>] [--cache-dir <DIR>] [-v]
+		[-p] [--version] [--validate] [--dump] [--dump-path] [--pull]
 		[<task>] [ARGS [ARGS ...]]
 
     Yet Another Task Runner.
@@ -40,6 +40,9 @@ Usage
       -m <macro>=<value>, --macro <macro>=<value>
 			    Set/override macro with specified value
       --cache-dir <DIR>     Path of cache directory
+      -v, --verbose         Print commands to be run
+      -p, --preview         Preview commands to be run without running them
+			    (implies -v)
       --version             Print version
       --validate            Only validate the yatrfile
       --dump                Dump macro values
@@ -156,7 +159,7 @@ After includes are processed, macros are not resolved until task runtime.  The e
 Tasks may also be defined as a list of command strings, to be executed one after the other, as illustrated by ``bar``::
 
     $ yatr bar
-    foo
+    bar
     bar baz xyz
 
 
@@ -165,11 +168,27 @@ If the command string is the name of a defined task, then yatr will simply execu
 The ``bar`` task also illustrates another feature of yatr:  command-line arguments may be passed to tasks for execution.  For example::
 
     $ yatr bar foo
-    foo
+    bar
     bar baz foo
 
 
 Unless, explicitly re-defined, the macro ``_1`` denotes the first task command-line argument, ``_2`` denotes the second task command-line argument, and so on.  Default values may be specified using the Jinja2 ``default`` filter, as is illustrated in the definition of ``bar``.
+
+If the ``-v`` option is supplied at the command line, yatr will print the commands to be run before running them.  For example::
+
+    $ yatr -v bar foo
+    echo bar
+    bar
+    echo bar baz foo
+    bar baz foo
+
+
+If the ``-p`` option is supplied, yatr will simply print the commands without running them.  For example::
+
+    $ yatr -p bar foo
+    echo bar
+    echo bar baz foo
+
 
 Tasks may be defined to execute conditionally upon the successful execution of a command, using the keys ``if`` and ``ifnot``.  If these or other command options are used, the command itself must be explicitly identified by use of the ``command`` key.  These principles are illustrated in the ``cond1``, ``cond2``, ``cond3``, and ``cond4`` tasks::
 
