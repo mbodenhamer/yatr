@@ -5,6 +5,7 @@ macros:
   urlbase: https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles
   b: bar
   c: "{{b}} baz"
+  canard: "false"
 
 tasks:
   cwd: pwd
@@ -12,6 +13,8 @@ tasks:
   bar:
     - foo
     - "echo {{c}} {{_1|default('xyz')}}"
+
+  verily: "true"
 
   cond1:
     command: foo
@@ -23,8 +26,8 @@ tasks:
 
   cond3:
     command: foo
-    ifnot: "true"
+    ifnot: verily
 
   cond4:
     command: foo
-    ifnot: "false"
+    ifnot: "{{canard}}"

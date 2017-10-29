@@ -64,6 +64,7 @@ Suppose you have the following ``yatrfile.yml`` in your current working director
       urlbase: https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles
       b: bar
       c: "{{b}} baz"
+      canard: "false"
 
     tasks:
       cwd: pwd
@@ -71,6 +72,8 @@ Suppose you have the following ``yatrfile.yml`` in your current working director
       bar:
 	- foo
 	- "echo {{c}} {{_1|default('xyz')}}"
+
+      verily: "true"
 
       cond1:
 	command: foo
@@ -82,11 +85,11 @@ Suppose you have the following ``yatrfile.yml`` in your current working director
 
       cond3:
 	command: foo
-	ifnot: "true"
+	ifnot: verily
 
       cond4:
 	command: foo
-	ifnot: "false"
+	ifnot: "{{canard}}"
 
 
 As illustrated in this example, yatr currently supports three top-level keys in the yatrfile: ``include``, ``macros``, and ``tasks``.  The ``macros`` section must be a mapping of macro names to macro definitions.  Macro definitions may either be plain strings or `Jinja2 templates`_.
@@ -200,7 +203,7 @@ Tasks may be defined to execute conditionally upon the successful execution of a
     bar
 
 
-As currently implemented, the strings supplied to ``if`` and ``ifnot`` must be system commands, not tasks, and must not contain any macros.  If a value is supplied for ``if``, the command will be executed only if the return code of the test command is zero.  Likewise, if a value is supplied for ``ifnot``, the command will be executed only if the return code of the test command is non-zero.  Supporting macros and task references in the test command specification is planned for future releases.
+The values supplied to ``if`` and ``ifnot`` may be anything that would otherwise constitute a valid task definition.  If a value is supplied for ``if``, the command will be executed only if the return code of the test command is zero.  Likewise, if a value is supplied for ``ifnot``, the command will be executed only if the return code of the test command is non-zero.  Supporting macros and task references in the test command specification is planned for future releases.
 
 .. _Jinja2 templates: http://jinja.pocoo.org/docs/latest/templates/
 .. _test2.yml: https://github.com/mbodenhamer/yatrfiles/blob/master/yatrfiles/test/test2.yml

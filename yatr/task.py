@@ -1,6 +1,6 @@
 import sys
 from syn.base import Base, Attr
-from syn.type import List
+from syn.type import List, This
 from syn.five import STR
 
 from .base import ValidationError, command
@@ -50,7 +50,7 @@ class Command(Base):
 
 class Task(Base):
     _attrs = dict(commands = Attr(List(Command)),
-                  condition = Attr(Command, optional=True),
+                  condition = Attr(This, optional=True),
                   condition_type = Attr(bool, True))
     _opts = dict(init_validate = True,
                  optional_none = True)
@@ -73,10 +73,10 @@ class Task(Base):
                         cmd.context = dct['context']
 
                 if 'if' in dct:
-                    ret.condition = Command(dct['if'])
+                    ret.condition = Task.from_yaml(name + '-if', dct['if'])
                     ret.condition_type = True
                 elif 'ifnot' in dct:
-                    ret.condition = Command(dct['ifnot'])
+                    ret.condition = Task.from_yaml(name + '-ifnot', dct['ifnot'])
                     ret.condition_type = False
                 return ret
 
@@ -90,7 +90,8 @@ class Task(Base):
         exit_on_error = kwargs.get('exit_on_error', True)
 
         if self.condition:
-            code = self.condition.run(env, **kwargs)
+            codes_ = self.condition.run(env, **kwargs)
+            code = max(codes_)
             if ((self.condition_type is True and code != 0) or
                 (self.condition_type is False and code == 0)):
                 return []

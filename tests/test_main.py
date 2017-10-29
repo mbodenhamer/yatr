@@ -92,7 +92,6 @@ def test_main():
                 _main('-f', 'C.yml', '-m' 'a=zab', '-m', 'd=jkl', '--dump')
             assert out.getvalue() == 'a = zab\nb = ghi\nc = xyz\nd = jkl\n'
 
-
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__': # pragma: no cover
