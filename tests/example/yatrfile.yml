@@ -1,11 +1,15 @@
 include:
   - "{{urlbase}}/test/test2.yml"
 
+capture:
+  baz: "ls {{glob}}"
+
 macros:
   urlbase: https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles
   b: bar
   c: "{{b}} baz"
   canard: "false"
+  glob: "*.yml"
 
 tasks:
   cwd: pwd
@@ -17,7 +21,7 @@ tasks:
   verily: "true"
 
   cond1:
-    command: foo
+    command: 'echo "{{baz}}"'
     if: "true"
 
   cond2:

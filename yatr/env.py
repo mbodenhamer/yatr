@@ -2,7 +2,7 @@ from syn.base import Base, Attr, init_hook
 from syn.type import Dict
 from syn.five import STR
 
-from .base import resolve, ordered_macros
+from .base import resolve, ordered_macros, get_output
 from .context import Context, BUILTIN_CONTEXTS
 from .task import Task
 
@@ -23,6 +23,8 @@ class Env(Base):
                                doc='Task definitions'),
                   secret_values = Attr(Dict(STR), init=lambda self: dict(),
                                        doc='Secret value store'),
+                  captures = Attr(Dict(STR), init=lambda self: dict(),
+                                  doc='Commands to captures output of'),
                   env = Attr(Dict(STR), init=lambda self: dict(),
                              doc='Current name resolution environment'),
                   default_context = Attr(Context, doc='Execution context to use '
@@ -37,6 +39,12 @@ class Env(Base):
         if not hasattr(self, 'default_context'):
             self.default_context = self.contexts['null']
 
+    def capture_value(self, cmd, **kwargs):
+        out, code = get_output(cmd)
+        # These are intended to be macro values, so newlines and extra
+        # white space probably aren't desirable
+        return out.strip() 
+
     def macro_env(self, **kwargs):
         dct = dict(self.macros)
         dct.update(self.secret_values)
@@ -44,9 +52,16 @@ class Env(Base):
 
     def resolve_macros(self, **kwargs):
         env = self.macro_env(**kwargs)
+        macros = dict(self.macros)
+        macros.update(self.captures)
+
         # TODO: better error message if there is a cycle
-        for name, template in ordered_macros(self.macros):
-            env[name] = resolve(template, env)
+        for name, template in ordered_macros(macros):
+            if name in self.macros:
+                env[name] = resolve(template, env)
+            if name in self.captures:
+                cmd = resolve(template, env)
+                env[name] = self.capture_value(cmd, **kwargs)
         self.env = env
 
     def resolve(self, template):
@@ -55,6 +70,7 @@ class Env(Base):
     def update(self, env, **kwargs):
         self.secret_values.update(env.secret_values)
         self.macros.update(env.macros)
+        self.captures.update(env.captures)
         self.contexts.update(env.contexts)
         self.tasks.update(env.tasks)
 

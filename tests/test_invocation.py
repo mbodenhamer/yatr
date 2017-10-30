@@ -53,7 +53,10 @@ def test_invocation():
         assert out == 'echo bar\nbar\necho bar baz foo\nbar baz foo\n'
         
         out, code = get_output('yatr cond1')
-        assert out == 'bar\n'
+        assert out.strip().split() == ['A.yml',
+                                       'B.yml',
+                                       'C.yml',
+                                       'yatrfile.yml']
 
         out, code = get_output('yatr cond2')
         assert out == ''

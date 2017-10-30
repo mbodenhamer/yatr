@@ -55,17 +55,21 @@ If not supplied, ``<yatrfile>`` will default to a file matching the regular expr
 Example(s)
 ----------
 
-Suppose you have the following ``yatrfile.yml`` in your current working directory::
+Suppose you have the following ``yatrfile.yml`` in your `current working directory`_::
 
     include:
       - "{{urlbase}}/test/test2.yml"
 
+    capture:
+      baz: "ls {{glob}}"
+    
     macros:
       urlbase: https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles
       b: bar
       c: "{{b}} baz"
       canard: "false"
-
+      glob: "*.yml"
+    
     tasks:
       cwd: pwd
 
@@ -76,7 +80,7 @@ Suppose you have the following ``yatrfile.yml`` in your current working director
       verily: "true"
 
       cond1:
-	command: foo
+	command: 'echo "{{baz}}"'
 	if: "true"
 
       cond2:
@@ -92,7 +96,7 @@ Suppose you have the following ``yatrfile.yml`` in your current working director
 	ifnot: "{{canard}}"
 
 
-As illustrated in this example, yatr currently supports three top-level keys in the yatrfile: ``include``, ``macros``, and ``tasks``.  The ``macros`` section must be a mapping of macro names to macro definitions.  Macro definitions may either be plain strings or `Jinja2 templates`_.
+As illustrated in this example, yatr currently supports four top-level keys in the yatrfile: ``include``, ``capture``, ``macros``, and ``tasks``.  The ``macros`` section must be a mapping of macro names to macro definitions.  Macro definitions may either be plain strings or `Jinja2 templates`_.
 
 The ``include`` section must be a list of strings, each of which must be either a filesystem path or a URL specifying the location of another yatrfile.  When a yatrfile is "included" in this manner, its macros and tasks are added to the macros and tasks defined by the main yatrfile.  Nested includes are supported, following the rule that conflicts in macro or task names are resolved by favoring the definition closest to the main yatrfile.  
 
@@ -193,10 +197,12 @@ If the ``-p`` option is supplied, yatr will simply print the commands without ru
     echo bar baz foo
 
 
+The ``capture`` section defines a special type of macro, specifying a mapping from a macro name to a system command whose captured output is to be the value of the macro.  Values of ``capture`` mappings cannot contain task references, though they may contain references to other macros.  In the main example above, the yatrfile defines a capture macro named ``baz``, whose definition is ``ls {{glob}}``.  In the macro section, ``glob`` is defined as ``*.yml``.  Thus, if yatr is invoked in the `example working directory`_, the value of ``baz`` will resolve to ``A.yml  B.yml  C.yml  yatrfile.yml``.
+
 Tasks may be defined to execute conditionally upon the successful execution of a command, using the keys ``if`` and ``ifnot``.  If these or other command options are used, the command itself must be explicitly identified by use of the ``command`` key.  These principles are illustrated in the ``cond1``, ``cond2``, ``cond3``, and ``cond4`` tasks::
 
     $ yatr cond1
-    bar
+    A.yml  B.yml  C.yml  yatrfile.yml
     $ yatr cond2
     $ yatr cond3
     $ yatr cond4
@@ -207,7 +213,8 @@ The values supplied to ``if`` and ``ifnot`` may be anything that would otherwise
 
 .. _Jinja2 templates: http://jinja.pocoo.org/docs/latest/templates/
 .. _test2.yml: https://github.com/mbodenhamer/yatrfiles/blob/master/yatrfiles/test/test2.yml
-
+.. _current working directory: https://github.com/mbodenhamer/yatr/tree/master/tests/example
+.. _example working directory: https://github.com/mbodenhamer/yatr/tree/master/tests/example
 .. _Future Features:
 
 Future Features

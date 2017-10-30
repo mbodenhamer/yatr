@@ -41,6 +41,10 @@ def test_document():
     codes = d.run('dir', silent=True)
     assert codes == [0]
 
+    d = Document.from_yaml(dict(capture=dict(cwd='pwd')), os.getcwd())
+    d.post_process()
+    assert d.env.env['cwd'] == os.getcwd()
+
     path = os.path.join(DIR, 'mod1.py')
     assert_raises(ImportError, Document.from_yaml, {'import': [path]}, DIR)
 

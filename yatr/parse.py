@@ -37,6 +37,7 @@ class Document(Base):
                   contexts = Attr(Dict(Context), init=lambda self: dict()),
                   tasks = Attr(Dict(Task), init=lambda self: dict()),
                   secret_values = Attr(Dict(STR), init=lambda self: dict()),
+                  captures = Attr(Dict(STR), init=lambda self: dict()),
                   env = Attr(Env, init=lambda self: Env(), internal=True),
                   dirname = Attr(STR, doc='Relative path for includes'),
                   cachedir = Attr(STR, '', 'Directory to store downloaded files'),
@@ -56,6 +57,7 @@ class Document(Base):
     def from_yaml(cls, dct, dirname, **kwargs):
         get_delete(dct, kwargs, 'import', [], 'imports')
         get_delete(dct, kwargs, 'include', [], 'includes')
+        get_delete(dct, kwargs, 'capture', {}, 'captures')
         get_delete(dct, kwargs, 'secrets', [])
         get_delete(dct, kwargs, 'macros', {})
         get_delete(dct, kwargs, 'contexts', {})
@@ -107,7 +109,7 @@ class Document(Base):
             self.process_secret(name, **kwargs)
 
         env = Env(macros=self.macros, contexts=self.contexts, tasks=self.tasks,
-                  secret_values=self.secret_values)
+                  secret_values=self.secret_values, captures=self.captures)
         self.env.update(env, **kwargs)
 
     def post_process(self, **kwargs):
