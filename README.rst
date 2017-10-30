@@ -23,8 +23,9 @@ Usage
 -----
 ::
 
-    usage: yatr [-h] [-f <yatrfile>] [-m <macro>=<value>] [--cache-dir <DIR>] [-v]
-		[-p] [--version] [--validate] [--dump] [--dump-path] [--pull]
+    usage: yatr [-h] [-f <yatrfile>] [-m <macro>=<value>] [-s <setting>=<value>]
+		[--cache-dir <DIR>] [-v] [-p] [--version] [--validate] [--dump]
+		[--dump-path] [--pull]
 		[<task>] [ARGS [ARGS ...]]
 
     Yet Another Task Runner.
@@ -39,6 +40,8 @@ Usage
 			    The yatrfile to load
       -m <macro>=<value>, --macro <macro>=<value>
 			    Set/override macro with specified value
+      -s <setting>=<value>, --setting <setting>=<value>
+			    Set/override setting with specified value
       --cache-dir <DIR>     Path of cache directory
       -v, --verbose         Print commands to be run
       -p, --preview         Preview commands to be run without running them
