@@ -96,7 +96,9 @@ Suppose you have the following ``yatrfile.yml`` in your `current working directo
 	ifnot: "{{canard}}"
 
 
-As illustrated in this example, yatr currently supports four top-level keys in the yatrfile: ``include``, ``capture``, ``macros``, and ``tasks``.  A fifth top-level section ``settings`` is also supported (see Settings_).  The ``macros`` section must be a mapping of macro names to macro definitions.  Macro definitions may either be plain strings or `Jinja2 templates`_.
+As illustrated in this example, yatr currently supports four top-level keys in the yatrfile: ``include``, ``capture``, ``macros``, and ``tasks``.  A fifth top-level section ``settings`` is also supported (see Settings_).
+
+The ``macros`` section must be a mapping of macro names to macro definitions.  Macro definitions may either be plain strings or `Jinja2 templates`_.
 
 The ``include`` section must be a list of strings, each of which must be either a filesystem path or a URL specifying the location of another yatrfile.  When a yatrfile is "included" in this manner, its macros and tasks are added to the macros and tasks defined by the main yatrfile.  Nested includes are supported, following the rule that conflicts in macro or task names are resolved by favoring the definition closest to the main yatrfile.  
 
@@ -147,7 +149,7 @@ Macro values may also be set or overridden at the command line by supplying the 
     c = xyz
     d = jkl
 
-Include paths or URLs may use macros, as the main example above demonstrates, having an include defined in terms of the ``urlbase`` macro.  However, any such macros must be defined in the yatrfile itself, and cannot be defined in an included yatrfile or depend on the macros defined in an included yatrfile for their proper resolution.
+Include paths or URLs may use macros, as the main example above demonstrates, as it has an include defined in terms of the ``urlbase`` macro.  However, any such macros must be defined in the yatrfile itself, and cannot be defined in an included yatrfile or depend on the macros defined in an included yatrfile for their proper resolution.
 
 If an include path is a URL, yatr will attempt to download the file and save it in a cache directory.  By default, the cache directory is set to ``~/.yatr/``, but this may be changed through the ``--cache-dir`` option.  If the URL file already exists in the cache directory, yatr will load the cached file without downloading.  To force yatr to re-download all URL includes specified by the yatrfile, supply the ``--pull`` option at the command line.
 
@@ -157,7 +159,7 @@ Tasks are defined in the ``tasks`` section of the yatrfile.  Tasks may be define
     /foo/baz
 
 
-After includes are processed, macros are not resolved until task runtime.  The example yatrfile specifies the inclusion of a file named `test2.yml`_, which defines a task named ``foo``.  However, ``foo`` is defined in terms of a macro named ``b``, which is not defined in ``test2.yml``.  The macro ``b`` is defined in the main yatrfile, however, which induces the following behavior::
+Macros are not fully resolved until task runtime.  The example yatrfile specifies the inclusion of a file named `test2.yml`_, which defines a task named ``foo``.  However, ``foo`` is defined in terms of a macro named ``b``, which is not defined in ``test2.yml``.  The macro ``b`` is defined in the main yatrfile, however, which induces the following behavior::
 
     $ yatr foo
     bar
@@ -181,7 +183,7 @@ The ``bar`` task also illustrates another feature of yatr:  command-line argumen
 
 Unless, explicitly re-defined, the macro ``_1`` denotes the first task command-line argument, ``_2`` denotes the second task command-line argument, and so on.  Default values may be specified using the Jinja2 ``default`` filter, as is illustrated in the definition of ``bar``.
 
-If the ``-v`` option is supplied at the command line, yatr will print the commands to be run before running them.  For example::
+If the ``-v`` option is supplied at the command line, yatr will print the commands to be run before running them::
 
     $ yatr -v bar foo
     echo bar
@@ -190,7 +192,7 @@ If the ``-v`` option is supplied at the command line, yatr will print the comman
     bar baz foo
 
 
-If the ``-p`` option is supplied, yatr will simply print the commands without running them.  For example::
+If the ``-p`` option is supplied, yatr will simply print the commands without running them::
 
     $ yatr -p bar foo
     echo bar
@@ -209,7 +211,7 @@ Tasks may be defined to execute conditionally upon the successful execution of a
     bar
 
 
-The values supplied to ``if`` and ``ifnot`` may be anything that would otherwise constitute a valid task definition.  If a value is supplied for ``if``, the command will be executed only if the return code of the test command is zero.  Likewise, if a value is supplied for ``ifnot``, the command will be executed only if the return code of the test command is non-zero.  Supporting macros and task references in the test command specification is planned for future releases.
+The values supplied to ``if`` and ``ifnot`` may be anything that would otherwise constitute a valid task definition.  If a value is supplied for ``if``, the command will be executed only if the return code of the test command is zero.  Likewise, if a value is supplied for ``ifnot``, the command will be executed only if the return code of the test command is non-zero.
 
 .. _Jinja2 templates: http://jinja.pocoo.org/docs/latest/templates/
 .. _test2.yml: https://github.com/mbodenhamer/yatrfiles/blob/master/yatrfiles/test/test2.yml
