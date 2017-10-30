@@ -1,6 +1,7 @@
 from jinja2 import UndefinedError
 from nose.tools import assert_raises
-from yatr.base import resolve, variables, ordered_macros, get_output
+from yatr.base import resolve, variables, ordered_macros, get_output,\
+    str_to_bool
 
 #-------------------------------------------------------------------------------
 # Utilities
@@ -39,6 +40,23 @@ def test_get_output():
     out, code = get_output('python -c "raise Exception(\\"Test\\")"')
     assert 'Exception' in out
     assert code == 1
+
+def test_str_to_bool():
+    assert str_to_bool(1) is True
+    assert str_to_bool(True) is True
+    assert str_to_bool(0) is False
+    assert str_to_bool(False) is False
+
+    assert str_to_bool(' YES   ')
+    assert str_to_bool(' TrUE   ')
+    assert str_to_bool(' 1   ')
+
+    assert not str_to_bool(' NO   ')
+    assert not str_to_bool(' FalSE   ')
+    assert not str_to_bool(' 0   ')
+
+    assert_raises(TypeError, str_to_bool, [])
+    assert_raises(TypeError, str_to_bool, 'foo')
 
 #-------------------------------------------------------------------------------
 

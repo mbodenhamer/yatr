@@ -25,6 +25,8 @@ class Env(Base):
                                        doc='Secret value store'),
                   captures = Attr(Dict(STR), init=lambda self: dict(),
                                   doc='Commands to captures output of'),
+                  settings = Attr(Dict(None), init=lambda self: dict(),
+                                  doc='Global settings of various sorts'),
                   env = Attr(Dict(STR), init=lambda self: dict(),
                              doc='Current name resolution environment'),
                   default_context = Attr(Context, doc='Execution context to use '
@@ -73,6 +75,7 @@ class Env(Base):
         self.captures.update(env.captures)
         self.contexts.update(env.contexts)
         self.tasks.update(env.tasks)
+        self.settings.update(env.settings)
 
         self.default_context = env.default_context
 

@@ -7,7 +7,7 @@ from syn.type import List, Dict
 from syn.five import STR
 
 from .base import ValidationError, resolve_url, resolve, ordered_macros,\
-    DEFAULT_CACHE_DIR
+    DEFAULT_CACHE_DIR, str_to_bool
 from .context import Context
 from .task import Task
 from .env import Env
@@ -38,6 +38,7 @@ class Document(Base):
                   tasks = Attr(Dict(Task), init=lambda self: dict()),
                   secret_values = Attr(Dict(STR), init=lambda self: dict()),
                   captures = Attr(Dict(STR), init=lambda self: dict()),
+                  settings = Attr(Dict(None), init=lambda self: dict()),
                   env = Attr(Env, init=lambda self: Env(), internal=True),
                   dirname = Attr(STR, doc='Relative path for includes'),
                   cachedir = Attr(STR, '', 'Directory to store downloaded files'),
@@ -62,6 +63,12 @@ class Document(Base):
         get_delete(dct, kwargs, 'macros', {})
         get_delete(dct, kwargs, 'contexts', {})
         get_delete(dct, kwargs, 'tasks', {})
+        
+        settings = dict(dct.get('settings', {}))
+        settings.update(kwargs.get('settings', {}))
+        kwargs['settings'] = settings
+        if 'settings' in dct:
+            del dct['settings']
 
         if dct:
             raise ValidationError('Invalid top-level keys: {}'
@@ -83,6 +90,8 @@ class Document(Base):
         cachedir = DEFAULT_CACHE_DIR
         if self.cachedir:
             cachedir = self.cachedir
+
+        self.process_settings(**kwargs)
 
         pre_macros = dict(self.macros)
         for name, macro in ordered_macros(pre_macros, lenient=True):
@@ -109,7 +118,8 @@ class Document(Base):
             self.process_secret(name, **kwargs)
 
         env = Env(macros=self.macros, contexts=self.contexts, tasks=self.tasks,
-                  secret_values=self.secret_values, captures=self.captures)
+                  secret_values=self.secret_values, captures=self.captures,
+                  settings=self.settings)
         self.env.update(env, **kwargs)
 
     def post_process(self, **kwargs):
@@ -133,6 +143,9 @@ class Document(Base):
 
     def process_secret(self, name, **kwargs):
         raise NotImplementedError('Secrets currently unsupported')
+
+    def process_settings(self, **kwargs):
+        self.settings['silent'] = str_to_bool(self.settings.get('silent', False))
 
     def run(self, name, **kwargs):
         try:

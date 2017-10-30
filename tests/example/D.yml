@@ -1,0 +1,5 @@
+include:
+  - yatrfile.yml
+
+settings:
+  silent: true

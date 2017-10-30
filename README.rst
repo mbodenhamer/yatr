@@ -96,7 +96,7 @@ Suppose you have the following ``yatrfile.yml`` in your `current working directo
 	ifnot: "{{canard}}"
 
 
-As illustrated in this example, yatr currently supports four top-level keys in the yatrfile: ``include``, ``capture``, ``macros``, and ``tasks``.  The ``macros`` section must be a mapping of macro names to macro definitions.  Macro definitions may either be plain strings or `Jinja2 templates`_.
+As illustrated in this example, yatr currently supports four top-level keys in the yatrfile: ``include``, ``capture``, ``macros``, and ``tasks``.  A fifth top-level section ``settings`` is also supported (see Settings_).  The ``macros`` section must be a mapping of macro names to macro definitions.  Macro definitions may either be plain strings or `Jinja2 templates`_.
 
 The ``include`` section must be a list of strings, each of which must be either a filesystem path or a URL specifying the location of another yatrfile.  When a yatrfile is "included" in this manner, its macros and tasks are added to the macros and tasks defined by the main yatrfile.  Nested includes are supported, following the rule that conflicts in macro or task names are resolved by favoring the definition closest to the main yatrfile.  
 
@@ -197,12 +197,12 @@ If the ``-p`` option is supplied, yatr will simply print the commands without ru
     echo bar baz foo
 
 
-The ``capture`` section defines a special type of macro, specifying a mapping from a macro name to a system command whose captured output is to be the value of the macro.  Values of ``capture`` mappings cannot contain task references, though they may contain references to other macros.  In the main example above, the yatrfile defines a capture macro named ``baz``, whose definition is ``ls {{glob}}``.  In the macro section, ``glob`` is defined as ``*.yml``.  Thus, if yatr is invoked in the `example working directory`_, the value of ``baz`` will resolve to ``A.yml  B.yml  C.yml  yatrfile.yml``.
+The ``capture`` section defines a special type of macro, specifying a mapping from a macro name to a system command whose captured output is to be the value of the macro.  Values of ``capture`` mappings cannot contain task references, though they may contain references to other macros.  In the main example above, the yatrfile defines a capture macro named ``baz``, whose definition is ``ls {{glob}}``.  In the macro section, ``glob`` is defined as ``*.yml``.  Thus, if yatr is invoked in the `example working directory`_, the value of ``baz`` will resolve to ``A.yml  B.yml  C.yml  D.yml  yatrfile.yml``.
 
 Tasks may be defined to execute conditionally upon the successful execution of a command, using the keys ``if`` and ``ifnot``.  If these or other command options are used, the command itself must be explicitly identified by use of the ``command`` key.  These principles are illustrated in the ``cond1``, ``cond2``, ``cond3``, and ``cond4`` tasks::
 
     $ yatr cond1
-    A.yml  B.yml  C.yml  yatrfile.yml
+    A.yml  B.yml  C.yml  D.yml  yatrfile.yml
     $ yatr cond2
     $ yatr cond3
     $ yatr cond4
@@ -215,7 +215,35 @@ The values supplied to ``if`` and ``ifnot`` may be anything that would otherwise
 .. _test2.yml: https://github.com/mbodenhamer/yatrfiles/blob/master/yatrfiles/test/test2.yml
 .. _current working directory: https://github.com/mbodenhamer/yatr/tree/master/tests/example
 .. _example working directory: https://github.com/mbodenhamer/yatr/tree/master/tests/example
-.. _Future Features:
+
+Settings
+--------
+
+The top-level section ``settings`` allows the global execution behavior of yatr to be modified in various ways.  Only one setting (``silent``) is currently supported, but more will be added as more features are implemented.  The ``silent`` setting, if set to ``true``, will suppress all system command output at the console.  Such behavior is disabled by default.
+
+An example of settings can be found in `D.yml`_, which includes the main example yatrfile discussed above::
+
+    include:
+      - yatrfile.yml
+
+    settings:
+      silent: true
+
+
+In the example above, running ``yatr foo`` led to the output ``bar`` being printed to the console.  However, invoking the same task through `D.yml`_ will result in no output being printed::
+
+    $ yatr -f D.yml foo
+ 
+
+However, any setting can be set or overridden at the command line by supplying the ``-s`` option::
+
+    $ yatr -f D.yml -s silent=false foo
+    bar
+
+
+For boolean-type settings, such as ``silent``, any of the following strings may be used to denote True, regardless of capitalization:  ``yes``, ``true``, ``1``.  Likewise, any of the following strings may be used to denote False, regardless of capitalization:  ``no``, ``false``, ``0``.
+
+.. _D.yml: https://github.com/mbodenhamer/yatr/blob/master/tests/example/D.yml
 
 Future Features
 ---------------
@@ -225,5 +253,3 @@ As an inspection of the source code might reveal, three additional top-level key
 The ``secrets`` section defines a special type of macro, specifying a list of names corresponding to secrets that should not be stored as plaintext.  In future releases, yatr will attempt to find these values in the user keyring, and then prompt the user to enter their values via stdin if not present.  There will also be an option to store values so entered in the user keyring to avoid having to re-enter them on future task invocations.  No support for secrets is implemented at present, however.
 
 The ``contexts`` section allows the specification of custom execution contexts in which tasks are invoked.  For example, one might define a custom shell execution context that specifies the values of various environment variables to avoid cluttering up a task definition with extra macros or statements.  This feature is not currently supported, and its future is uncertain.
-
-A top-level ``settings`` section is also planned for configuring the default behavior of tasks in various ways.

@@ -18,6 +18,9 @@ parser.add_argument('-f', '--yatrfile', dest='yatrfile', type=str,
 parser.add_argument('-m', '--macro', dest='macros',
                     action='append', metavar='<macro>=<value>',
                     help='Set/override macro with specified value')
+parser.add_argument('-s', '--setting', dest='settings',
+                    action='append', metavar='<setting>=<value>',
+                    help='Set/override setting with specified value')
 parser.add_argument('--cache-dir', dest='cachedir', type=str,
                     default=DEFAULT_CACHE_DIR, metavar='<DIR>',
                     help='Path of cache directory')
@@ -86,9 +89,17 @@ def _main(*args):
         key = '_{}'.format(k+1)
         INITIAL_MACROS[key] = arg
 
+    # Process settings
+    settings = {}
+    if opts.settings:
+        for s in opts.settings:
+            setting, value = s.split('=')
+            settings[setting] = value
+
     # Load yatrfile
     path = find_yatrfile_path(opts.yatrfile)
-    doc = Document.from_path(path, pull=opts.pull, cachedir=opts.cachedir)
+    doc = Document.from_path(path, pull=opts.pull, cachedir=opts.cachedir,
+                             settings=settings)
     
     # Process command-line macro overrides
     if opts.macros:

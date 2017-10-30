@@ -114,6 +114,17 @@ def tempdir(*args, **kwargs):
     finally:
         shutil.rmtree(path)
 
+def str_to_bool(value):
+    if isinstance(value, int):
+        return bool(value)
+    elif isinstance(value, STR):
+        val = value.strip().lower()
+        if val in {'yes', 'true', '1'}:
+            return True
+        if val in {'no', 'false', '0'}:
+            return False
+    raise TypeError('Invalid type/value for conversion: {}'.format(value))
+
 #-------------------------------------------------------------------------------
 # __all__
 

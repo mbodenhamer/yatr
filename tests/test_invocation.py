@@ -56,6 +56,7 @@ def test_invocation():
         assert out.strip().split() == ['A.yml',
                                        'B.yml',
                                        'C.yml',
+                                       'D.yml',
                                        'yatrfile.yml']
 
         out, code = get_output('yatr cond2')
@@ -69,6 +70,14 @@ def test_invocation():
 
         out, code = get_output('yatr -v cond4')
         assert out == 'false\necho bar\nbar\n'
+
+        # Test settings.silent
+        out, code = get_output('yatr -f D.yml foo')
+        assert out == ''
+        assert code == 0
+
+        out, code = get_output('yatr -f D.yml -s silent=false foo')
+        assert out == 'bar\n'
 
 #-------------------------------------------------------------------------------
 

@@ -33,7 +33,7 @@ class Command(Base):
     def run(self, env, **kwargs):
         verbose = kwargs.get('verbose', False)
         preview = kwargs.get('preview', False)
-        silent = kwargs.get('silent', False)
+        silent = kwargs.get('silent', env.settings.get('silent', False))
 
         pre = ''
         if preview:
