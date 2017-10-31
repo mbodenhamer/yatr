@@ -1,0 +1,10 @@
+# -*- shell-script -*-
+
+_yatr()
+{
+    export COMP_LINE
+    export COMP_CWORD
+    export COMP_POINT
+    COMPREPLY=( $(yatr --dump-bash-completions) )
+}
+complete -o default -o bashdefault -F _yatr yatr

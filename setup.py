@@ -1,4 +1,6 @@
 from setuptools import setup, find_packages
+# from setuptools import find_packages
+# from distutils.core import setup
 
 def read(fpath):
     with open(fpath, 'r') as f:
@@ -18,7 +20,10 @@ setup(
     description = 'Yet Another Task Runner',
     long_description = read('README.rst'),
     url = 'https://github.com/mbodenhamer/yatr',
-    packages = find_packages(),
+    packages = ['yatr'],
+    package_dir = {'yatr': 'yatr'},
+    package_data = {'yatr': 'scripts'},
+    include_package_data = True,
     install_requires = requirements('requirements.in'),
     entry_points = {
         'console_scripts': [
