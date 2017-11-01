@@ -61,6 +61,7 @@ add_argument(parser, 'args', metavar='ARGS', nargs='*',
              help='Additional arguments for the task')
 
 USAGE = parser.format_usage().strip()
+OPTION_STRINGS.sort()
 
 #-------------------------------------------------------------------------------
 # Yatrfile search
@@ -91,6 +92,13 @@ def find_yatrfile_path(path):
 #-------------------------------------------------------------------------------
 # Completion data
 
+def default_data():
+    ret = {}
+    ret['tasks'] = []
+    ret['macros'] = []
+    ret['settings'] = []
+    return ret
+
 def data_path_from_yatrfile_path(path, cachedir):
     base = hashlib.sha224(path.encode('utf-8')).hexdigest()
     fname = base + '_compdata'
@@ -98,9 +106,12 @@ def data_path_from_yatrfile_path(path, cachedir):
     return fpath
 
 def compile_completion_data(path, cachedir, outpath):
-    doc = Document.from_path(path, cachedir=cachedir)
+    data = default_data()
+    try:
+        doc = Document.from_path(path, cachedir=cachedir)
+    except:
+        return data
 
-    data = {}
     data['tasks'] = sorted(doc.env.tasks.keys())
     data['macros'] = sorted(doc.env.macros.keys())
     data['settings'] = sorted(doc.env.settings.keys())
@@ -117,12 +128,8 @@ def load_completion_data(yatrfile, cachedir):
     cachedir = os.path.expanduser(cachedir)
     try:
         path = find_yatrfile_path(yatrfile)
-    except RuntimeError:
-        ret = {}
-        ret['tasks'] = []
-        ret['macros'] = []
-        ret['settings'] = []
-        return ret
+    except:
+        return default_data()
 
     dpath = data_path_from_yatrfile_path(path, cachedir)
 
@@ -136,7 +143,6 @@ def load_completion_data(yatrfile, cachedir):
         with open(dpath, 'r') as f:
             data = json.load(f)
 
-    data['options'] = OPTION_STRINGS
     return data
 
 #-------------------------------------------------------------------------------
