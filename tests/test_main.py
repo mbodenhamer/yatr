@@ -73,6 +73,12 @@ def test_bash_completions():
         out = find_bash_completions(['print', 'xyz'], 1)
         assert out == []
         
+        out = find_bash_completions(['-i', '/app'], 1)
+        assert out == []
+
+        out = find_bash_completions(['-o', '/app'], 1)
+        assert out == []
+
 
         out = find_bash_completions([], 0)
         assert out == ['print']
@@ -93,6 +99,12 @@ def test_bash_completions():
         assert out == ['print']
 
         out = find_bash_completions(['-m', 'a=xyz', 'print'], 3)
+        assert out == []
+
+        out = find_bash_completions(['-i'], 1)
+        assert out == []
+
+        out = find_bash_completions(['-o'], 1)
         assert out == []
 
         with capture() as (out, err):

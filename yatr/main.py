@@ -220,6 +220,9 @@ def find_bash_completions(args, idx):
                 else:
                     return matches(word, data['settings'])
 
+            elif pword in ('-i', '-o'):
+                return [] # we are completing a filename
+
             else: # The only other option is that we are completing a task name
                 return matches(word, data['tasks'])
 
@@ -241,6 +244,9 @@ def find_bash_completions(args, idx):
             elif pword in ('-s', '--setting'):
                 return data['settings']
 
+            elif pword in ('-i', '-o'):
+                return [] # we are completing a filename
+
             else: # probably looking for a task at this point
                 return data['tasks']
 
@@ -249,13 +255,15 @@ def dump_bash_completions(args, idx):
     out = ' '.join(comps)
     print(out)
 
-BASH_COMPLETION_MESSAGE = '''You may need to add the following line to ~/.bashrc:
+BASH_COMPLETION_MESSAGE = \
+'''If custom tab completions are not enabled globally, you may need to add the following line to ~/.bashrc:
 
     source /etc/bash_completion.d/yatr
 
-which can be accomplished with the following:
+which can be accomplished by running the following:
 
-    echo "source /etc/bash_completion.d/yatr" >> ~/.bashrc'''
+    echo "source /etc/bash_completion.d/yatr" >> ~/.bashrc
+'''
 
 def install_bash_completions():
     script = os.path.join(DIR, 'scripts/completion/yatr')
