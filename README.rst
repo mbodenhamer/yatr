@@ -19,13 +19,20 @@ Installation
     $ pip install yatr
 
 
+Dynamic task, macro, setting, and option name bash tab completions are supported.  To install, run::
+
+    $ yatr --install-bash-completions
+
+
+As with invoking ``pip``, you will need to have root access or use ``sudo``.  Depending on your system configuration, configurable bash tab completions may not be enabled by default.  If it is infeasible or undesirable to enable such functionality globally, the above command also prints out instructions for how to enable tab completions for ``yatr`` locally.
+
 Usage
 -----
 ::
 
     usage: yatr [-h] [-f <yatrfile>] [-m <macro>=<value>] [-s <setting>=<value>]
-		[--cache-dir <DIR>] [-v] [-p] [--version] [--validate] [--dump]
-		[--dump-path] [--pull]
+		[--cache-dir <DIR>] [--install-bash-completions] [-v] [-p]
+		[--version] [--validate] [--dump] [--dump-path] [--pull]
 		[<task>] [ARGS [ARGS ...]]
 
     Yet Another Task Runner.
@@ -43,6 +50,8 @@ Usage
       -s <setting>=<value>, --setting <setting>=<value>
 			    Set/override setting with specified value
       --cache-dir <DIR>     Path of cache directory
+      --install-bash-completions
+			    Install bash tab completion script globally
       -v, --verbose         Print commands to be run
       -p, --preview         Preview commands to be run without running them
 			    (implies -v)
