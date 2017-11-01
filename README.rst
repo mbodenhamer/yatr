@@ -82,6 +82,8 @@ Suppose you have the following ``yatrfile.yml`` in your `current working directo
       canard: "false"
       glob: "*.yml"
     
+    default: foo
+
     tasks:
       cwd: pwd
 
@@ -108,7 +110,7 @@ Suppose you have the following ``yatrfile.yml`` in your `current working directo
 	ifnot: "{{canard}}"
 
 
-As illustrated in this example, yatr currently supports four top-level keys in the yatrfile: ``include``, ``capture``, ``macros``, and ``tasks``.  A fifth top-level section ``settings`` is also supported (see Settings_).
+As illustrated in this example, yatr currently supports five top-level keys in the yatrfile: ``include``, ``capture``, ``macros``, ``tasks``, and ``default``.  A sixth top-level section ``settings`` is also supported (see Settings_).
 
 The ``macros`` section must be a mapping of macro names to macro definitions.  Macro definitions may either be plain strings or `Jinja2 templates`_.
 
@@ -176,6 +178,14 @@ Macros are not fully resolved until task runtime.  The example yatrfile specifie
     $ yatr foo
     bar
 
+
+The ``default`` section, if specified, must contain the name of a task to be run if no task names are provided at the command line.  In this example, the default task is set to ``foo``.  As such::
+
+    $ yatr
+    bar
+
+
+If no default task is defined, and if yatr is invoked without any arguments, then yatr will exit after printing usage information.
 
 Tasks may also be defined as a list of command strings, to be executed one after the other, as illustrated by ``bar``::
 

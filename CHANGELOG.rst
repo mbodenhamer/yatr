@@ -5,6 +5,7 @@ Changelog
 ~~~~~~~~~~~~~~~~~~
 
 * Fixed issue of capture command execution directory.
+* Added default task section.
 
 0.0.4 (2017-11-05)
 ~~~~~~~~~~~~~~~~~~

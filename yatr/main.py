@@ -63,6 +63,13 @@ USAGE = parser.format_usage().strip()
 OPTION_STRINGS.sort()
 
 #-------------------------------------------------------------------------------
+
+def print_(s, flush=True):
+    sys.stdout.write(s + '\n')
+    if flush:
+        sys.stdout.flush()
+
+#-------------------------------------------------------------------------------
 # Yatrfile search
 
 YATRFILE_PATTERN = re.compile('^[Yy]atrfile(.yml)?$')
@@ -288,13 +295,13 @@ def _main(*args):
     doc.post_process()
 
     if opts.dump_path:
-        print(path)
+        print_(path)
 
     if opts.dump_vars:
         # TODO: add support for filtering out unwanted variables
         # TODO: add support for not including possible secrets in output
         for name in sorted(doc.env.env):
-            print('{} = {}'.format(name, doc.env.env[name]))
+            print_('{} = {}'.format(name, doc.env.env[name]))
 
     if opts.validate:
         # Check that there are no undefined macros in task definitions
@@ -307,8 +314,12 @@ def _main(*args):
     if opts.preview:
         opts.verbose = True
 
-    if opts.task:
-        codes = doc.run(opts.task, preview=opts.preview, verbose=opts.verbose)
+    task = opts.task
+    if not task and doc.env.default_task:
+        task = doc.env.default_task
+
+    if task:
+        codes = doc.run(task, preview=opts.preview, verbose=opts.verbose)
         if codes:
             sys.exit(max(codes))
 

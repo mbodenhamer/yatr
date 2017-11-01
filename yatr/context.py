@@ -96,7 +96,7 @@ class Bash(Context):
 #-----------------------------------------------------------
 # CD
 
-# Example: cd .. to then rsync the repo
+
 class CD(Context):
     context_name = 'cd'
 

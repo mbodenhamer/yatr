@@ -14,6 +14,7 @@ from yatr.base import read, tempdir, ValidationError
 
 DIR = os.path.abspath(os.path.dirname(__file__))
 TEST1 = os.path.join(DIR, 'test1.yml')
+TEST2 = os.path.join(DIR, 'test2.yml')
 TEST3 = os.path.join(DIR, 'test3.yml')
 TEST4 = os.path.join(DIR, 'test4.yml')
 OUT = os.path.join(DIR, 'output')
@@ -179,15 +180,25 @@ def test_main():
             _main('-f', os.path.join(DIR, 'yatrfile1.yml'), '--validate')
         assert out.getvalue() == 'Validation successful\n'
 
+        # Test default task
+        with capture() as (out, err):
+            _main('-f', TEST2, '-p')
+        assert out.getvalue() == 'true\n'
+
         try:
             # Test --dump and task command-line arg passing
             with chdir(os.path.join(DIR, 'foo')):
                 with capture() as (out, err):
                     _main('--dump')
-                assert out.getvalue() == 'a = abc\nb = abcdef\nc = abcdefghi\n'
+                assert out.getvalue() == ('a = abc\nb = abcdef\nc = abcdefghi\n'
+                                          'pwd = {}\n'.format(DIR))
 
                 _main('print', '5')
                 assert read(OUT) == 'abcdefghi 5\n'
+
+                with capture() as (out, err):
+                    _main()
+                assert out.getvalue() == USAGE + '\n'
 
             # Test task referencing in task definition
             _main('-f', TEST3, 'a')
@@ -250,10 +261,6 @@ def test_main():
 
             # Cover settings
             _main('-f', 'D.yml', '-s', 'silent=false')
-
-            with capture() as (out, err):
-                _main()
-            assert out.getvalue() == USAGE + '\n'
 
 #-------------------------------------------------------------------------------
 

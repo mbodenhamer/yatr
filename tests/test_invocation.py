@@ -28,7 +28,7 @@ def test_invocation():
     with chdir(os.path.join(DIR, 'example')):
         # Test --dump-path
         out, code = get_output('yatr --dump-path')
-        assert out == '{}\n'.format(os.path.join(DIR, 'example/yatrfile.yml'))
+        assert out == '{}\nbar\n'.format(os.path.join(DIR, 'example/yatrfile.yml'))
         assert code == 0
 
         # Test nested include
@@ -37,6 +37,10 @@ def test_invocation():
 
         # Test included task
         out, code = get_output('yatr foo')
+        assert out == 'bar\n'
+
+        # Test default task
+        out, code = get_output('yatr')
         assert out == 'bar\n'
 
         # Test example tasks

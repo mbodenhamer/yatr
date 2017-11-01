@@ -29,6 +29,8 @@ class Env(Base):
                                   doc='Global settings of various sorts'),
                   env = Attr(Dict(STR), init=lambda self: dict(),
                              doc='Current name resolution environment'),
+                  default_task = Attr(STR, '', 'Task to run if no task is '
+                                      'specified at the command line'),
                   default_context = Attr(Context, doc='Execution context to use '
                                          'if none is specified in task definition'))
     _opts = dict(init_validate = True)
@@ -78,6 +80,7 @@ class Env(Base):
         self.settings.update(env.settings)
 
         self.default_context = env.default_context
+        self.default_task = env.default_task
 
     def validate(self):
         super(Env, self).validate()

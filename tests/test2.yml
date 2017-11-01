@@ -1,3 +1,5 @@
+default: good
+
 tasks:
   good: "true"
   bad: 

@@ -11,6 +11,8 @@ macros:
   canard: "false"
   glob: "*.yml"
 
+default: foo
+
 tasks:
   cwd: pwd
 

@@ -1,6 +1,9 @@
 include:
   - yatrfile1.yml
 
+capture:
+  pwd: pwd
+
 macros:
   c: "{{b}}ghi"
 

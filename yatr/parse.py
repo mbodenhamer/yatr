@@ -39,6 +39,8 @@ class Document(Base):
                   secret_values = Attr(Dict(STR), init=lambda self: dict()),
                   captures = Attr(Dict(STR), init=lambda self: dict()),
                   settings = Attr(Dict(None), init=lambda self: dict()),
+                  default_task = Attr(STR, '', 'Task to run if no task is '
+                                      'specified at the command line'),
                   env = Attr(Env, init=lambda self: Env(), internal=True),
                   dirname = Attr(STR, doc='Relative path for includes'),
                   cachedir = Attr(STR, '', 'Directory to store downloaded files'),
@@ -63,7 +65,8 @@ class Document(Base):
         get_delete(dct, kwargs, 'macros', {})
         get_delete(dct, kwargs, 'contexts', {})
         get_delete(dct, kwargs, 'tasks', {})
-        
+        get_delete(dct, kwargs, 'default', '', 'default_task')
+
         settings = dict(dct.get('settings', {}))
         settings.update(kwargs.get('settings', {}))
         kwargs['settings'] = settings
@@ -119,7 +122,7 @@ class Document(Base):
 
         env = Env(macros=self.macros, contexts=self.contexts, tasks=self.tasks,
                   secret_values=self.secret_values, captures=self.captures,
-                  settings=self.settings)
+                  settings=self.settings, default_task=self.default_task)
         self.env.update(env, **kwargs)
 
     def post_process(self, **kwargs):
