@@ -30,9 +30,10 @@ Usage
 -----
 ::
 
-    usage: yatr [-h] [-f <yatrfile>] [-m <macro>=<value>] [-s <setting>=<value>]
-		[--cache-dir <DIR>] [--install-bash-completions] [-v] [-p]
-		[--version] [--validate] [--dump] [--dump-path] [--pull]
+    usage: yatr [-h] [-f <yatrfile>] [-i <file>] [-o <file>] [-m <macro>=<value>]
+		[-s <setting>=<value>] [--cache-dir <DIR>] [-v] [-p] [--dump]
+		[--dump-path] [--pull] [--render] [--version] [--validate]
+		[--install-bash-completions]
 		[<task>] [ARGS [ARGS ...]]
 
     Yet Another Task Runner.
@@ -45,21 +46,25 @@ Usage
       -h, --help            show this help message and exit
       -f <yatrfile>, --yatrfile <yatrfile>
 			    The yatrfile to load
+      -i <file>             Input file
+      -o <file>             Output file
       -m <macro>=<value>, --macro <macro>=<value>
 			    Set/override macro with specified value
       -s <setting>=<value>, --setting <setting>=<value>
 			    Set/override setting with specified value
       --cache-dir <DIR>     Path of cache directory
-      --install-bash-completions
-			    Install bash tab completion script globally
       -v, --verbose         Print commands to be run
       -p, --preview         Preview commands to be run without running them
 			    (implies -v)
-      --version             Print version
-      --validate            Only validate the yatrfile
-      --dump                Dump macro values
-      --dump-path           Print yatrfile path
-      --pull                Force download of URL includes and imports
+      --dump                Dump macro values and exit
+      --dump-path           Print yatrfile path and exit
+      --pull                Force download of URL includes and imports, then exit
+      --render              Use macros to render a Jinja2 template file (requires
+			    -i and -o)
+      --version             Print version info and exit
+      --validate            Validate the yatrfile and exit
+      --install-bash-completions
+			    Install bash tab completion script globally, then exit
 
 
 If not supplied, ``<yatrfile>`` will default to a file matching the regular expression ``^[Yy]atrfile(.yml)?$``.  If such a file is not present in the current working directory, yatr will search rootward up the filesystem tree looking for a file that matches the expression.  This is intended as a feature of convenience, so that tasks can be easily executed when working in a project sub-directory.  If it is unclear which yatrfile has been loaded, the ``--dump-path`` option may be supplied to disambiguate.  Likewise, the ``-f`` option may be supplied in order to force the loading of a particular yatrfile.
