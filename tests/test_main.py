@@ -125,6 +125,25 @@ def test_bash_completions():
             yfpath = os.path.join(DIR, 'yatrfile.yaml')
             out = find_bash_completions(['-f', yfpath], 2)
             assert out == []
+            
+            yfpath = os.path.join(d, 'yatrfile.yml')
+            shutil.copyfile(os.path.join(DIR, 'test2.yml'), yfpath)
+            out = find_bash_completions([], 0)
+            assert out == ['bad', 'good']
+            
+            with tempdir() as d2:
+                cd = os.path.join(d2, 'foo')
+                out = find_bash_completions(['--cache-dir', cd], 2)
+                assert out == ['bad', 'good']
+                
+                with open(yfpath, 'r') as f:
+                    data = f.read()
+                out = data.replace('bad', 'dad')
+                with open(yfpath, 'w') as f:
+                    f.write(out)
+
+                out = find_bash_completions(['--cache-dir', cd], 2)
+                assert out == ['dad', 'good']
 
     spath = os.path.join(os.path.abspath(os.path.dirname(ybase.__file__)),
                          'scripts/completion/yatr')

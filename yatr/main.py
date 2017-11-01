@@ -136,7 +136,7 @@ def load_completion_data(yatrfile, cachedir):
     if not os.path.isfile(dpath):
         data = compile_completion_data(path, cachedir, dpath)
 
-    elif os.stat(dpath).st_mtime < os.stat(path).st_mtime:
+    elif os.stat(dpath).st_mtime <= os.stat(path).st_mtime:
         data = compile_completion_data(path, cachedir, dpath)
 
     else:
