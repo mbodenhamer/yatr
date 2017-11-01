@@ -4,6 +4,8 @@ Changelog
 0.0.5 (2017-11-12)
 ~~~~~~~~~~~~~~~~~~
 
+* Fixed issue of capture command execution directory.
+
 0.0.4 (2017-11-05)
 ~~~~~~~~~~~~~~~~~~
 

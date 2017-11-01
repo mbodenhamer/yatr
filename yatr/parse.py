@@ -123,8 +123,9 @@ class Document(Base):
         self.env.update(env, **kwargs)
 
     def post_process(self, **kwargs):
-        self.env.resolve_macros()
-        self.validate()
+        with chdir(self.dirname):
+            self.env.resolve_macros()
+            self.validate()
 
     def process_import(self, path, **kwargs):
         mod = imp.load_source('yatr_module_import', path)
