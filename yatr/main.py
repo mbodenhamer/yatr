@@ -25,6 +25,8 @@ def add_argument(parser, *args, **kwargs):
 DESCRIPTION = 'Yet Another Task Runner.'
 
 parser = ArgumentParser(prog='yatr', description=DESCRIPTION)
+
+# Value options
 add_argument(parser, '-f', '--yatrfile', dest='yatrfile', type=str,
              default='', metavar='<yatrfile>', help='The yatrfile to load')
 add_argument(parser, '-m', '--macro', dest='macros',
@@ -36,24 +38,30 @@ add_argument(parser, '-s', '--setting', dest='settings',
 add_argument(parser, '--cache-dir', dest='cachedir', type=str,
              default=DEFAULT_CACHE_DIR, metavar='<DIR>',
              help='Path of cache directory')
-add_argument(parser, '--install-bash-completions', default=False,
-             dest='install_bash_completions', action='store_true',
-             help='Install bash tab completion script globally')
+
+# Switches
 add_argument(parser, '-v', '--verbose', dest='verbose', default=False,
              action='store_true', help='Print commands to be run')
 add_argument(parser, '-p', '--preview', dest='preview', default=False,
              action='store_true', help='Preview commands to be run '
              'without running them (implies -v)')
-add_argument(parser, '--version', dest='show_version', default=False,
-             action='store_true', help='Print version')
-add_argument(parser, '--validate', dest='validate', default=False,
-             action='store_true', help='Only validate the yatrfile')
+
+# Commands
 add_argument(parser, '--dump', dest='dump_vars', default=False,
              action='store_true', help='Dump macro values')
 add_argument(parser, '--dump-path', dest='dump_path', default=False,
              action='store_true', help='Print yatrfile path')
+add_argument(parser, '--install-bash-completions', default=False,
+             dest='install_bash_completions', action='store_true',
+             help='Install bash tab completion script globally')
 add_argument(parser, '--pull', dest='pull', default=False, action='store_true',
              help='Force download of URL includes and imports')
+add_argument(parser, '--version', dest='show_version', default=False,
+             action='store_true', help='Print version')
+add_argument(parser, '--validate', dest='validate', default=False,
+             action='store_true', help='Only validate the yatrfile')
+
+# Positional args
 add_argument(parser, 'task', metavar='<task>', type=str, default='', nargs='?',
              help='The task to run')
 add_argument(parser, 'args', metavar='ARGS', nargs='*',
@@ -296,12 +304,14 @@ def _main(*args):
 
     if opts.dump_path:
         print_(path)
+        return
 
     if opts.dump_vars:
         # TODO: add support for filtering out unwanted variables
         # TODO: add support for not including possible secrets in output
         for name in sorted(doc.env.env):
             print_('{} = {}'.format(name, doc.env.env[name]))
+        return
 
     if opts.validate:
         # Check that there are no undefined macros in task definitions
