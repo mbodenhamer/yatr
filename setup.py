@@ -1,6 +1,4 @@
-from setuptools import setup, find_packages
-# from setuptools import find_packages
-# from distutils.core import setup
+from setuptools import setup
 
 def read(fpath):
     with open(fpath, 'r') as f:
