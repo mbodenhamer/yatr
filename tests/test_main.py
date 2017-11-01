@@ -6,7 +6,8 @@ from mock import MagicMock
 from nose.tools import assert_raises
 from syn.base_utils import capture, assign, chdir
 from yatr.main import _main, main, search_rootward, find_bash_completions,\
-    dump_bash_completions, BASH_COMPLETION_MESSAGE, USAGE, OPTION_STRINGS
+    dump_bash_completions, BASH_COMPLETION_MESSAGE, USAGE, OPTION_STRINGS,\
+    DEFAULT_SETTINGS
 from yatr import __version__ as yver
 from yatr import base as ybase
 from yatr.base import read, tempdir, ValidationError
@@ -25,7 +26,7 @@ def listify(s):
 # Bash completions
 
 def test_bash_completions():
-    settings = ['silent']
+    settings = DEFAULT_SETTINGS
     
     with chdir(DIR):
         out = find_bash_completions(['--cache-dir', '/app', 'print'], 1)
@@ -112,8 +113,8 @@ def test_bash_completions():
             out = find_bash_completions(['-m'], 1)
             assert out == []
 
-            # out = find_bash_completions(['-s'], 1)
-            # assert out == settings
+            out = find_bash_completions(['-s'], 1)
+            assert out == settings
 
             yfpath = os.path.join(DIR, 'yatrfile.yml')
             out = find_bash_completions(['-f', yfpath], 2)
@@ -121,6 +122,9 @@ def test_bash_completions():
 
             out = find_bash_completions(['--yatrfile', yfpath], 2)
             assert out == ['print']
+
+            out = find_bash_completions(['-f', yfpath, '-s'], 3)
+            assert out == settings
 
             yfpath = os.path.join(DIR, 'yatrfile.yaml')
             out = find_bash_completions(['-f', yfpath], 2)

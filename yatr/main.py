@@ -2,12 +2,11 @@ import os
 import re
 import sys
 import json
-import shlex
 import shutil
 import hashlib
 from argparse import ArgumentParser
 from .env import INITIAL_MACROS
-from .parse import Document
+from .parse import Document, DEFAULT_SETTINGS
 from .base import DEFAULT_CACHE_DIR
 from . import __version__ as yver
 
@@ -96,7 +95,7 @@ def default_data():
     ret = {}
     ret['tasks'] = []
     ret['macros'] = []
-    ret['settings'] = []
+    ret['settings'] = DEFAULT_SETTINGS
     return ret
 
 def data_path_from_yatrfile_path(path, cachedir):
