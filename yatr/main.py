@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import json
+import shlex
 import shutil
 import hashlib
 from argparse import ArgumentParser
@@ -36,9 +37,6 @@ add_argument(parser, '-s', '--setting', dest='settings',
 add_argument(parser, '--cache-dir', dest='cachedir', type=str,
              default=DEFAULT_CACHE_DIR, metavar='<DIR>',
              help='Path of cache directory')
-add_argument(parser, '--dump-bash-completions', dest='dump_bash_completions',
-             default=False, action='store_true',
-             help='Dump data for the bash tab-completion script')
 add_argument(parser, '--install-bash-completions', default=False,
              dest='install_bash_completions', action='store_true',
              help='Install bash tab completion script globally')
@@ -107,13 +105,25 @@ def compile_completion_data(path, cachedir, outpath):
     data['macros'] = sorted(doc.env.macros.keys())
     data['settings'] = sorted(doc.env.settings.keys())
 
+    if not os.path.isdir(cachedir):
+        os.mkdir(cachedir)
+
     with open(outpath, 'w') as f:
         json.dump(data, f)
 
     return data
 
 def load_completion_data(yatrfile, cachedir):
-    path = find_yatrfile_path(yatrfile)
+    cachedir = os.path.expanduser(cachedir)
+    try:
+        path = find_yatrfile_path(yatrfile)
+    except RuntimeError:
+        ret = {}
+        ret['tasks'] = []
+        ret['macros'] = []
+        ret['settings'] = []
+        return ret
+
     dpath = data_path_from_yatrfile_path(path, cachedir)
 
     if not os.path.isfile(dpath):
@@ -132,43 +142,110 @@ def load_completion_data(yatrfile, cachedir):
 #-------------------------------------------------------------------------------
 # Bash completions
 
-def print_bash_completion_data(data):
-    out = ' '.join(data)
+def matches(s, lst):
+    return [elem for elem in lst if elem.startswith(s)]
+
+def find_bash_completions(args, idx):
+    def find_opt(name, default):
+        if name in args:
+            n_idx = args.index(name)
+            if n_idx == idx - 1:
+                return # We are trying to complete a pathname
+            elif n_idx < len(args) - 1:
+                return args[n_idx + 1]
+        return default
+
+    cachedir = find_opt('--cache-dir', DEFAULT_CACHE_DIR)
+    if cachedir is None:
+        return [] # we are completing directory path; let defaults handle it
+
+    yfpath = find_opt('-f', '')
+    if yfpath is None:
+        return [] # we are completing a file path; let defaults handle it
+
+    # if query on '-f' returns '', check if '--yatrfile' was given
+    if not yfpath:
+        yfpath = find_opt('--yatrfile', '')
+        if yfpath is None:
+            return [] # we are completing a file path; let defaults handle it
+
+    data = load_completion_data(yfpath, cachedir)
+
+    if idx < len(args):
+        word = args[idx]
+        if word.startswith('-'):
+            return matches(word, OPTION_STRINGS)
+
+        elif idx > 0:
+            pword = args[idx - 1]
+            if any(w in data['tasks'] for w in args):
+                return [] # we are at a task argument; let defaults handle it
+
+            elif pword in ('-m', '--macro'):
+                if '=' in word:
+                    return [] # we are completing a macro value
+                else:
+                    return matches(word, data['macros'])
+
+            elif pword in ('-s', '--setting'):
+                if '=' in word:
+                    return [] # we are completing a setting value
+                else:
+                    return matches(word, data['settings'])
+
+            else: # The only other option is that we are completing a task name
+                return matches(word, data['tasks'])
+
+        else: # The first non-'-'-prefixed argument; must be a task name
+            return matches(word, data['tasks'])
+    
+    else: # we are starting a new word
+        if idx == 0: # probably looking for a specific task, so return all names
+            return data['tasks']
+        
+        else:
+            pword = args[idx - 1]
+            if any(w in data['tasks'] for w in args):
+                return [] # we are at a task argument; job for defaults
+            
+            elif pword in ('-m', '--macro'):
+                return data['macros']
+            
+            elif pword in ('-s', '--settings'):
+                return data['settings']
+
+            else: # probably looking for a task at this point
+                return data['tasks']
+
+def dump_bash_completions(args, idx):
+    comps = find_bash_completions(args, idx)
+    out = ' '.join(comps)
     print(out)
 
-def dump_bash_completions():
-    line = os.environ['COMP_LINE']
-    n_word = os.environ['COMP_CWORD']
-    idx = os.environ['COMP_POINT']
-    print('a')
-
-MESSAGE = '''You may need to add the following line to ~/.bashrc:
+BASH_COMPLETION_MESSAGE = '''You may need to add the following line to ~/.bashrc:
 
     source /etc/bash_completion.d/yatr
 
-OR run the following:
+which can be accomplished with the following:
 
-    echo "source /etc/bash_completion.d/yatr" >> ~/.bashrc
-'''
+    echo "source /etc/bash_completion.d/yatr" >> ~/.bashrc'''
 
 def install_bash_completions():
     script = os.path.join(DIR, 'scripts/completion/yatr')
     shutil.copyfile(script, '/etc/bash_completion.d/yatr')
-    print(MESSAGE)
+    print(BASH_COMPLETION_MESSAGE)
 
 #-------------------------------------------------------------------------------
 # Main
 
 def _main(*args):
+    if args:
+        if args[0] == '--dump-bash-completions':
+            dump_bash_completions(args[2:], int(args[1]))
+            return
+
     opts = parser.parse_args(args)
     
-    # TODO: if yatrfile isn't found on search, don't error; just return and print nothing
-    # TODO: if they are completing -f, though, you will need to complete based on files;  however, the options to complete in the bash script should take care of that
-
-    if opts.dump_bash_completions:
-        dump_bash_completions()
-        return
-
     if opts.install_bash_completions:
         install_bash_completions()
         return
@@ -229,6 +306,10 @@ def _main(*args):
         codes = doc.run(opts.task, preview=opts.preview, verbose=opts.verbose)
         if codes:
             sys.exit(max(codes))
+
+    elif not args:
+        print(USAGE)
+        sys.exit(1)
 
 #-------------------------------------------------------------------------------
 

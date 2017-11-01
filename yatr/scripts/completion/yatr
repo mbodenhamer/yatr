@@ -2,9 +2,6 @@
 
 _yatr()
 {
-    export COMP_LINE
-    export COMP_CWORD
-    export COMP_POINT
-    COMPREPLY=( $(yatr --dump-bash-completions) )
+    COMPREPLY=( $(yatr --dump-bash-completions ${COMP_CWORD} "${COMP_WORDS[@]}") )
 }
 complete -o default -o bashdefault -F _yatr yatr
