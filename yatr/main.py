@@ -48,18 +48,18 @@ add_argument(parser, '-p', '--preview', dest='preview', default=False,
 
 # Commands
 add_argument(parser, '--dump', dest='dump_vars', default=False,
-             action='store_true', help='Dump macro values')
+             action='store_true', help='Dump macro values and exit')
 add_argument(parser, '--dump-path', dest='dump_path', default=False,
-             action='store_true', help='Print yatrfile path')
+             action='store_true', help='Print yatrfile path and exit')
+add_argument(parser, '--pull', dest='pull', default=False, action='store_true',
+             help='Force download of URL includes and imports, then exit')
+add_argument(parser, '--version', dest='show_version', default=False,
+             action='store_true', help='Print version info and exit')
+add_argument(parser, '--validate', dest='validate', default=False,
+             action='store_true', help='Validate the yatrfile and exit')
 add_argument(parser, '--install-bash-completions', default=False,
              dest='install_bash_completions', action='store_true',
-             help='Install bash tab completion script globally')
-add_argument(parser, '--pull', dest='pull', default=False, action='store_true',
-             help='Force download of URL includes and imports')
-add_argument(parser, '--version', dest='show_version', default=False,
-             action='store_true', help='Print version')
-add_argument(parser, '--validate', dest='validate', default=False,
-             action='store_true', help='Only validate the yatrfile')
+             help='Install bash tab completion script globally, then exit')
 
 # Positional args
 add_argument(parser, 'task', metavar='<task>', type=str, default='', nargs='?',
@@ -294,6 +294,9 @@ def _main(*args):
     doc = Document.from_path(path, pull=opts.pull, cachedir=opts.cachedir,
                              settings=settings)
     
+    if opts.pull:
+        return
+
     # Process command-line macro overrides
     if opts.macros:
         for s in opts.macros:
