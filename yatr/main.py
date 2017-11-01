@@ -171,7 +171,7 @@ def find_bash_completions(args, idx):
 
     data = load_completion_data(yfpath, cachedir)
 
-    if idx < len(args):
+    if idx < len(args): # we are completing an already-started word
         word = args[idx]
         if word.startswith('-'):
             return matches(word, OPTION_STRINGS)
@@ -211,7 +211,7 @@ def find_bash_completions(args, idx):
             elif pword in ('-m', '--macro'):
                 return data['macros']
             
-            elif pword in ('-s', '--settings'):
+            elif pword in ('-s', '--setting'):
                 return data['settings']
 
             else: # probably looking for a task at this point

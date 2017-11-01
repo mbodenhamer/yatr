@@ -4,7 +4,7 @@ from jinja2 import UndefinedError
 from mock import MagicMock
 from nose.tools import assert_raises
 from syn.base_utils import capture, assign, chdir
-from yatr.main import _main, main, search_rootward
+from yatr.main import _main, main, search_rootward, find_bash_completions
 from yatr import __version__ as yver
 from yatr import base as ybase
 from yatr.base import read, tempdir, ValidationError
@@ -15,6 +15,37 @@ TEST3 = os.path.join(DIR, 'test3.yml')
 TEST4 = os.path.join(DIR, 'test4.yml')
 OUT = os.path.join(DIR, 'output')
 URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
+
+def listify(s):
+    return [o.strip() for o in s.strip().split()]
+
+#-------------------------------------------------------------------------------
+# find_bash_completions
+
+def test_find_bash_completions():
+    settings = ['silent']
+
+    with chdir(DIR):
+        out = find_bash_completions([], 0)
+        assert out == ['print']
+
+        out = find_bash_completions(['-m'], 1)
+        assert out == ['a', 'b', 'c']
+
+        out = find_bash_completions(['--macro'], 1)
+        assert out == ['a', 'b', 'c']
+
+        out = find_bash_completions(['-s'], 1)
+        assert out == settings
+
+        out = find_bash_completions(['--setting'], 1)
+        assert out == settings
+
+        out = find_bash_completions(['-m', 'a=xyz'], 2)
+        assert out == ['print']
+
+        out = find_bash_completions(['-m', 'a=xyz', 'print'], 3)
+        assert out == []
 
 #-------------------------------------------------------------------------------
 # main
