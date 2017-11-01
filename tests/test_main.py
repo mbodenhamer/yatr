@@ -209,6 +209,24 @@ def test_main():
         finally:
             os.remove(OUT)
 
+        # Test --render
+        with chdir(DIR):
+            with capture() as (out, err):
+                _main('--render', 
+                      '-i', os.path.join(DIR, 'test1.j2'),
+                      '-o', os.path.join(DIR, 'test1.txt'))
+            assert out.getvalue() == ''
+            assert err.getvalue() == ''
+
+            with open(os.path.join(DIR, 'test1.txt'), 'r') as f:
+                txt = f.read()
+            assert txt == 'First abc, then abcdef, then abcdefghi.'
+
+            assert_raises(RuntimeError, _main, '--render')
+            assert_raises(RuntimeError, _main, '--render', '-i', '/foo/bar/baz')
+            assert_raises(RuntimeError, _main, '--render', '-i', 
+                          os.path.join(DIR, 'test1.j2'))
+
         # Test --pull
         ybase.resolve_url(URL)
         with assign(ybase, 'download', MagicMock()):

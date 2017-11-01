@@ -7,7 +7,7 @@ import hashlib
 from argparse import ArgumentParser
 from .env import INITIAL_MACROS
 from .parse import Document, DEFAULT_SETTINGS
-from .base import DEFAULT_CACHE_DIR
+from .base import DEFAULT_CACHE_DIR, resolve
 from . import __version__ as yver
 
 DIR = os.path.abspath(os.path.dirname(__file__))
@@ -29,6 +29,10 @@ parser = ArgumentParser(prog='yatr', description=DESCRIPTION)
 # Value options
 add_argument(parser, '-f', '--yatrfile', dest='yatrfile', type=str,
              default='', metavar='<yatrfile>', help='The yatrfile to load')
+add_argument(parser, '-i', dest='infile', type=str, default='',
+             metavar='<file>', help='Input file')
+add_argument(parser, '-o', dest='outfile', type=str, default='',
+             metavar='<file>', help='Output file')
 add_argument(parser, '-m', '--macro', dest='macros',
              action='append', metavar='<macro>=<value>',
              help='Set/override macro with specified value')
@@ -53,6 +57,9 @@ add_argument(parser, '--dump-path', dest='dump_path', default=False,
              action='store_true', help='Print yatrfile path and exit')
 add_argument(parser, '--pull', dest='pull', default=False, action='store_true',
              help='Force download of URL includes and imports, then exit')
+add_argument(parser, '--render', dest='render', default=False, 
+             action='store_true', help='Use macros to render a Jinja2 template'
+             ' file (requires -i and -o)')
 add_argument(parser, '--version', dest='show_version', default=False,
              action='store_true', help='Print version info and exit')
 add_argument(parser, '--validate', dest='validate', default=False,
@@ -256,6 +263,18 @@ def install_bash_completions():
     print(BASH_COMPLETION_MESSAGE)
 
 #-------------------------------------------------------------------------------
+# --render
+
+def render(doc, infile, outfile):
+    with open(infile, 'r') as f:
+        template = f.read()
+
+    out = resolve(template, doc.env.env)
+    
+    with open(outfile, 'w') as f:
+        f.write(out)
+
+#-------------------------------------------------------------------------------
 # Main
 
 def _main(*args):
@@ -270,10 +289,16 @@ def _main(*args):
         install_bash_completions()
         return
 
-    # Show version if requested
+    # --version
     if opts.show_version:
         print('yatr {}'.format(yver))
         return
+
+    # Validate -i
+    if opts.infile:
+        if not os.path.isfile(opts.infile):
+            raise RuntimeError('Input file "{}" does not exist'
+                               .format(opts.infile))
 
     # Populate position arg macros
     for key in list(INITIAL_MACROS.keys()):
@@ -294,6 +319,7 @@ def _main(*args):
     doc = Document.from_path(path, pull=opts.pull, cachedir=opts.cachedir,
                              settings=settings)
     
+    # If we executed --pull, then exit
     if opts.pull:
         return
 
@@ -305,10 +331,12 @@ def _main(*args):
     
     doc.post_process()
 
+    # --dump-path
     if opts.dump_path:
         print_(path)
         return
 
+    # --dump
     if opts.dump_vars:
         # TODO: add support for filtering out unwanted variables
         # TODO: add support for not including possible secrets in output
@@ -316,12 +344,23 @@ def _main(*args):
             print_('{} = {}'.format(name, doc.env.env[name]))
         return
 
+    # --validate
     if opts.validate:
         # Check that there are no undefined macros in task definitions
         for task in doc.env.tasks.values():
             task.run_commands(doc.env)
 
         print("Validation successful")
+        return
+
+    # --render
+    if opts.render:
+        if not opts.infile:
+            raise RuntimeError('Required option -i not given')
+        if not opts.outfile:
+            raise RuntimeError('Required option -o not given')
+
+        render(doc, opts.infile, opts.outfile)
         return
 
     if opts.preview:

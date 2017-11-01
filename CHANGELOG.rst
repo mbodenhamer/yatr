@@ -1,11 +1,12 @@
 Changelog
 ---------
 
-0.0.5 (2017-11-12)
+0.0.5 (2017-11-01)
 ~~~~~~~~~~~~~~~~~~
 
 * Fixed issue of capture command execution directory.
 * Added default task section.
+* Added ``--render``.
 
 0.0.4 (2017-11-05)
 ~~~~~~~~~~~~~~~~~~
