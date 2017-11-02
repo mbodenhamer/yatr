@@ -317,7 +317,7 @@ Name                            Description
 =============================== =========================================================================
 ``--dump``                      Dump macro values to ``stdout``
 ``--dump-path``                 Print yatrfile path to ``stdout``
-``--pull``                      Download all URL includes and imports in yatrfile
+``--pull``                      Download all URL includes and imports defined in yatrfile
 ``--render``                    Use macros to render a Jinja2 template file (requires ``-i`` and ``-o``)
 ``--version``                   Print version information to ``stdout``
 ``--validate``                  Validate the yatrfile
