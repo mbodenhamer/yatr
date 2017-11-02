@@ -1,0 +1,9 @@
+macros:
+  version: 0.0.14
+  image: foo
+
+tasks:
+  render: yatr --render -i Dockerfile.j2 -o Dockerfile
+  build:
+    - render
+    - "docker build -t {{image}}:latest ."

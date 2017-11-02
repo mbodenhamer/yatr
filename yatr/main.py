@@ -56,7 +56,7 @@ add_argument(parser, '--dump', dest='dump_vars', default=False,
 add_argument(parser, '--dump-path', dest='dump_path', default=False,
              action='store_true', help='Print yatrfile path and exit')
 add_argument(parser, '--pull', dest='pull', default=False, action='store_true',
-             help='Force download of URL includes and imports, then exit')
+             help='Download all URL includes and imports, then exit')
 add_argument(parser, '--render', dest='render', default=False, 
              action='store_true', help='Use macros to render a Jinja2 template'
              ' file (requires -i and -o)')

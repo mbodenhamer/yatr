@@ -17,11 +17,22 @@ TEST1 = os.path.join(DIR, 'test1.yml')
 TEST2 = os.path.join(DIR, 'test2.yml')
 TEST3 = os.path.join(DIR, 'test3.yml')
 TEST4 = os.path.join(DIR, 'test4.yml')
+DOCKERFILE = os.path.join(DIR, 'example/render/Dockerfile')
 OUT = os.path.join(DIR, 'output')
 URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
 
 def listify(s):
     return [o.strip() for o in s.strip().split()]
+
+#-------------------------------------------------------------------------------
+
+DFRENDER = '''# -*- dockerfile -*-
+FROM python:2-alpine
+
+RUN pip install -U --no-cache \\
+    syn>=0.0.14
+
+CMD ["python2"]'''
 
 #-------------------------------------------------------------------------------
 # Bash completions
@@ -292,6 +303,22 @@ def test_main():
             # Cover settings
             _main('-f', 'D.yml', '-s', 'silent=false')
 
+        # Verify render example
+        with chdir(os.path.join(DIR, 'example/render')):
+            with capture() as (out, err):
+                _main('render')
+            assert out.getvalue() == ''
+            
+            with open(DOCKERFILE, 'r') as f:
+                txt = f.read()
+            assert txt == DFRENDER
+
+            with capture() as (out, err):
+                _main('-p', 'build')
+            assert out.getvalue() == \
+                ('yatr --render -i Dockerfile.j2 -o Dockerfile\n'
+                 'docker build -t foo:latest .\n')
+            
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__': # pragma: no cover

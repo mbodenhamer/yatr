@@ -1,0 +1,7 @@
+# -*- dockerfile -*-
+FROM python:2-alpine
+
+RUN pip install -U --no-cache \
+    syn>={{version}}
+
+CMD ["python2"]
