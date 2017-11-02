@@ -10,7 +10,7 @@ yatr
 .. image:: https://readthedocs.org/projects/yatr/badge/?version=latest
     :target: http://yatr.readthedocs.org/en/latest/?badge=latest
 
-Yet Another Task Runner.  Or alternatively, YAml Task Runner.  Yatr is a YAML-based task runner that attempts to implement and extend the best features of GNU Make for 21st-century software development contexts that are not centered around the compilation of C/C++ code.  The project is very much in preliminary development, but is nonetheless functional for basic applications.
+Yet Another Task Runner.  Or alternatively, YAml Task Runner.  Yatr is a YAML-based task runner that attempts to implement and extend the best features of GNU Make for 21st-century software development contexts that are not centered around the compilation of C/C++ code.  The project is in preliminary development, but is nonetheless functional for basic applications.
 
 Installation
 ------------
@@ -58,7 +58,7 @@ Usage
 			    (implies -v)
       --dump                Dump macro values and exit
       --dump-path           Print yatrfile path and exit
-      --pull                Force download of URL includes and imports, then exit
+      --pull                Download all URL includes and imports, then exit
       --render              Use macros to render a Jinja2 template file (requires
 			    -i and -o)
       --version             Print version info and exit
@@ -67,7 +67,7 @@ Usage
 			    Install bash tab completion script globally, then exit
 
 
-If not supplied, ``<yatrfile>`` will default to a file matching the regular expression ``^[Yy]atrfile(.yml)?$``.  If such a file is not present in the current working directory, yatr will search rootward up the filesystem tree looking for a file that matches the expression.  This is intended as a feature of convenience, so that tasks can be easily executed when working in a project sub-directory.  If it is unclear which yatrfile has been loaded, the ``--dump-path`` option may be supplied to disambiguate.  Likewise, the ``-f`` option may be supplied in order to force the loading of a particular yatrfile.
+If not supplied, ``<yatrfile>`` will default to a file matching the regular expression ``^[Yy]atrfile(.yml)?$``.  If such a file is not present in the current working directory, yatr will search rootward up the filesystem tree looking for a file that matches the expression.  This is intended as a feature of convenience, so that tasks can be easily executed when working in a project sub-directory.  If it is unclear which yatrfile has been loaded, ``yatr --dump-path`` may be run to disambiguate.  Likewise, the ``-f`` option may be supplied in order to force the loading of a particular yatrfile.
 
 Example(s)
 ----------
@@ -170,7 +170,7 @@ Macro values may also be set or overridden at the command line by supplying the 
 
 Include paths or URLs may use macros, as the main example above demonstrates, as it has an include defined in terms of the ``urlbase`` macro.  However, any such macros must be defined in the yatrfile itself, and cannot be defined in an included yatrfile or depend on the macros defined in an included yatrfile for their proper resolution.
 
-If an include path is a URL, yatr will attempt to download the file and save it in a cache directory.  By default, the cache directory is set to ``~/.yatr/``, but this may be changed through the ``--cache-dir`` option.  If the URL file already exists in the cache directory, yatr will load the cached file without downloading.  To force yatr to re-download all URL includes specified by the yatrfile, supply the ``--pull`` option at the command line.
+If an include path is a URL, yatr will attempt to download the file and save it in a cache directory.  By default, the cache directory is set to ``~/.yatr/``, but this may be changed through the ``--cache-dir`` option.  If the URL file already exists in the cache directory, yatr will load the cached file without downloading.  To force yatr to re-download all URL includes specified by the yatrfile, run ``yatr --pull`` at the command line.
 
 Tasks are defined in the ``tasks`` section of the yatrfile.  Tasks may be defined as a single command string.  In this example, the task ``cwd`` is simply defined as the system command ``pwd``.  If your current working directory happens to be ``/foo/baz``, then::
 
@@ -244,6 +244,61 @@ The values supplied to ``if`` and ``ifnot`` may be anything that would otherwise
 .. _test2.yml: https://github.com/mbodenhamer/yatrfiles/blob/master/yatrfiles/test/test2.yml
 .. _current working directory: https://github.com/mbodenhamer/yatr/tree/master/tests/example
 .. _example working directory: https://github.com/mbodenhamer/yatr/tree/master/tests/example
+
+Commands
+--------
+
+As its name implies, yatr is primarily a task runner.  As such, its default execution behavior is to run tasks defined in a yatrfile.  However, when using a task runner in real-world applications, there are often situations where other execution behaviors become desirable.  For example, if it becomes necessary to debug a particular yatrfile, dumping the values of the macros (via ``yatr --dump``) might be helpful.  As such, yatr supports a number of special execution behaviors, called "commands", which do not run tasks.  To avoid restricting the namespace of potential task names, all yatr commands are prefixed by ``--``.  However, unlike normal command-line options, at most one command should be specified at the command line for any yatr invocation.
+
+The following table lists the currently-supported commands:
+
+=============================== =========================================================================
+Name                            Description
+=============================== =========================================================================
+``--dump``                      Dump macro values to ``stdout``
+``--dump-path``                 Print yatrfile path to ``stdout``
+``--pull``                      Download all URL includes and imports in yatrfile
+``--render``                    Use macros to render a Jinja2 template file (requires ``-i`` and ``-o``)
+``--version``                   Print version information to ``stdout``
+``--validate``                  Validate the yatrfile
+``--install-bash-completions``  Install bash tab completion script in ``/etc/bash_completions.d/``
+=============================== =========================================================================
+
+Most of the commands are self-explanatory, or have already been discussed in the example(s) above.  Those that do not fit this description are discussed in more detail below.
+
+``--render``
+~~~~~~~~~~~~
+
+The ``--render`` command renders a Jinja2 template file using the macros defined by a yatrfile.  This can be useful in certain cases where it is desirable to have scripts or configuration files that always contain the latest values for things such as version numbers whenever a task is run, which can be stored and modified in one central location whenever they need to be updated.  For example, suppose you have the following template for a Dockerfile named ``Dockerfile.j2``::
+
+    FROM python:2-alpine
+
+    RUN pip install -U --no-cache \
+	syn>={{version}}
+
+    CMD ["python2"]
+
+
+Suppose one also has the following ``yatrfile.yml`` in the same directory::
+
+    macros:
+      version: 0.0.14
+      image: foo
+
+    tasks:
+      render: yatr --render -i Dockerfile.j2 -o Dockerfile
+      build:
+        - render
+	- "docker build -t {{image}}:latest ."
+
+
+One could then run::
+
+    $ yatr build
+
+
+to generate the desired Dockerfile (i.e. resolve the ``{{version}}`` macro in the Dockerfile template to ``0.0.14``) and then build the desired Docker image.
+
 
 Settings
 --------
