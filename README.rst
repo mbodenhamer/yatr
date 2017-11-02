@@ -222,7 +222,12 @@ Unless, explicitly re-defined, the macro ``_1`` denotes the first task command-l
 ``default``
 ~~~~~~~~~~~
 
-The ``default`` section, if specified, must contain the name of a task to be run if no task names are provided at the command line.  In this example, the default task is set to ``foo``.  As such::
+The ``default`` section, if specified, must contain the name of a task to be run if no task names are provided at the command line.  In this example, the default task is set to ``foo``::
+
+    default: foo
+
+
+As such, running ``yatr`` at the command line is equivalent to running ``yatr foo``::
 
     $ yatr
     bar
