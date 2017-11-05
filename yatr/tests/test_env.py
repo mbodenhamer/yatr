@@ -27,6 +27,7 @@ def test_env():
 
     e1c = e1.copy()
     assert_equivalent(e1, e1c)
+    assert_equivalent(e1.macros, e1c.macros)
 
     e0 = deepcopy(e1)
     e0.resolve_macros()
