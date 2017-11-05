@@ -19,6 +19,7 @@ TEST3 = os.path.join(DIR, 'test3.yml')
 TEST4 = os.path.join(DIR, 'test4.yml')
 TEST5 = os.path.join(DIR, 'test5.yml')
 TEST6 = os.path.join(DIR, 'test6.yml')
+TEST7 = os.path.join(DIR, 'test7.yml')
 DOCKERFILE = os.path.join(DIR, 'example/render/Dockerfile')
 OUT = os.path.join(DIR, 'output')
 URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
@@ -283,6 +284,14 @@ def test_main():
         with capture() as (out, err):
             _main('-f', TEST6, '-p')
         assert out.getvalue() == 'false\ntrue\n'
+
+        # Test for and list macros
+        with capture() as (out, err):
+            _main('-f', TEST7, '-p', 'foo')
+        assert out.getvalue() == 'echo x x w\n' \
+            'echo x x z\n' \
+            'echo x y w\n' \
+            'echo x y z\n'
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):

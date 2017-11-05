@@ -1,0 +1,19 @@
+macros:
+  a: x
+  b: 
+    - "{{a}}"
+    - "y"
+  c: 
+    - w
+    - z
+
+tasks:
+  foo:
+    command: "echo {{a}} {{u}} {{v}}"
+    for:
+      var:
+        - u
+        - v
+      in:
+        - b
+        - c

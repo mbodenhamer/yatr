@@ -7,24 +7,12 @@ from syn.type import List, Dict
 from syn.five import STR
 
 from .base import ValidationError, resolve_url, resolve, ordered_macros,\
-    DEFAULT_CACHE_DIR, str_to_bool
+    DEFAULT_CACHE_DIR, str_to_bool, get_delete
 from .context import Context
 from .task import Task
 from .env import Env
 
 STRList = List(STR)
-
-#-------------------------------------------------------------------------------
-# Utilities
-
-def get_delete(in_, out, key, default, outkey=None):
-    if outkey is None:
-        outkey = key
-
-    out[outkey] = in_.get(key, default)
-    
-    if key in in_:
-        del in_[key]
 
 #-------------------------------------------------------------------------------
 # Document
@@ -33,7 +21,8 @@ class Document(Base):
     _attrs = dict(imports = Attr(List(STR), init=lambda self:list()),
                   includes = Attr(List(STR), init=lambda self: list()),
                   secrets = Attr(List(STR), init=lambda self: list()),
-                  macros = Attr(Dict((STR, int)), init=lambda self: dict()),
+                  macros = Attr(Dict((STR, int, List(STR))), 
+                                init=lambda self: dict()),
                   contexts = Attr(Dict(Context), init=lambda self: dict()),
                   tasks = Attr(Dict(Task), init=lambda self: dict()),
                   secret_values = Attr(Dict(STR), init=lambda self: dict()),

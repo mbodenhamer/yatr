@@ -1,6 +1,45 @@
 from jinja2 import UndefinedError
 from nose.tools import assert_raises
-from yatr import Command, Task, Env, ValidationError
+from yatr import Command, Task, Env, For, ValidationError
+
+#-------------------------------------------------------------------------------
+# For
+
+def test_for():
+    f = For.from_yaml('x in y')
+    assert f.var == 'x'
+    assert f.in_ == 'y'
+    
+    env = Env(env=dict(x='abc', y='def'))
+    assert_raises(ValidationError, f.resolve_macros, env)
+
+    env = Env(env=dict(x='abc', y=['d', 'e']))
+    assert list(f.resolve_macros(env)) == [['x'], [['d', 'e']]]
+    assert list(f.loop(env)) == [Env(env=dict(x='d', y=['d', 'e'])),
+                                 Env(env=dict(x='e', y=['d', 'e']))]
+
+    assert_raises(ValidationError, For.from_yaml, '-x in y')
+    assert_raises(ValidationError, For.from_yaml, {'var': 'x', 'in': ['x']})
+    assert_raises(ValidationError, For.from_yaml, {'var': ['x'], 
+                                                   'in': ['x', 'y']})
+
+    f = For.from_yaml({'var': ['x', 'y'], 'in': ['A', 'B']})
+    env = Env(env=dict(A=['a', 'b'], B=['c', 'd']))
+    assert list(f.resolve_macros(env)) == [['x', 'y'], [['a', 'b'],
+                                                        ['c', 'd']]]
+    assert list(f.loop(env)) == [Env(env=dict(x='a', y='c', A=['a', 'b'],
+                                              B=['c','d'])),
+                                 Env(env=dict(x='a', y='d', A=['a', 'b'],
+                                              B=['c','d'])),
+                                 Env(env=dict(x='b', y='c', A=['a', 'b'],
+                                              B=['c','d'])),
+                                 Env(env=dict(x='b', y='d', A=['a', 'b'],
+                                              B=['c','d']))]
+
+    assert_raises(TypeError, For.from_yaml, {})
+    assert_raises(ValidationError, For.from_yaml, {'var': ['x', 'y'], 
+                                                   'in': ['A', 'B'],
+                                                   'bar': 2})
 
 #-------------------------------------------------------------------------------
 # Command

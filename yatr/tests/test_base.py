@@ -12,8 +12,11 @@ def test_resolve():
     assert resolve('ab{{c}}', {}, lenient=True) == 'ab'
     assert resolve('ab{{c}}', dict(c='d')) == 'abd'
 
+    assert resolve(['{{a}}', '{{b}}', 'c'], dict(a='d', b='e')) == ['d', 'e', 'c']
+
 def test_variables():
     assert variables('{{a}} {{b}}') == {'a', 'b'}
+    assert variables(['{{a}}', '{{b}}', 'c']) == {'a', 'b'}
 
 def test_ordered_macros():
     assert list(ordered_macros({})) == []
@@ -27,6 +30,15 @@ def test_ordered_macros():
     assert list(ordered_macros(dct)) == [('a', 'b'), 
                                          ('b', '{{a}}'),
                                          ('c', '{{b}}')]
+
+    dct = dict(a = 'b',
+               b = '{{a}}',
+               c = ['{{b}}', 'c'],
+               d = '{{c}}')
+    assert list(ordered_macros(dct)) == [('a', 'b'), 
+                                         ('b', '{{a}}'),
+                                         ('c', ['{{b}}', 'c']),
+                                         ('d', '{{c}}')]
 
 def test_get_output():
     out, code = get_output('true')

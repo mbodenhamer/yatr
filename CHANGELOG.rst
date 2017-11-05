@@ -5,6 +5,7 @@ Changelog
 ~~~~~~~~~~~~~~~~~~
 
 * Fixed default task specification not inheriting.
+* Added for loop tasks and list macros.
 
 0.0.5 (2017-11-02)
 ~~~~~~~~~~~~~~~~~~

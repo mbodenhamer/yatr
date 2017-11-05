@@ -20,6 +20,9 @@ class ValidationError(Exception):
 # Utilities
 
 def resolve(template, env, lenient=False):
+    if isinstance(template, list):
+        return [resolve(elem, env, lenient) for elem in template]
+
     if isinstance(template, STR):
         if '{{' in template:
             if lenient:
@@ -30,6 +33,12 @@ def resolve(template, env, lenient=False):
     return template
 
 def variables(template):
+    if isinstance(template, list):
+        ret = set()
+        for elem in template:
+            ret.update(variables(elem))
+        return ret
+
     env = Environment()
     return meta.find_undeclared_variables(env.parse(template))
 
@@ -124,6 +133,15 @@ def str_to_bool(value):
         if val in {'no', 'false', '0'}:
             return False
     raise TypeError('Invalid type/value for conversion: {}'.format(value))
+
+def get_delete(in_, out, key, default, outkey=None):
+    if outkey is None:
+        outkey = key
+
+    out[outkey] = in_.get(key, default)
+    
+    if key in in_:
+        del in_[key]
 
 #-------------------------------------------------------------------------------
 # __all__

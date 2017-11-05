@@ -1,6 +1,6 @@
 from copy import copy
 from syn.base import Base, Attr, init_hook
-from syn.type import Dict
+from syn.type import Dict, List
 from syn.five import STR
 
 from .base import resolve, ordered_macros, get_output
@@ -51,7 +51,8 @@ class Updateable(object):
 
 class Env(Base, Copyable, Updateable):
     _groups = (UP, AUP)
-    _attrs = dict(macros = Attr(Dict((STR, int)), init=lambda self: dict(),
+    _attrs = dict(macros = Attr(Dict(((STR, List(STR)), int)), 
+                                init=lambda self: dict(),
                                 doc='Macro definitions', groups=(UP, CP)),
                   contexts = Attr(Dict(Context), init=lambda self: dict(),
                                   doc='Execution context definitions', 
@@ -67,7 +68,8 @@ class Env(Base, Copyable, Updateable):
                   settings = Attr(Dict(None), init=lambda self: dict(),
                                   doc='Global settings of various sorts', 
                                   groups=(UP, CP)),
-                  env = Attr(Dict(STR), init=lambda self: dict(),
+                  env = Attr(Dict(((STR, List(STR)), int)), 
+                             init=lambda self: dict(),
                              doc='Current name resolution environment', 
                              groups=(UP, CP)),
                   default_task = Attr(STR, '', 'Task to run if no task is '
