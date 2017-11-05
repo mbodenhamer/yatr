@@ -4,6 +4,8 @@ Changelog
 0.0.6 (2017-11-09)
 ~~~~~~~~~~~~~~~~~~
 
+* Fixed default task specification not inheriting.
+
 0.0.5 (2017-11-02)
 ~~~~~~~~~~~~~~~~~~
 

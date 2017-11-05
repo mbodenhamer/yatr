@@ -71,6 +71,12 @@ class Env(Base):
     def resolve(self, template):
         return resolve(template, self.env)
 
+    def _update_value(self, name, other):
+        value = getattr(other, name)
+        if not value:
+            value = getattr(self, name)
+        setattr(self, name, value)
+
     def update(self, env, **kwargs):
         self.secret_values.update(env.secret_values)
         self.macros.update(env.macros)
@@ -79,8 +85,8 @@ class Env(Base):
         self.tasks.update(env.tasks)
         self.settings.update(env.settings)
 
-        self.default_context = env.default_context
-        self.default_task = env.default_task
+        self._update_value('default_context', env)
+        self._update_value('default_task', env)
 
     def validate(self):
         super(Env, self).validate()

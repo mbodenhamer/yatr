@@ -1,0 +1,4 @@
+default: bad
+
+include:
+  - test2.yml

@@ -51,6 +51,12 @@ def test_env():
     e1c2.update(e3)
     assert_raises(ValueError, e1c2.resolve_macros)
 
+    e = Env(default_task='foo')
+    e.update(Env())
+    assert e.default_task == 'foo'
+    e.update(Env(default_task='bar'))
+    assert e.default_task == 'bar'
+
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__': # pragma: no cover

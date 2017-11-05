@@ -17,6 +17,8 @@ TEST1 = os.path.join(DIR, 'test1.yml')
 TEST2 = os.path.join(DIR, 'test2.yml')
 TEST3 = os.path.join(DIR, 'test3.yml')
 TEST4 = os.path.join(DIR, 'test4.yml')
+TEST5 = os.path.join(DIR, 'test5.yml')
+TEST6 = os.path.join(DIR, 'test6.yml')
 DOCKERFILE = os.path.join(DIR, 'example/render/Dockerfile')
 OUT = os.path.join(DIR, 'output')
 URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
@@ -272,6 +274,15 @@ def test_main():
         assert out.getvalue() == ''
         assert err.getvalue() == ''
         assert_raises(UndefinedError, _main, '-f', TEST4, '--validate')
+
+        # Test default_task inheritance
+        with capture() as (out, err):
+            _main('-f', TEST5, '-p')
+        assert out.getvalue() == 'true\n'
+
+        with capture() as (out, err):
+            _main('-f', TEST6, '-p')
+        assert out.getvalue() == 'false\ntrue\n'
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):
