@@ -3,7 +3,7 @@ from nose.tools import assert_raises
 
 from yatr import Env
 from yatr import env as ye
-from syn.base_utils import assign
+from syn.base_utils import assign, assert_equivalent
 
 #-------------------------------------------------------------------------------
 # Env
@@ -24,6 +24,9 @@ def test_env():
     e2 = Env(macros = dict(a='a',
                            d='{{c}}e'))
     e3 = Env(macros = dict(a='{{d}}'))
+
+    e1c = e1.copy()
+    assert_equivalent(e1, e1c)
 
     e0 = deepcopy(e1)
     e0.resolve_macros()

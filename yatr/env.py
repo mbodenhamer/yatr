@@ -1,3 +1,5 @@
+from copy import copy
+
 from syn.base import Base, Attr, init_hook
 from syn.type import Dict
 from syn.five import STR
@@ -48,6 +50,9 @@ class Env(Base):
         # These are intended to be macro values, so newlines and extra
         # white space probably aren't desirable
         return out.strip() 
+
+    def copy(self):
+        return copy(self)
 
     def macro_env(self, **kwargs):
         dct = dict(self.macros)
