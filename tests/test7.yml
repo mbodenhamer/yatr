@@ -17,3 +17,9 @@ tasks:
       in:
         - b
         - c
+
+  bar:
+    command: "echo {{x}} {{count}}"
+    for:
+      var: x
+      in: [1, 2, 3, 4]

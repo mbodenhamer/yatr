@@ -19,7 +19,6 @@ def test_for():
                                  Env(env=dict(x='e', y=['d', 'e']))]
 
     assert_raises(ValidationError, For.from_yaml, '-x in y')
-    assert_raises(ValidationError, For.from_yaml, {'var': 'x', 'in': ['x']})
     assert_raises(ValidationError, For.from_yaml, {'var': ['x'], 
                                                    'in': ['x', 'y']})
 
@@ -35,6 +34,15 @@ def test_for():
                                               B=['c','d'])),
                                  Env(env=dict(x='b', y='d', A=['a', 'b'],
                                               B=['c','d']))]
+
+    f = For.from_yaml({'var': ['x', 'y'], 'in': ['A', [1, 2]]})
+    env = Env(env=dict(A=['a', 'b']))
+    assert list(f.resolve_macros(env)) == [['x', 'y'], [['a', 'b'],
+                                                        [1, 2]]]
+    assert list(f.loop(env)) == [Env(env=dict(x='a', y=1, A=['a', 'b'])),
+                                 Env(env=dict(x='a', y=2, A=['a', 'b'])),
+                                 Env(env=dict(x='b', y=1, A=['a', 'b'])),
+                                 Env(env=dict(x='b', y=2, A=['a', 'b']))]
 
     assert_raises(TypeError, For.from_yaml, {})
     assert_raises(ValidationError, For.from_yaml, {'var': ['x', 'y'], 

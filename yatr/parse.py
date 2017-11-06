@@ -21,7 +21,7 @@ class Document(Base):
     _attrs = dict(imports = Attr(List(STR), init=lambda self:list()),
                   includes = Attr(List(STR), init=lambda self: list()),
                   secrets = Attr(List(STR), init=lambda self: list()),
-                  macros = Attr(Dict((STR, int, List(STR))), 
+                  macros = Attr(Dict((STR, int, List((STR, int, list)))), 
                                 init=lambda self: dict()),
                   contexts = Attr(Dict(Context), init=lambda self: dict()),
                   tasks = Attr(Dict(Task), init=lambda self: dict()),

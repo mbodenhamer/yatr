@@ -18,7 +18,8 @@ FOREX = re.compile('([a-zA-Z_][a-zA-Z0-9_-]*)\s+in\s+([a-zA-Z_][a-zA-Z0-9_-]*)')
 
 class For(Base):
     _attrs = dict(var = Attr((STR, List(STR)), doc='The loop variable(s)'),
-                  in_ = Attr((STR, List(STR)), doc='Name(s) of list macro(s) to loop over'))
+                  in_ = Attr((STR, List((STR, int, list))), 
+                             doc='Name(s) of list macro(s) to loop over'))
     _opts = dict(init_validate = True, 
                  args = ('var', 'in_'))
 
@@ -50,10 +51,14 @@ class For(Base):
 
         outs = []
         for k, v in enumerate(var):
-            val = env.env[in_[k]]
-            if not isinstance(val, list):
-                raise ValidationError('For loop "in" specifier must be name of '
-                                      'list macro: {}'.format(in_[k]))
+            name = in_[k]
+            if isinstance(name, list):
+                val = name
+            else:
+                val = env.env[name]
+                if not isinstance(val, list):
+                    raise ValidationError('For loop "in" specifier must be name of '
+                                          'list macro: {}'.format(in_[k]))
             outs.append(val)
         return var, outs
 
@@ -69,9 +74,6 @@ class For(Base):
     def validate(self):
         super(For, self).validate()
         
-        if type(self.var) is not type(self.in_):
-            raise ValidationError('"var" and "in" specifiers must be same type')
-
         if isinstance(self.var, list):
             if len(self.var) != len(self.in_):
                 raise ValidationError('"var" and "in" lists must be same '

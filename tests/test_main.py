@@ -293,6 +293,13 @@ def test_main():
             'echo x y w 2\n' \
             'echo x y z 3\n'
 
+        with capture() as (out, err):
+            _main('-f', TEST7, '-p', '-s', 'loop_count_macro=count', 'bar')
+        assert out.getvalue() == 'echo 1 0\n' \
+            'echo 2 1\n' \
+            'echo 3 2\n' \
+            'echo 4 3\n' \
+
         # Verify example
         with chdir(os.path.join(DIR, 'example')):
             # Test --dump-path

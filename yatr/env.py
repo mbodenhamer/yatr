@@ -51,7 +51,7 @@ class Updateable(object):
 
 class Env(Base, Copyable, Updateable):
     _groups = (UP, AUP)
-    _attrs = dict(macros = Attr(Dict(((STR, List(STR)), int)), 
+    _attrs = dict(macros = Attr(Dict((STR, int, List((STR, int, list)))), 
                                 init=lambda self: dict(),
                                 doc='Macro definitions', groups=(UP, CP)),
                   contexts = Attr(Dict(Context), init=lambda self: dict(),
