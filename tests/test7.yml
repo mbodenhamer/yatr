@@ -9,7 +9,7 @@ macros:
 
 tasks:
   foo:
-    command: "echo {{a}} {{u}} {{v}}"
+    command: "echo {{a}} {{u}} {{v}} {{_n}}"
     for:
       var:
         - u

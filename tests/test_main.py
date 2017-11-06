@@ -288,10 +288,10 @@ def test_main():
         # Test for and list macros
         with capture() as (out, err):
             _main('-f', TEST7, '-p', 'foo')
-        assert out.getvalue() == 'echo x x w\n' \
-            'echo x x z\n' \
-            'echo x y w\n' \
-            'echo x y z\n'
+        assert out.getvalue() == 'echo x x w 0\n' \
+            'echo x x z 1\n' \
+            'echo x y w 2\n' \
+            'echo x y z 3\n'
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):

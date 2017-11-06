@@ -182,10 +182,13 @@ class Task(Base):
             kwargs['preview_pre'] = '\t'
 
         if self.loop and not looping:
+            n = 0
             kwargs['looping'] = True
             for env_ in self.loop.loop(env, **kwargs):
+                env_.env['_n'] = n
                 codes_ = self.run(env_, **kwargs)
                 codes.extend(codes_)
+                n += 1
             return codes
 
         for cmd in self.commands:
