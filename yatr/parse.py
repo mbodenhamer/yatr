@@ -138,7 +138,10 @@ class Document(Base):
         raise NotImplementedError('Secrets currently unsupported')
 
     def process_settings(self, **kwargs):
-        self.settings['silent'] = str_to_bool(self.settings.get('silent', False))
+        self.settings['silent'] = \
+            str_to_bool(self.settings.get('silent', False))
+        self.settings['loop_count_macro'] = \
+            self.settings.get('loop_count_macro', '_n')
 
     def run(self, name, **kwargs):
         try:

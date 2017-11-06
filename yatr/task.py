@@ -185,7 +185,7 @@ class Task(Base):
             n = 0
             kwargs['looping'] = True
             for env_ in self.loop.loop(env, **kwargs):
-                env_.env['_n'] = n
+                env_.env[env_.settings['loop_count_macro']] = n
                 codes_ = self.run(env_, **kwargs)
                 codes.extend(codes_)
                 n += 1
