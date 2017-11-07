@@ -3,12 +3,16 @@ from nose.tools import assert_raises
 
 from yatr import Env
 from yatr import env as ye
+from yatr.env import Updateable
 from syn.base_utils import assign, assert_equivalent
 
 #-------------------------------------------------------------------------------
 # Env
 
 def test_env():
+    Updateable()._update_pre({})
+    Updateable()._update_post({})
+
     with assign(ye, 'INITIAL_MACROS', dict(a='1', b='2')):
         e = Env()
         

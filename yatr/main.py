@@ -277,7 +277,7 @@ def render(doc, infile, outfile):
     with open(infile, 'r') as f:
         template = f.read()
 
-    out = resolve(template, doc.env.env)
+    out = resolve(template, doc.env.env, jenv=doc.env.jenv)
     
     with open(outfile, 'w') as f:
         f.write(out)
@@ -349,7 +349,8 @@ def _main(*args):
         # TODO: add support for filtering out unwanted variables
         # TODO: add support for not including possible secrets in output
         for name in sorted(doc.env.env):
-            print_('{} = {}'.format(name, doc.env.env[name]))
+            if name in doc.env.macros or name in doc.env.captures:
+                print_('{} = {}'.format(name, doc.env.env[name]))
         return
 
     # --validate

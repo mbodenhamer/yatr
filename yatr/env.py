@@ -1,9 +1,11 @@
 from copy import copy
+from functools import partial
+from jinja2 import Environment, StrictUndefined
 from syn.base import Base, Attr, init_hook
-from syn.type import Dict, List
+from syn.type import Dict, List, Callable
 from syn.five import STR
 
-from .base import resolve, ordered_macros, get_output
+from .base import resolve, ordered_macros, get_output, DEFAULT_FILTERS
 from .context import Context, BUILTIN_CONTEXTS
 from .task import Task
 
@@ -34,7 +36,12 @@ class Copyable(object):
 
 
 class Updateable(object):
+    def _update_pre(self, other, **kwargs):
+        pass
+
     def update(self, other, **kwargs):
+        self._update_pre(other, **kwargs)
+
         for attr in self._groups.dict_update:
             getattr(self, attr).update(getattr(other, attr, {}))
 
@@ -43,6 +50,11 @@ class Updateable(object):
             if not value:
                 value = getattr(self, attr)
             setattr(self, attr, value)
+
+        self._update_post(other, **kwargs)
+
+    def _update_post(self, other, **kwargs):
+        pass
 
 
 #-------------------------------------------------------------------------------
@@ -68,10 +80,15 @@ class Env(Base, Copyable, Updateable):
                   settings = Attr(Dict(None), init=lambda self: dict(),
                                   doc='Global settings of various sorts', 
                                   groups=(UP, CP)),
+                  filters = Attr(Dict(Callable), 
+                                 init=lambda self: dict(DEFAULT_FILTERS),
+                                 doc='Custom Jinja2 filters', groups=(UP, CP)),
                   env = Attr(Dict(((STR, List(STR)), int)), 
                              init=lambda self: dict(),
                              doc='Current name resolution environment', 
                              groups=(UP, CP)),
+                  jenv = Attr(Environment, doc='Jinja2 environment', group='eq_exclude',
+                              init=lambda self: Environment(undefined=StrictUndefined)),
                   default_task = Attr(STR, '', 'Task to run if no task is '
                                       'specified at the command line', 
                                       group=AUP),
@@ -87,6 +104,11 @@ class Env(Base, Copyable, Updateable):
 
         if not hasattr(self, 'default_context'):
             self.default_context = self.contexts['null']
+
+    def _update_post(self, other, **kwargs):
+         # TODO: should probably also capture settings as **self.settings
+        self.filters['task'] = partial(DEFAULT_FILTERS['task'], env=self)
+        self.jenv.filters.update(self.filters)
 
     def capture_value(self, cmd, **kwargs):
         out, code = get_output(cmd)
@@ -107,14 +129,20 @@ class Env(Base, Copyable, Updateable):
         # TODO: better error message if there is a cycle
         for name, template in ordered_macros(macros):
             if name in self.macros:
-                env[name] = resolve(template, env)
+                env[name] = resolve(template, env, jenv=self.jenv)
             if name in self.captures:
                 cmd = resolve(template, env)
                 env[name] = self.capture_value(cmd, **kwargs)
+
+        # Populate task names for task macros
+        for name in self.tasks:
+            if name not in env:
+                env[name] = name
+
         self.env = env
 
     def resolve(self, template):
-        return resolve(template, self.env)
+        return resolve(template, self.env, jenv=self.jenv)
 
     def validate(self):
         super(Env, self).validate()

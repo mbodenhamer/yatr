@@ -20,6 +20,9 @@ TEST4 = os.path.join(DIR, 'test4.yml')
 TEST5 = os.path.join(DIR, 'test5.yml')
 TEST6 = os.path.join(DIR, 'test6.yml')
 TEST7 = os.path.join(DIR, 'test7.yml')
+TEST8 = os.path.join(DIR, 'test8.yml')
+TEST8_IN = os.path.join(DIR, 'test8.j2')
+TEST8_OUT = os.path.join(DIR, 'test8.bash')
 DOCKERFILE = os.path.join(DIR, 'example/render/Dockerfile')
 OUT = os.path.join(DIR, 'output')
 URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
@@ -211,29 +214,26 @@ def test_main():
             _main('-f', TEST2, '-p')
         assert out.getvalue() == 'true\n'
 
-        try:
-            # Test --dump and task command-line arg passing
-            with chdir(os.path.join(DIR, 'foo')):
-                with capture() as (out, err):
-                    _main('--dump')
-                assert out.getvalue() == ('a = abc\nb = abcdef\nc = abcdefghi\n'
-                                          'pwd = {}\n'.format(DIR))
+        # Test --dump and task command-line arg passing
+        with chdir(os.path.join(DIR, 'foo')):
+            with capture() as (out, err):
+                _main('--dump')
+            assert out.getvalue() == ('a = abc\nb = abcdef\nc = abcdefghi\n'
+                                      'pwd = {}\n'.format(DIR))
 
-                _main('print', '5')
-                assert read(OUT) == 'abcdefghi 5\n'
+            _main('print', '5')
+            assert read(OUT) == 'abcdefghi 5\n'
 
-                with capture() as (out, err):
-                    _main()
-                assert out.getvalue() == USAGE + '\n'
+            with capture() as (out, err):
+                _main()
+            assert out.getvalue() == USAGE + '\n'
 
-            # Test task referencing in task definition
-            _main('-f', TEST3, 'a')
-            assert read(OUT) == 'abc\n'
+        # Test task referencing in task definition
+        _main('-f', TEST3, 'a')
+        assert read(OUT) == 'abc\n'
 
-            _main('-f', TEST3, 'b')
-            assert read(OUT) == 'abc\ndef\n'
-        finally:
-            os.remove(OUT)
+        _main('-f', TEST3, 'b')
+        assert read(OUT) == 'abc\ndef\n'
 
         # Test --render
         with chdir(DIR):
@@ -298,7 +298,13 @@ def test_main():
         assert out.getvalue() == 'echo 1 0\n' \
             'echo 2 1\n' \
             'echo 3 2\n' \
-            'echo 4 3\n' \
+            'echo 4 3\n'
+
+        # Test task macros
+        _main('-f', TEST8, '-i', TEST8_IN, '-o', TEST8_OUT, '--render')
+        with open(TEST8_OUT, 'r') as f:
+            txt = f.read()
+            assert txt == '#!/bin/bash\necho foo\necho bar\necho baz'
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):

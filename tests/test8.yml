@@ -1,0 +1,8 @@
+macros:
+  shebang: "#!/bin/bash"
+
+tasks:
+  foo:
+    - echo foo
+    - echo bar
+    - echo baz

@@ -6,7 +6,7 @@ from tempfile import mkstemp, mkdtemp
 from contextlib import contextmanager
 from subprocess import call, check_output, CalledProcessError, STDOUT
 from jinja2 import Template, Environment, meta, StrictUndefined
-from syn.base_utils import Precedes, topological_sorting
+from syn.base_utils import Precedes, topological_sorting, assign
 from syn.five import STR
 
 DEFAULT_CACHE_DIR = '~/.yatr'
@@ -17,9 +17,20 @@ class ValidationError(Exception):
     pass
 
 #-------------------------------------------------------------------------------
+# Filters
+
+# NOTE: this filter cannot be overridden 
+def filter_task(name, env=None, **kwargs):
+    task = env.tasks[name]
+    lines = task.run_commands(env, **kwargs)
+    return '\n'.join(lines)
+
+DEFAULT_FILTERS = dict(task = filter_task)
+
+#-------------------------------------------------------------------------------
 # Utilities
 
-def resolve(template, env, lenient=False):
+def resolve(template, env, lenient=False, jenv=None):
     if isinstance(template, list):
         return [resolve(elem, env, lenient) for elem in template]
 
@@ -28,7 +39,8 @@ def resolve(template, env, lenient=False):
             if lenient:
                 return Template(template).render(env)
             else:
-                jenv = Environment(undefined=StrictUndefined)
+                if jenv is None:
+                    jenv = Environment(undefined=StrictUndefined)
                 return jenv.from_string(template).render(env)
     return template
 
