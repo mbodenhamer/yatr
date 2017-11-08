@@ -12,6 +12,10 @@ def test_resolve():
     assert resolve('ab{{c}}', {}, lenient=True) == 'ab'
     assert resolve('ab{{c}}', dict(c='d')) == 'abd'
 
+    # No autoescape
+    assert resolve('"abc" <in >& /dev/null', {}) == '"abc" <in >& /dev/null'
+
+    # list macros
     assert resolve(['{{a}}', '{{b}}', 'c'], dict(a='d', b='e')) == ['d', 'e', 'c']
 
 def test_variables():
