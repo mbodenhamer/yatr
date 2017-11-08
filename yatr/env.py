@@ -5,7 +5,8 @@ from syn.base import Base, Attr, init_hook
 from syn.type import Dict, List, Callable
 from syn.five import STR
 
-from .base import resolve, ordered_macros, get_output, DEFAULT_JINJA_FILTERS
+from .base import resolve, ordered_macros, get_output, DEFAULT_JINJA_FILTERS, \
+    DEFAULT_JINJA_FUNCTIONS
 from .context import Context, BUILTIN_CONTEXTS
 from .task import Task
 
@@ -81,8 +82,15 @@ class Env(Base, Copyable, Updateable):
                                   doc='Global settings of various sorts', 
                                   groups=(UP, CP)),
                   jinja_filters = Attr(Dict(Callable), 
-                                 init=lambda self: dict(DEFAULT_JINJA_FILTERS),
-                                 doc='Custom Jinja2 filters', groups=(UP, CP)),
+                                       init=lambda self: \
+                                       dict(DEFAULT_JINJA_FILTERS),
+                                       doc='Custom Jinja2 filters', 
+                                       groups=(UP, CP)),
+                  jinja_functions = Attr(Dict(Callable),
+                                         init=lambda self: \
+                                         dict(DEFAULT_JINJA_FUNCTIONS),
+                                         doc='Custom Jinja2 functions',
+                                         groups=(UP, CP)),
                   env = Attr(Dict(((STR, List(STR)), int)), 
                              init=lambda self: dict(),
                              doc='Current name resolution environment', 
@@ -105,11 +113,18 @@ class Env(Base, Copyable, Updateable):
         if not hasattr(self, 'default_context'):
             self.default_context = self.contexts['null']
 
-    def _update_post(self, other, **kwargs):
+    @init_hook
+    def _set_jenv(self, **kwargs):
          # TODO: should probably also capture settings as **self.settings
-        self.jinja_filters['commands'] = \
-            partial(DEFAULT_JINJA_FILTERS['commands'], env=self)
-        self.jenv.filters.update(self.jinja_filters)
+        filts = dict(self.jinja_filters)
+        filts['commands'] = partial(filts['commands'], env=self)
+        self.jenv.filters.update(filts)
+
+        funcs = dict(self.jinja_functions)
+        self.jenv.globals.update(funcs)
+
+    def _update_post(self, other, **kwargs):
+        self._set_jenv(**kwargs)
 
     def capture_value(self, cmd, **kwargs):
         out, code = get_output(cmd)
@@ -128,7 +143,7 @@ class Env(Base, Copyable, Updateable):
         macros.update(self.captures)
 
         # TODO: better error message if there is a cycle
-        for name, template in ordered_macros(macros):
+        for name, template in ordered_macros(macros, funcs=self.jinja_functions):
             if name in self.macros:
                 env[name] = resolve(template, env, jenv=self.jenv)
             if name in self.captures:

@@ -85,9 +85,11 @@ class Document(Base):
 
         self.process_settings(**kwargs)
 
+        jenv = Env().jenv
         pre_macros = dict(self.macros)
         for name, macro in ordered_macros(pre_macros, lenient=True):
-            pre_macros[name] = resolve(macro, pre_macros, lenient=True)
+            pre_macros[name] = resolve(macro, pre_macros, lenient=True, 
+                                       jenv=jenv)
 
         def process(path):
             return resolve_url(resolve(path, pre_macros), 

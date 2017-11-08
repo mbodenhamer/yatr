@@ -1,8 +1,16 @@
 macros:
   shebang: "#!/bin/bash"
+  bar: "{{env('YATR_BAR', 'baz')}}"
+  home: "{{env('PATH')}}"
 
 tasks:
   foo:
     - echo foo
     - echo bar
     - echo baz
+
+  bar:
+    - "echo {{bar}}"
+
+  home:
+    - "echo {{home}}"

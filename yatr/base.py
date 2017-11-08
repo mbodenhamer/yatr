@@ -5,8 +5,8 @@ import requests
 from tempfile import mkstemp, mkdtemp
 from contextlib import contextmanager
 from subprocess import call, check_output, CalledProcessError, STDOUT
-from jinja2 import Template, Environment, meta, StrictUndefined
-from syn.base_utils import Precedes, topological_sorting
+from jinja2 import Template, Environment, meta, StrictUndefined, Undefined
+from syn.base_utils import Precedes, topological_sorting, assign
 from syn.five import STR
 
 DEFAULT_CACHE_DIR = '~/.yatr'
@@ -17,7 +17,7 @@ class ValidationError(Exception):
     pass
 
 #-------------------------------------------------------------------------------
-# Filters
+# Jinja Filters
 
 # NOTE: this filter cannot be overridden 
 def jfilt_commands(name, env=None, **kwargs):
@@ -26,6 +26,16 @@ def jfilt_commands(name, env=None, **kwargs):
     return '\n'.join(lines)
 
 DEFAULT_JINJA_FILTERS = dict(commands = jfilt_commands)
+
+#-------------------------------------------------------------------------------
+# Jinja Functions
+
+def jfunc_env(name, value=None):
+    if value is not None:
+        return os.environ.get(name, value)
+    return os.environ[name]
+
+DEFAULT_JINJA_FUNCTIONS = dict(env = jfunc_env)
 
 #-------------------------------------------------------------------------------
 # Utilities
@@ -37,6 +47,9 @@ def resolve(template, env, lenient=False, jenv=None):
     if isinstance(template, STR):
         if '{{' in template:
             if lenient:
+                if jenv:
+                    with assign(jenv, 'undefined', Undefined):
+                        return jenv.from_string(template).render(env)
                 return Template(template).render(env)
             else:
                 if jenv is None:
@@ -61,13 +74,16 @@ def order_relations_from_macros(macros):
             out.append(Precedes(var, name))
     return out
 
-def ordered_macros(macros, lenient=False):
+def ordered_macros(macros, lenient=False, funcs=None):
+    funcs = funcs if funcs else []
     rels = order_relations_from_macros(macros)
     names = topological_sorting(macros, rels)
 
     for name in names:
         if name in macros:
             yield name, macros[name]
+        elif name in funcs:
+            pass
         else:
             if not lenient:
                 raise ValidationError('Referenced macro {} not defined'
