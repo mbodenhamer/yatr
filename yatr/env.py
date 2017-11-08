@@ -107,7 +107,8 @@ class Env(Base, Copyable, Updateable):
 
     def _update_post(self, other, **kwargs):
          # TODO: should probably also capture settings as **self.settings
-        self.filters['task'] = partial(DEFAULT_FILTERS['task'], env=self)
+        self.filters['commands'] = \
+            partial(DEFAULT_FILTERS['commands'], env=self)
         self.jenv.filters.update(self.filters)
 
     def capture_value(self, cmd, **kwargs):

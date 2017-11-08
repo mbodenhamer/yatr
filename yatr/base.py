@@ -20,12 +20,12 @@ class ValidationError(Exception):
 # Filters
 
 # NOTE: this filter cannot be overridden 
-def filter_task(name, env=None, **kwargs):
+def filter_commands(name, env=None, **kwargs):
     task = env.tasks[name]
     lines = task.run_commands(env, **kwargs)
     return '\n'.join(lines)
 
-DEFAULT_FILTERS = dict(task = filter_task)
+DEFAULT_FILTERS = dict(commands = filter_commands)
 
 #-------------------------------------------------------------------------------
 # Utilities
