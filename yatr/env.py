@@ -5,7 +5,7 @@ from syn.base import Base, Attr, init_hook
 from syn.type import Dict, List, Callable
 from syn.five import STR
 
-from .base import resolve, ordered_macros, get_output, DEFAULT_FILTERS
+from .base import resolve, ordered_macros, get_output, DEFAULT_JINJA_FILTERS
 from .context import Context, BUILTIN_CONTEXTS
 from .task import Task
 
@@ -80,8 +80,8 @@ class Env(Base, Copyable, Updateable):
                   settings = Attr(Dict(None), init=lambda self: dict(),
                                   doc='Global settings of various sorts', 
                                   groups=(UP, CP)),
-                  filters = Attr(Dict(Callable), 
-                                 init=lambda self: dict(DEFAULT_FILTERS),
+                  jinja_filters = Attr(Dict(Callable), 
+                                 init=lambda self: dict(DEFAULT_JINJA_FILTERS),
                                  doc='Custom Jinja2 filters', groups=(UP, CP)),
                   env = Attr(Dict(((STR, List(STR)), int)), 
                              init=lambda self: dict(),
@@ -107,9 +107,9 @@ class Env(Base, Copyable, Updateable):
 
     def _update_post(self, other, **kwargs):
          # TODO: should probably also capture settings as **self.settings
-        self.filters['commands'] = \
-            partial(DEFAULT_FILTERS['commands'], env=self)
-        self.jenv.filters.update(self.filters)
+        self.jinja_filters['commands'] = \
+            partial(DEFAULT_JINJA_FILTERS['commands'], env=self)
+        self.jenv.filters.update(self.jinja_filters)
 
     def capture_value(self, cmd, **kwargs):
         out, code = get_output(cmd)

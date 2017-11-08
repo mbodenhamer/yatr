@@ -6,7 +6,7 @@ from tempfile import mkstemp, mkdtemp
 from contextlib import contextmanager
 from subprocess import call, check_output, CalledProcessError, STDOUT
 from jinja2 import Template, Environment, meta, StrictUndefined
-from syn.base_utils import Precedes, topological_sorting, assign
+from syn.base_utils import Precedes, topological_sorting
 from syn.five import STR
 
 DEFAULT_CACHE_DIR = '~/.yatr'
@@ -20,12 +20,12 @@ class ValidationError(Exception):
 # Filters
 
 # NOTE: this filter cannot be overridden 
-def filter_commands(name, env=None, **kwargs):
+def jfilt_commands(name, env=None, **kwargs):
     task = env.tasks[name]
     lines = task.run_commands(env, **kwargs)
     return '\n'.join(lines)
 
-DEFAULT_FILTERS = dict(commands = filter_commands)
+DEFAULT_JINJA_FILTERS = dict(commands = jfilt_commands)
 
 #-------------------------------------------------------------------------------
 # Utilities
