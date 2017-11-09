@@ -19,7 +19,6 @@ class ValidationError(Exception):
 #-------------------------------------------------------------------------------
 # Jinja Filters
 
-# NOTE: this filter cannot be overridden 
 def jfilt_commands(name, env=None, **kwargs):
     task = env.tasks[name]
     lines = task.run_commands(env, **kwargs)
@@ -30,7 +29,7 @@ DEFAULT_JINJA_FILTERS = dict(commands = jfilt_commands)
 #-------------------------------------------------------------------------------
 # Jinja Functions
 
-def jfunc_env(name, value=None):
+def jfunc_env(name, value=None, **kwargs):
     if value is not None:
         return os.environ.get(name, value)
     return os.environ[name]

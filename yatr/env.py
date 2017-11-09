@@ -115,12 +115,14 @@ class Env(Base, Copyable, Updateable):
 
     @init_hook
     def _set_jenv(self, **kwargs):
-         # TODO: should probably also capture settings as **self.settings
         filts = dict(self.jinja_filters)
-        filts['commands'] = partial(filts['commands'], env=self)
+        for name, filt in filts.items():
+            filts[name] = partial(filt, env=self)
         self.jenv.filters.update(filts)
 
         funcs = dict(self.jinja_functions)
+        for name, func in funcs.items():
+            funcs[name] = partial(func, env=self)
         self.jenv.globals.update(funcs)
 
     def _update_post(self, other, **kwargs):
