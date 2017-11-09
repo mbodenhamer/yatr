@@ -300,11 +300,16 @@ def test_main():
             'echo 3 2\n' \
             'echo 4 3\n'
 
-        # Test task macros
+        # Test commands function
         _main('-f', TEST8, '-i', TEST8_IN, '-o', TEST8_OUT, '--render')
         with open(TEST8_OUT, 'r') as f:
             txt = f.read()
             assert txt == '#!/bin/bash\necho foo\necho bar\necho baz'
+
+        # Test env function
+        with capture() as (out, err):
+            _main('-f', TEST8, '-p', 'home')
+        assert out.getvalue() == 'echo {}\n'.format(os.environ['PATH'])
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):
