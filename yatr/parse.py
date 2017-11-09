@@ -1,6 +1,7 @@
 import os
 import imp
 import yaml
+from jinja2 import UndefinedError
 from syn.base_utils import chdir
 from syn.base import Base, Attr, init_hook
 from syn.type import List, Dict
@@ -88,8 +89,12 @@ class Document(Base):
         jenv = Env().jenv
         pre_macros = dict(self.macros)
         for name, macro in ordered_macros(pre_macros, lenient=True):
-            pre_macros[name] = resolve(macro, pre_macros, lenient=True, 
-                                       jenv=jenv)
+            try:
+                pre_macros[name] = resolve(macro, pre_macros, lenient=True,
+                                           jenv=jenv)
+            except UndefinedError:
+                pass # There might be macros defined in terms of
+                     # functions to be imported
 
         def process(path):
             return resolve_url(resolve(path, pre_macros), 
