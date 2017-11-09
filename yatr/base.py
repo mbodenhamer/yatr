@@ -199,11 +199,11 @@ def fix_functions(template, potential_problems, env):
                 alias = var + '_' + uuid4().hex
                 env.jenv.globals[alias] = env.jenv.globals[var]
                 env.function_aliases[var] = alias
+                eprint("Warning: '{}' defined as both macro and Jinja2 "
+                       "function.  Using function alias '{}'".format(var, alias))
                 
             repl = '\\1' + alias + '\\2'
             fixed = re.sub(test, repl, fixed)
-            eprint("Warning: '{}' defined as both macro and Jinja2 function.  "
-                   "Using function alias '{}'".format(var, alias))
 
     return fixed
 
