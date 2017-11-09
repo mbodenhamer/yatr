@@ -4,7 +4,7 @@ import shutil
 from jinja2 import UndefinedError
 from mock import MagicMock
 from nose.tools import assert_raises
-from syn.base_utils import capture, assign, chdir
+from syn.base_utils import capture, assign, chdir, setitem
 from yatr.main import _main, main, search_rootward, find_bash_completions,\
     dump_bash_completions, BASH_COMPLETION_MESSAGE, USAGE, OPTION_STRINGS,\
     DEFAULT_SETTINGS
@@ -310,6 +310,15 @@ def test_main():
         with capture() as (out, err):
             _main('-f', TEST8, '-p', 'home')
         assert out.getvalue() == 'echo {}\n'.format(os.environ['PATH'])
+
+        with capture() as (out, err):
+            _main('-f', TEST8, '-p', 'bar')
+        assert out.getvalue() == 'echo baz\n'
+
+        with capture() as (out, err):
+            with setitem(os.environ, 'YATR_BAR', 'foo'):
+                _main('-f', TEST8, '-p', 'bar')
+        assert out.getvalue() == 'echo foo\n'
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):
