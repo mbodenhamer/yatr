@@ -19,22 +19,24 @@ class ValidationError(Exception):
 #-------------------------------------------------------------------------------
 # Jinja Filters
 
-def jfilt_commands(name, env=None, **kwargs):
-    task = env.tasks[name]
-    lines = task.run_commands(env, **kwargs)
-    return '\n'.join(lines)
-
-DEFAULT_JINJA_FILTERS = dict(commands = jfilt_commands)
+DEFAULT_JINJA_FILTERS = dict()
 
 #-------------------------------------------------------------------------------
 # Jinja Functions
+
+def jfunc_commands(name, **kwargs):
+    env = kwargs.pop('env')
+    task = env.tasks[name]
+    lines = task.run_commands(env, **kwargs)
+    return '\n'.join(lines)
 
 def jfunc_env(name, value=None, **kwargs):
     if value is not None:
         return os.environ.get(name, value)
     return os.environ[name]
 
-DEFAULT_JINJA_FUNCTIONS = dict(env = jfunc_env)
+DEFAULT_JINJA_FUNCTIONS = dict(commands = jfunc_commands,
+                               env = jfunc_env)
 
 #-------------------------------------------------------------------------------
 # Utilities
