@@ -94,10 +94,10 @@ class Document(Base):
                                            jenv=jenv)
             except UndefinedError:
                 pass # There might be macros defined in terms of
-                     # functions to be imported
+                     # jinja_functions to be imported
 
         def process(path):
-            return resolve_url(resolve(path, pre_macros), 
+            return resolve_url(resolve(path, pre_macros, jenv=jenv), 
                                cachedir=cachedir, force=self.pull)
 
         with chdir(self.dirname):
