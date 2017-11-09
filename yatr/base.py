@@ -190,7 +190,7 @@ def get_delete(in_, out, key, default, outkey=None):
 def fix_functions(template, potential_problems, env):
     fixed = template
     for var in potential_problems:
-        test = '((\{\{[^}]*\\b))' + var + '(\([^}]*\)[^}]*\}\})'
+        test = '(\{\{[^}]*\\b)' + var + '(\([^}]*\)[^}]*\}\})'
         if re.search(test, fixed):
             if var in env.function_aliases:
                 alias = env.function_aliases[var]
@@ -200,7 +200,7 @@ def fix_functions(template, potential_problems, env):
                 env.jenv.globals[alias] = env.jenv.globals[var]
                 env.function_aliases[var] = alias
                 
-            repl = '\\2' + alias + '\\3'
+            repl = '\\1' + alias + '\\2'
             while re.search(test, fixed):
                 fixed = re.sub(test, repl, fixed)
             eprint("Warning: '{}' defined as both macro and Jinja2 function.  "
