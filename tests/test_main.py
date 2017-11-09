@@ -320,6 +320,10 @@ def test_main():
                 _main('-f', TEST8, '-p', 'bar')
         assert out.getvalue() == 'echo foo\n'
 
+        with capture() as (out, err):
+            _main('-f', TEST8, '-p', 'baz')
+        assert out.getvalue() == 'echo baz_foo foo_bar\n'
+
         # Verify example
         with chdir(os.path.join(DIR, 'example')):
             # Test --dump-path

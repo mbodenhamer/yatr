@@ -1,7 +1,6 @@
 import os
 import imp
 import yaml
-from jinja2 import UndefinedError
 from syn.base_utils import chdir
 from syn.base import Base, Attr, init_hook
 from syn.type import List, Dict
@@ -92,7 +91,7 @@ class Document(Base):
             try:
                 pre_macros[name] = resolve(macro, pre_macros, lenient=True,
                                            jenv=jenv)
-            except UndefinedError:
+            except:
                 pass # There might be macros defined in terms of
                      # jinja_functions to be imported
 
@@ -136,8 +135,6 @@ class Document(Base):
         self.env.update(mod.env, **kwargs)
 
     def process_include(self, path, **kwargs):
-        # TODO: support for ':' in path to restrict include scope
-        # TODO: when implementing :-support, will need to modify path validation
         doc = Document.from_path(path)
         self.env.update(doc.env, **kwargs)
 

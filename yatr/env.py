@@ -145,7 +145,8 @@ class Env(Base, Copyable, Updateable):
         macros.update(self.captures)
 
         # TODO: better error message if there is a cycle
-        for name, template in ordered_macros(macros, funcs=self.jinja_functions):
+        for name, template in ordered_macros(macros, jenv=self.jenv,
+                                             funcs=self.jinja_functions):
             if name in self.macros:
                 env[name] = resolve(template, env, jenv=self.jenv)
             if name in self.captures:

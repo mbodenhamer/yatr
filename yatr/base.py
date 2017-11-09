@@ -58,26 +58,33 @@ def resolve(template, env, lenient=False, jenv=None):
                 return jenv.from_string(template).render(env)
     return template
 
-def variables(template):
+def variables(template, lenient=False, jenv=None):
     if isinstance(template, list):
         ret = set()
         for elem in template:
             ret.update(variables(elem))
         return ret
 
-    env = Environment()
-    return meta.find_undeclared_variables(env.parse(template))
+    if jenv is None:
+        jenv = Environment()
 
-def order_relations_from_macros(macros):
+    try:
+        return meta.find_undeclared_variables(jenv.parse(template))
+    except Exception as e:
+        if lenient:
+            return set()
+        raise e
+
+def order_relations_from_macros(macros, lenient=False, jenv=None):
     out = []
     for name, template in macros.items():
-        for var in variables(template):
+        for var in variables(template, lenient=lenient, jenv=jenv):
             out.append(Precedes(var, name))
     return out
 
-def ordered_macros(macros, lenient=False, funcs=None):
+def ordered_macros(macros, lenient=False, funcs=None, jenv=None):
     funcs = funcs if funcs else []
-    rels = order_relations_from_macros(macros)
+    rels = order_relations_from_macros(macros, lenient=lenient, jenv=jenv)
     names = topological_sorting(macros, rels)
 
     for name in names:
