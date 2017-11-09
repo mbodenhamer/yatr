@@ -201,8 +201,7 @@ def fix_functions(template, potential_problems, env):
                 env.function_aliases[var] = alias
                 
             repl = '\\1' + alias + '\\2'
-            while re.search(test, fixed):
-                fixed = re.sub(test, repl, fixed)
+            fixed = re.sub(test, repl, fixed)
             eprint("Warning: '{}' defined as both macro and Jinja2 function.  "
                    "Using function alias '{}'".format(var, alias))
 
