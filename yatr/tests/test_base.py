@@ -21,6 +21,7 @@ def test_resolve():
 def test_variables():
     assert variables('{{a}} {{b}}') == {'a', 'b'}
     assert variables(['{{a}}', '{{b}}', 'c']) == {'a', 'b'}
+    assert_raises(Exception, variables, '{{a|foo}}')
 
 def test_ordered_macros():
     assert list(ordered_macros({})) == []
