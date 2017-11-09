@@ -1,7 +1,10 @@
 import os
+import re
+import sys
 import shutil
 import hashlib
 import requests
+from uuid import uuid4
 from tempfile import mkstemp, mkdtemp
 from contextlib import contextmanager
 from subprocess import call, check_output, CalledProcessError, STDOUT
@@ -40,6 +43,11 @@ DEFAULT_JINJA_FUNCTIONS = dict(commands = jfunc_commands,
 
 #-------------------------------------------------------------------------------
 # Utilities
+
+def eprint(out, flush=True):
+    sys.stderr.write(out + '\n')
+    if flush:
+        sys.stderr.flush()
 
 def resolve(template, env, lenient=False, jenv=None):
     if isinstance(template, list):
@@ -178,6 +186,27 @@ def get_delete(in_, out, key, default, outkey=None):
     
     if key in in_:
         del in_[key]
+
+def fix_functions(template, potential_problems, env):
+    fixed = template
+    for var in potential_problems:
+        test = '((\{\{[^}]*\\b))' + var + '(\([^}]*\)[^}]*\}\})'
+        if re.search(test, fixed):
+            if var in env.function_aliases:
+                alias = env.function_aliases[var]
+            else:
+                # TODO: replace with real gensym
+                alias = var + '_' + uuid4().hex
+                env.jenv.globals[alias] = env.jenv.globals[var]
+                env.function_aliases[var] = alias
+                
+            repl = '\\2' + alias + '\\3'
+            while re.search(test, fixed):
+                fixed = re.sub(test, repl, fixed)
+            eprint("Warning: '{}' defined as both macro and Jinja2 function.  "
+                   "Using function alias '{}'".format(var, alias))
+
+    return fixed
 
 #-------------------------------------------------------------------------------
 # __all__

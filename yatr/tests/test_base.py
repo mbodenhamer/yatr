@@ -1,7 +1,9 @@
 from jinja2 import UndefinedError
 from nose.tools import assert_raises
+from syn.base_utils import assign, capture
+import yatr.base as ybase
 from yatr.base import resolve, variables, ordered_macros, get_output,\
-    str_to_bool
+    str_to_bool, fix_functions
 
 #-------------------------------------------------------------------------------
 # Utilities
@@ -74,6 +76,33 @@ def test_str_to_bool():
 
     assert_raises(TypeError, str_to_bool, [])
     assert_raises(TypeError, str_to_bool, 'foo')
+
+def test_fix_functions():
+    from yatr import Env
+
+    class Foo(object):
+        pass
+    
+    def fooer():
+        ret = Foo()
+        ret.hex = 'foo'
+        return ret
+
+    def identity(s=None, **kwargs):
+        return s
+
+    env = Env(macros=dict(abc='def'),
+              jinja_functions=dict(abc=identity))
+    with capture() as (out, err):
+        with assign(ybase, 'uuid4', fooer):
+            out = fix_functions("{{abc('sdf')}} {{abc}} {{abc('qwe')}}", 
+                                {'abc'}, env)
+            assert out == "{{abc_foo('sdf')}} {{abc}} {{abc_foo('qwe')}}"
+            assert resolve(out, env.macros, jenv=env.jenv) == 'sdf def qwe'
+
+            out = fix_functions("{{abc('ghi')}}", {'abc'}, env)
+            assert out == "{{abc_foo('ghi')}}"
+            assert resolve(out, env.macros, jenv=env.jenv) == 'ghi'
 
 #-------------------------------------------------------------------------------
 

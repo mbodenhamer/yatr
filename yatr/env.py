@@ -6,7 +6,7 @@ from syn.type import Dict, List, Callable
 from syn.five import STR
 
 from .base import resolve, ordered_macros, get_output, DEFAULT_JINJA_FILTERS, \
-    DEFAULT_JINJA_FUNCTIONS
+    DEFAULT_JINJA_FUNCTIONS, fix_functions
 from .context import Context, BUILTIN_CONTEXTS
 from .task import Task
 
@@ -91,6 +91,9 @@ class Env(Base, Copyable, Updateable):
                                          dict(DEFAULT_JINJA_FUNCTIONS),
                                          doc='Custom Jinja2 functions',
                                          groups=(UP, CP)),
+                  function_aliases = Attr(Dict(STR), init=lambda self: dict(),
+                                          internal=True, groups=(UP, CP),
+                                          doc='Jinja function aliases'),
                   env = Attr(Dict(((STR, List(STR)), int)), 
                              init=lambda self: dict(),
                              doc='Current name resolution environment', 
@@ -145,18 +148,16 @@ class Env(Base, Copyable, Updateable):
         macros.update(self.captures)
 
         # TODO: better error message if there is a cycle
+        potential_problems = set(env) & set(self.jinja_functions)
         for name, template in ordered_macros(macros, jenv=self.jenv,
                                              funcs=self.jinja_functions):
             if name in self.macros:
-                env[name] = resolve(template, env, jenv=self.jenv)
+                fixed = fix_functions(template, potential_problems, self)
+                env[name] = resolve(fixed, env, jenv=self.jenv)
+
             if name in self.captures:
                 cmd = resolve(template, env)
                 env[name] = self.capture_value(cmd, **kwargs)
-
-        # Populate task names for task macros
-        for name in self.tasks:
-            if name not in env:
-                env[name] = name
 
         self.env = env
 

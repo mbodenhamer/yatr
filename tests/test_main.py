@@ -301,7 +301,8 @@ def test_main():
             'echo 4 3\n'
 
         # Test commands function
-        _main('-f', TEST8, '-i', TEST8_IN, '-o', TEST8_OUT, '--render')
+        with capture() as (out, err):
+            _main('-f', TEST8, '-i', TEST8_IN, '-o', TEST8_OUT, '--render')
         with open(TEST8_OUT, 'r') as f:
             txt = f.read()
             assert txt == '#!/bin/bash\necho foo\necho bar\necho baz'
