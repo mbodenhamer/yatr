@@ -40,6 +40,8 @@ For example, suppose yatr is invoked on a yatrfile named ``C.yml``, which includ
    :language: yaml
 
 
+.. _c.yml:
+
 ``C.yml``:
 
 .. literalinclude:: ../tests/example/C.yml

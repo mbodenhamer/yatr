@@ -31,6 +31,7 @@ If the ``-p`` option is supplied, yatr will simply print the commands without ru
     echo bar
     echo bar baz foo
 
+
 ``-m``
 ~~~~~~
 
@@ -41,6 +42,9 @@ Macro values may also be set or overridden at the command line by supplying the 
     b = ghi
     c = xyz
     d = jkl
+
+
+(See :ref:`C.yml <c.yml>`)
 
 
 Commands
