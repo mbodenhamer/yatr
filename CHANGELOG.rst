@@ -1,11 +1,12 @@
 Changelog
 ---------
 
-0.0.6 (2017-11-09)
+0.0.6 (2017-11-10)
 ~~~~~~~~~~~~~~~~~~
 
 * Fixed default task specification not inheriting.
 * Added for loop tasks and list macros.
+* Added support for custom Jinja2 functions and filters.
 
 0.0.5 (2017-11-02)
 ~~~~~~~~~~~~~~~~~~

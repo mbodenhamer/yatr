@@ -1,0 +1,35 @@
+usage: yatr [-h] [-f <yatrfile>] [-i <file>] [-o <file>] [-m <macro>=<value>]
+            [-s <setting>=<value>] [--cache-dir <DIR>] [-v] [-p] [--dump]
+            [--dump-path] [--pull] [--render] [--version] [--validate]
+            [--install-bash-completions]
+            [<task>] [ARGS [ARGS ...]]
+
+Yet Another Task Runner.
+
+positional arguments:
+  <task>                The task to run
+  ARGS                  Additional arguments for the task
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f <yatrfile>, --yatrfile <yatrfile>
+                        The yatrfile to load
+  -i <file>             Input file
+  -o <file>             Output file
+  -m <macro>=<value>, --macro <macro>=<value>
+                        Set/override macro with specified value
+  -s <setting>=<value>, --setting <setting>=<value>
+                        Set/override setting with specified value
+  --cache-dir <DIR>     Path of cache directory
+  -v, --verbose         Print commands to be run
+  -p, --preview         Preview commands to be run without running them
+                        (implies -v)
+  --dump                Dump macro values and exit
+  --dump-path           Print yatrfile path and exit
+  --pull                Download all URL includes and imports, then exit
+  --render              Use macros to render a Jinja2 template file (requires
+                        -i and -o)
+  --version             Print version info and exit
+  --validate            Validate the yatrfile and exit
+  --install-bash-completions
+                        Install bash tab completion script globally, then exit

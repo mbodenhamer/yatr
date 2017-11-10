@@ -99,7 +99,7 @@ show:
 	@python -c "import webbrowser as wb; wb.open('htmlcov/index.html')"
 
 help:
-	@$(PYDEV) bash -c "$(INSTALL); yatr -h"
+	@$(PYDEV) bash -c "$(INSTALL); yatr -h; yatr -h > docs/help.txt"
 
 .PHONY: test quick-test unit-test dist-test show
 .PHONY: py3-quick-test py3-unit-test help

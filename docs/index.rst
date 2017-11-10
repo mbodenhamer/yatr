@@ -10,6 +10,11 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   install
+   example
+   cli
+   settings
+   future
    yatr
    changelog
 
