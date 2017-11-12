@@ -135,7 +135,8 @@ class Document(Base):
         self.env.update(mod.env, **kwargs)
 
     def process_include(self, path, **kwargs):
-        doc = Document.from_path(path)
+        doc = Document.from_path(path, pull=self.pull, cachedir=self.cachedir,
+                                 settings=self.settings)
         self.env.update(doc.env, **kwargs)
 
     def process_secret(self, name, **kwargs):

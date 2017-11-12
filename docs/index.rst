@@ -11,9 +11,8 @@ Contents:
    :maxdepth: 2
 
    install
-   example
+   yatrfile
    cli
-   settings
    future
    yatr
    changelog

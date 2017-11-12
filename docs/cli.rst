@@ -8,10 +8,52 @@ Usage
    :language: console
 
 
-If not supplied, ``<yatrfile>`` will default to a file matching the regular expression ``^[Yy]atrfile(.yml)?$``.  If such a file is not present in the current working directory, yatr will search rootward up the filesystem tree looking for a file that matches the expression.  This is intended as a feature of convenience, so that tasks can be easily executed when working in a project sub-directory.  If it is unclear which yatrfile has been loaded, ``yatr --dump-path`` may be run to disambiguate.  Likewise, the ``-f`` option may be supplied in order to force the loading of a particular yatrfile.
-
 Options
 -------
+
+``--cachedir``
+~~~~~~~~~~~~~~
+
+Certain yatr features make use of a cache directory to increase the efficiency of repeated yatr invocations.  The cache directory is currently used for processing yatrfiles included via URL (see :ref:`include`), extension modules included via URL (see :ref:`import`), as well as for populating bash tab completion values.  By default, the cache directory is set to ``~/.yatr/``, but this may be changed like so::
+
+    $ yatr --cache-dir /path/to/cache/dir <some task or commmand>
+
+
+Cache files may be deleted at any time between yatr invocations with no deleterious effects, save for a potential increase in execution time during the next yatr invocation.
+
+``-f`` (``--yatrfile``)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Specify the yatrfile to load.  If this option is not supplied, yatr will try to load a file whose filename matches the regular expression ``^[Yy]atrfile(.yml)?$``.  If such a file is not present in the current working directory, yatr will search rootward up the filesystem tree looking for a file that matches the expression.  This is intended as a feature of convenience, so that tasks can be easily executed when working in a project sub-directory.  If it is unclear which yatrfile has been loaded, ``yatr --dump-path`` may be run to disambiguate.
+
+``-i`` and ``-o``
+~~~~~~~~~~~~~~~~~
+
+The ``-i`` and ``-o`` options specify input and output files, respectively.  These options have no effect when invoking yatr to run a task, and are only used by specific yatr commands that require them, such as :ref:`render`.
+
+``-m`` (``--macro``)
+~~~~~~~~~~~~~~~~~~~~
+
+Macro values may also be set or overridden at the command line by supplying the ``-m`` (or ``--macro``) option.  For example::
+
+    $ yatr -f C.yml -m a=zab --macro d=jkl --dump
+    a = zab
+    b = ghi
+    c = xyz
+    d = jkl
+
+
+(See :ref:`C.yml <c.yml>`)
+
+
+``-s`` (``--setting``)
+~~~~~~~~~~~~~~~~~~~~~~
+
+Any setting value may be set or overridden at the command line by supplying the ``-s`` (or ``--setting``) option.  For example::
+
+    $ yatr -f D.yml -s silent=false foo
+    bar
+
 
 ``-v`` and ``-p``
 ~~~~~~~~~~~~~~~~~
@@ -32,21 +74,6 @@ If the ``-p`` option is supplied, yatr will simply print the commands without ru
     echo bar baz foo
 
 
-``-m``
-~~~~~~
-
-Macro values may also be set or overridden at the command line by supplying the ``-m`` option.  For example::
-
-    $ yatr -f C.yml -m a=zab -m d=jkl --dump
-    a = zab
-    b = ghi
-    c = xyz
-    d = jkl
-
-
-(See :ref:`C.yml <c.yml>`)
-
-
 Commands
 --------
 
@@ -59,14 +86,45 @@ Name                            Description
 =============================== =========================================================================
 ``--dump``                      Dump macro values to ``stdout``
 ``--dump-path``                 Print yatrfile path to ``stdout``
+``--install-bash-completions``  Install bash tab completion script in ``/etc/bash_completions.d/``
 ``--pull``                      Download all URL includes and imports defined in yatrfile
 ``--render``                    Use macros to render a Jinja2 template file (requires ``-i`` and ``-o``)
-``--version``                   Print version information to ``stdout``
 ``--validate``                  Validate the yatrfile
-``--install-bash-completions``  Install bash tab completion script in ``/etc/bash_completions.d/``
+``--version``                   Print version information to ``stdout``
 =============================== =========================================================================
 
-Many of the commands are self-explanatory, and their usage is illustrated in :ref:`example`.  Less-straightforward commands are discussed in more detail below.
+A discussion of each command is given below.
+
+``--dump``
+~~~~~~~~~~
+
+Prints macro values (including ``capture`` values) to ``stdout``.  For example, with :ref:`C.yml <c.yml>`, running ``--dump`` produces the following::
+
+    $ yatr -f C.yml --dump
+    a = baz
+    b = ghi
+    c = xyz
+
+``--dump-path``
+~~~~~~~~~~~~~~~
+
+Prints the absolute path of the loaded yatrfile.  For example::
+
+    $ yatr -f /path/to/yatrfile.yml --dump-path
+    /path/to/yatrfile.yml
+
+
+``--install-bash-completions``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Installs script for dynamic bash tab completion support.  See :ref:`install`.
+
+``--pull``
+~~~~~~~~~~
+
+Downloads all URL includes and imports defined in the loaded yatrfile.  If included yatrfiles define URL imports or includes, these will also be downloaded.
+
+.. _render:
 
 ``--render``
 ~~~~~~~~~~~~
@@ -91,4 +149,12 @@ to generate the desired Dockerfile (i.e. resolve the ``{{version}}`` macro in th
 
 .. literalinclude:: ../tests/example/render/Dockerfile
 
+``--validate``
+~~~~~~~~~~~~~~
 
+Validates the loaded yatrfile.  A number of validation tasks are performed during the course of loading a yatrfile (such as validating proper YAML syntax) even if the ``--validate`` command is not given.  However, the ``--validate`` command validates further aspects of the loaded task environment, such as ensuring that no task definitions contain undefined macros.  If an error is found, an exception will be raised and the program will terminate with a non-zero exit status.
+
+``--version``
+~~~~~~~~~~~~~
+
+Prints the program name and current version number to ``stdout``.

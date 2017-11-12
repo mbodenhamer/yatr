@@ -1,14 +1,16 @@
-.. _example:
+.. _yatrfile:
 
-Example(s)
-==========
+Yatrfile Structure and Features
+===============================
+
+.. _main_example:
 
 Suppose you have the following ``yatrfile.yml`` in your `current working directory`_:
 
 .. literalinclude:: ../tests/example/yatrfile.yml
    :language: yaml
 
-As illustrated in this example, yatr currently supports five top-level keys in the yatrfile: ``include``, ``capture``, ``macros``, ``tasks``, and ``default``.  A sixth top-level section ``settings`` is also supported (see :ref:`settings`).
+As illustrated in this example, yatr currently supports five top-level keys in the yatrfile: ``include``, ``capture``, ``macros``, ``tasks``, and ``default``.  Two other sections, ``settings`` and ``import``, are also supported (see :ref:`settings` and :ref:`import`, respectively).
 
 ``macros``
 ----------
@@ -20,6 +22,8 @@ The ``macros`` section must be a mapping of macro names to macro definitions.  M
 
 
 As such, ``b`` resolves to ``bar`` and ``c`` resolves to ``bar baz``.  As the ``macros`` section is a mapping, and not a list, there is no inherent order to macro definition.  yatr takes care of resolving macros and their dependencies in the right order, provided that there are no cyclic macro definitions (e.g. a macro ``a`` defined in terms of ``b``, which is defined in terms of ``a``).  If any such cycles exist, the program will exit with an error.
+
+.. _include:
 
 ``include``
 -----------
@@ -116,6 +120,64 @@ As such, running ``yatr`` at the command line is equivalent to running ``yatr fo
 
 The ``capture`` section defines a special type of macro, specifying a mapping from a macro name to a system command whose captured output is to be the value of the macro.  Values of ``capture`` mappings cannot contain task references, though they may contain references to other macros.  In the main example above, the yatrfile defines a capture macro named ``baz``, whose definition is ``ls {{glob}}``.  In the macro section, ``glob`` is defined as ``*.yml``.  Thus, if yatr is invoked in the `example working directory`_, the value of ``baz`` will resolve to ``A.yml  B.yml  C.yml  D.yml  yatrfile.yml``.
 
+.. _settings:
+
+``settings``
+------------
+
+The top-level section ``settings`` allows the global execution behavior of yatr to be modified in various ways.  Only one setting (``silent``) is currently supported, but more will be added as more features are implemented.  The ``silent`` setting, if set to ``true``, will suppress all system command output at the console.  Such behavior is disabled by default.
+
+An example of settings can be found in `D.yml`_, which includes the example yatrfile discussed in :ref:`yatrfile`:
+
+.. literalinclude:: ../tests/example/D.yml
+   :language: yaml
+
+
+In the example above, running ``yatr foo`` led to the output ``bar`` being printed to the console.  However, invoking the same task through ``D.yml`` will result in no output being printed::
+
+    $ yatr -f D.yml foo
+ 
+
+However, any setting can be set or overridden at the command line by supplying the ``-s`` option::
+
+    $ yatr -f D.yml -s silent=false foo
+    bar
+
+
+For boolean-type settings, such as ``silent``, any of the following strings may be used to denote True, regardless of capitalization:  ``yes``, ``true``, ``1``.  Likewise, any of the following strings may be used to denote False, regardless of capitalization:  ``no``, ``false``, ``0``.
+
+.. _D.yml: https://github.com/mbodenhamer/yatr/blob/master/tests/example/D.yml
+
+.. _import:
+
+``import``
+----------
+
+.. literalinclude:: ../tests/test8.py
+   :language: python
+
+.. literalinclude:: ../tests/test8.yml
+   :language: yaml
+
+
+Custom Jinja2 Functions
+-----------------------
+
+list and explain the current functions
+
+``commands()``
+~~~~~~~~~~~~~~
+
+.. literalinclude:: ../tests/test8.j2
+   :language: bash
+
+.. literalinclude:: ../tests/test8.bash
+   :language: bash
+
+
+``env()``
+~~~~~~~~~
+
 Conditional Task Execution
 --------------------------
 
@@ -130,6 +192,13 @@ Tasks may be defined to execute conditionally upon the successful execution of a
 
 
 The values supplied to ``if`` and ``ifnot`` may be anything that would otherwise constitute a valid task definition.  If a value is supplied for ``if``, the command will be executed only if the return code of the test command is zero.  Likewise, if a value is supplied for ``ifnot``, the command will be executed only if the return code of the test command is non-zero.
+
+List Macros and For Loops
+-------------------------
+
+.. literalinclude:: ../tests/test7.yml
+   :language: yaml
+
 
 
 .. _current working directory: https://github.com/mbodenhamer/yatr/tree/master/tests/example
