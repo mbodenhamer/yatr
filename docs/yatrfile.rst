@@ -125,15 +125,15 @@ The ``capture`` section defines a special type of macro, specifying a mapping fr
 ``settings``
 ------------
 
-The top-level section ``settings`` allows the global execution behavior of yatr to be modified in various ways.  Only one setting (``silent``) is currently supported, but more will be added as more features are implemented.  The ``silent`` setting, if set to ``true``, will suppress all system command output at the console.  Such behavior is disabled by default.
+The top-level section ``settings`` allows the global execution behavior of yatr to be modified in various ways.  For example, the ``silent`` setting, if set to ``true``, will suppress all system command output at the console.  Such behavior is disabled by default.
 
-An example of settings can be found in `D.yml`_, which includes the example yatrfile discussed in :ref:`yatrfile`:
+An example of setting setting values in a yatrfile can be found in `D.yml`_, which includes the example yatrfile discussed in :ref:`yatrfile`:
 
 .. literalinclude:: ../tests/example/D.yml
    :language: yaml
 
 
-In the example above, running ``yatr foo`` led to the output ``bar`` being printed to the console.  However, invoking the same task through ``D.yml`` will result in no output being printed::
+In the :ref:`example <main_example>` above, running ``yatr foo`` led to the output ``bar`` being printed to the console.  However, invoking the same task through ``D.yml`` will result in no output being printed::
 
     $ yatr -f D.yml foo
  
@@ -146,6 +146,15 @@ However, any setting can be set or overridden at the command line by supplying t
 
 For boolean-type settings, such as ``silent``, any of the following strings may be used to denote True, regardless of capitalization:  ``yes``, ``true``, ``1``.  Likewise, any of the following strings may be used to denote False, regardless of capitalization:  ``no``, ``false``, ``0``.
 
+The following table lists the available settings:
+
+================================ ================================================================================
+Name                             Description
+================================ ================================================================================
+``loop_count_macro``             The name of the macro that contains the current loop iteration number (string)
+``silent``                       If true, suppress task output; false by default (boolean string)
+================================ ================================================================================
+
 .. _D.yml: https://github.com/mbodenhamer/yatr/blob/master/tests/example/D.yml
 
 .. _import:
@@ -153,30 +162,73 @@ For boolean-type settings, such as ``silent``, any of the following strings may 
 ``import``
 ----------
 
+The ``import`` feature enables the functionality of yatr to be extended when necessary, while preserving the simplicity of the default YAML specification for the majority of use cases for which the default capabilities of yatr are sufficient.
+
+The ``import`` section must be a list of strings, each of which must be either a filesystem path or a URL specifying the location of a Python module.  Each module so imported must contain a top-level variable named ``env``, which must be an instance of the ``Env`` class (see :ref:`yatr\.env module`).  Modules to be imported in this manner are called "extension modules" (not to be confused with Python extension modules written in C/C++).
+
+The following is an example of a yatr extension module:
+
 .. literalinclude:: ../tests/test8.py
    :language: python
+
+This particular extension module defines a custom Jinja2 function (see :ref:`Custom Jinja2 Functions`) and a custom Jinja2 filter (see :ref:`Custom Jinja2 Filters`).  Macros and tasks can theoretically be defined in an extension module through use of the yatr API, but the straightforward macro and task declaration facilitated by the standard yatrfile YAML syntax makes the use of ``include`` directives a much more efficient and user-friendly alternative.
+
+In this example extension module, a Jinja2 function ``bar`` is defined that appends ``_bar`` to its first argument.  Likewise, a Jinja2 filter ``foo`` is defined that appends ``_foo`` to its first argument.  Because yatr supplies the current yatr definition environment to custom Jinja 2 filters and functions, all such filters and functions defined in extension modules should accept ``**kwargs`` as the final argument, even if the ``kwargs`` variable is not used within the body of the filter or function itself.
+
+Here is an example yatrfile that uses the extension module defined above:
 
 .. literalinclude:: ../tests/test8.yml
    :language: yaml
 
+In addition to ``bar`` and ``foo``, this yatrfile also makes use of the built-in custom Jinja2 function ``env`` (see :ref:`env`).  The task ``baz`` is defined in terms of macros that make use of ``bar`` and ``foo``.  Invoking the task produces the following output::
+
+    $ yatr baz
+    baz_foo foo_bar
 
 Custom Jinja2 Functions
 -----------------------
 
-list and explain the current functions
+The following functions are defined by default for use in Jinja2 templates.
 
 ``commands()``
 ~~~~~~~~~~~~~~
 
+The ``commands`` function takes a single argument and prints the commands corresponding to the execution of the task whose name is the argument.  For example, suppose one is using the example yatrfile of the :ref:`import` section above in order to run a :ref:`render` command on the following template file (``template.j2``):
+
 .. literalinclude:: ../tests/test8.j2
    :language: bash
+
+
+One could then render the template like so::
+
+    yatr -i template.j2 -o template.bash --render
+
+
+The resulting output file (``template.bash``) would look like:
 
 .. literalinclude:: ../tests/test8.bash
    :language: bash
 
 
+.. _env:
+
 ``env()``
 ~~~~~~~~~
+
+The ``env`` function takes either one or two arguments.  In either case, the first argument must be the name of an environment variable.  The ``env`` function will return the value of this environment variable if it is defined.  If the environment variable is undefined and only one argument is supplied to ``env``, the function will raise an exception and halt execution of the task.  On the other hand, if a second argument is supplied to ``env``, it will be returned in the case that the environment variable in question is undefined.
+
+For example, consider the example yatrfile of the :ref:`import` section above.  The ``home`` macro is defined in terms of the environment variable ``PATH``.  In the practically-inconceivable case that ``PATH`` is not defined, yatr will exit with an exception when loading this yatrfile.  On the other hand, in an environment in which ``YATR_BAR`` is not defined, the program will behave as follows::
+
+    $ yatr bar
+    baz
+    $ YATR_BAR=foo yatr bar
+    foo
+
+
+Custom Jinja2 Filters
+---------------------
+
+There are currently no custom Jinja2 filters defined by default for use in Jinja2 templates, but some will probably be added in future releases.
 
 Conditional Task Execution
 --------------------------
@@ -196,10 +248,31 @@ The values supplied to ``if`` and ``ifnot`` may be anything that would otherwise
 List Macros and For Loops
 -------------------------
 
+In most use cases, macros will either be plain strings or Jinja2 templates.  However, there are some cases in which it is useful to have a list of strings or macros defined itself as a macro.  To define such a "list macro", simply use YAML list syntax in the macro definition.  For example, consider the following yatrfile:
+
 .. literalinclude:: ../tests/test7.yml
    :language: yaml
 
+The macro ``a`` is a plain string, but both ``b`` and ``c`` are list macros.  List macros are not all that useful on their own, but can be used for iteration via for loops, as is illustrated by the defitions of the tasks named ``foo`` and ``bar``.
 
+The ``for`` key requires two sub-keys, ``var`` and ``in``.  The ``var`` sub-key defines the iteration variable(s), while the ``in`` sub-key specifies the lists or list macros over which to iterate.  In the case that ``var`` is a string value, then ``for`` specifies a simple and intuitive for loop over the values specified by ``in``.  The value of ``in`` may either be the name of a list macro, as in the task named ``foo``, or a list literal, as in the task named ``bar``.  In the case that ``var`` is a list, then ``for`` specifies a loop over the Cartesian product of the lists specified by ``in``.  The task named ``foo`` illustrates a 2x2 Cartesian product, while the task named ``bar`` illustrates a simple for loop.
+
+It should be noted that the local variables defined by ``var`` only exist in the context of the execution of the loop.  It should also be noted that the for loop defines a special local variable named ``_n``, which contains the current iteration number.  Note that the task named ``foo`` is defined in terms of ``_n``.  As such::
+
+    $ yatr foo
+    x x w 0
+    x x z 1
+    x y w 2
+    x y z 3
+
+
+The name of ``_n`` may be changed if desired via the ``loop_count_macro`` setting.  For example::
+
+    $ yatr -s loop_count_macro=count bar
+    1 0
+    2 1
+    3 2
+    4 3
 
 .. _current working directory: https://github.com/mbodenhamer/yatr/tree/master/tests/example
 .. _Jinja2 templates: http://jinja.pocoo.org/docs/latest/templates/
