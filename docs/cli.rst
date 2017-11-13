@@ -16,7 +16,7 @@ Options
 
 Certain yatr features make use of a cache directory to increase the efficiency of repeated yatr invocations.  The cache directory is currently used for processing yatrfiles included via URL (see :ref:`include`), extension modules included via URL (see :ref:`import`), as well as for populating bash tab completion values.  By default, the cache directory is set to ``~/.yatr/``, but this may be changed like so::
 
-    $ yatr --cache-dir /path/to/cache/dir <some task or commmand>
+    $ yatr --cache-dir /path/to/cache/dir <some task or command>
 
 
 Cache files may be deleted at any time between yatr invocations with no deleterious effects, save for a potential increase in execution time during the next yatr invocation.

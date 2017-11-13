@@ -253,7 +253,7 @@ In most use cases, macros will either be plain strings or Jinja2 templates.  How
 .. literalinclude:: ../tests/test7.yml
    :language: yaml
 
-The macro ``a`` is a plain string, but both ``b`` and ``c`` are list macros.  List macros are not all that useful on their own, but can be used for iteration via for loops, as is illustrated by the defitions of the tasks named ``foo`` and ``bar``.
+The macro ``a`` is a plain string, but both ``b`` and ``c`` are list macros.  List macros are not all that useful on their own, but can be used for iteration via for loops, as is illustrated by the definitions of the tasks named ``foo`` and ``bar``.
 
 The ``for`` key requires two sub-keys, ``var`` and ``in``.  The ``var`` sub-key defines the iteration variable(s), while the ``in`` sub-key specifies the lists or list macros over which to iterate.  In the case that ``var`` is a string value, then ``for`` specifies a simple and intuitive for loop over the values specified by ``in``.  The value of ``in`` may either be the name of a list macro, as in the task named ``foo``, or a list literal, as in the task named ``bar``.  In the case that ``var`` is a list, then ``for`` specifies a loop over the Cartesian product of the lists specified by ``in``.  The task named ``foo`` illustrates a 2x2 Cartesian product, while the task named ``bar`` illustrates a simple for loop.
 
