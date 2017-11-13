@@ -116,6 +116,7 @@ class Docker(Context):
 # Python
 
 
+# TODO: separate contexts for python-eval and python-exec
 class Python(Context):
     context_name = 'python'
 
