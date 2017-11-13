@@ -4,6 +4,8 @@ Changelog
 0.0.7 (2017-11-20)
 ~~~~~~~~~~~~~~~~~~
 
+* Added ``files`` section and functionality.
+
 0.0.6 (2017-11-13)
 ~~~~~~~~~~~~~~~~~~
 

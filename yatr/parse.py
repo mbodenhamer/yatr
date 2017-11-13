@@ -27,6 +27,7 @@ class Document(Base):
                   tasks = Attr(Dict(Task), init=lambda self: dict()),
                   secret_values = Attr(Dict(STR), init=lambda self: dict()),
                   captures = Attr(Dict(STR), init=lambda self: dict()),
+                  files = Attr(Dict(STR), init=lambda self: dict()),
                   settings = Attr(Dict(None), init=lambda self: dict()),
                   default_task = Attr(STR, '', 'Task to run if no task is '
                                       'specified at the command line'),
@@ -50,6 +51,7 @@ class Document(Base):
         get_delete(dct, kwargs, 'import', [], 'imports')
         get_delete(dct, kwargs, 'include', [], 'includes')
         get_delete(dct, kwargs, 'capture', {}, 'captures')
+        get_delete(dct, kwargs, 'files', {})
         get_delete(dct, kwargs, 'secrets', [])
         get_delete(dct, kwargs, 'macros', {})
         get_delete(dct, kwargs, 'contexts', {})
@@ -112,12 +114,21 @@ class Document(Base):
                                           .format(path))
                 self.process_include(path, **kwargs)
 
+            files = {}
+            for fname, fpath in self.files.items():
+                path = process(fpath)
+                if not os.path.isfile(path):
+                    raise ValidationError("File path does not exist: {}"
+                                          .format(path))
+                files[fname] = path
+
         for name in self.secrets:
             self.process_secret(name, **kwargs)
 
         env = Env(macros=self.macros, contexts=self.contexts, tasks=self.tasks,
                   secret_values=self.secret_values, captures=self.captures,
-                  settings=self.settings, default_task=self.default_task)
+                  settings=self.settings, default_task=self.default_task,
+                  files=files)
         self.env.update(env, **kwargs)
 
     def post_process(self, **kwargs):

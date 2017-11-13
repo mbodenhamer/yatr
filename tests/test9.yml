@@ -1,0 +1,10 @@
+files:
+  test1: "{{urlbase}}/test/test1.txt"
+
+macros:
+  urlbase: https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles
+  tmpdir: "{{_1}}"
+
+tasks:
+  foo: 'cp "{{test1}}" "{{tmpdir}}/test1.txt"'
+  bar: 'cat "{{tmpdir}}/test1.txt"'

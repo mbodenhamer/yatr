@@ -348,8 +348,11 @@ def _main(*args):
     if opts.dump_vars:
         # TODO: add support for filtering out unwanted variables
         # TODO: add support for not including possible secrets in output
+        displayable = (set(doc.env.macros) | 
+                       set(doc.env.captures) | 
+                       set(doc.env.files))
         for name in sorted(doc.env.env):
-            if name in doc.env.macros or name in doc.env.captures:
+            if name in displayable:
                 print_('{} = {}'.format(name, doc.env.env[name]))
         return
 

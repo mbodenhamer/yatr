@@ -23,6 +23,7 @@ TEST7 = os.path.join(DIR, 'test7.yml')
 TEST8 = os.path.join(DIR, 'test8.yml')
 TEST8_IN = os.path.join(DIR, 'test8.j2')
 TEST8_OUT = os.path.join(DIR, 'test8.bash')
+TEST9 = os.path.join(DIR, 'test9.yml')
 DOCKERFILE = os.path.join(DIR, 'example/render/Dockerfile')
 OUT = os.path.join(DIR, 'output')
 URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
@@ -324,6 +325,19 @@ def test_main():
         with capture() as (out, err):
             _main('-f', TEST8, '-p', 'baz')
         assert out.getvalue() == 'echo baz_foo foo_bar\n'
+
+        # Test files
+        with tempdir() as d:
+            _main('-f', TEST9, 'foo', d)
+            path = os.path.join(d, 'test1.txt')
+            assert os.path.isfile(path)
+            with open(path, 'r') as f:
+                txt = f.read()
+            assert txt == 'foo\n'
+            
+            with capture() as (out, err):
+                _main('-f', TEST9, '-p', 'bar', d)
+            assert out.getvalue() == 'cat "{}/test1.txt"\n'.format(d)
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):

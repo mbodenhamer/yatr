@@ -78,6 +78,8 @@ class Env(Base, Copyable, Updateable):
                   captures = Attr(Dict(STR), init=lambda self: dict(),
                                   doc='Commands to captures output of', 
                                   groups=(UP, CP)),
+                  files = Attr(Dict(STR), init=lambda self: dict(),
+                               doc='File name macros', groups=(UP, CP)),
                   settings = Attr(Dict(None), init=lambda self: dict(),
                                   doc='Global settings of various sorts', 
                                   groups=(UP, CP)),
@@ -140,6 +142,7 @@ class Env(Base, Copyable, Updateable):
     def macro_env(self, **kwargs):
         dct = dict(self.macros)
         dct.update(self.secret_values)
+        dct.update(self.files)
         return dct
 
     def resolve_macros(self, **kwargs):
@@ -156,7 +159,7 @@ class Env(Base, Copyable, Updateable):
                 env[name] = resolve(fixed, env, jenv=self.jenv)
 
             if name in self.captures:
-                cmd = resolve(template, env)
+                cmd = resolve(template, env, jenv=self.jenv)
                 env[name] = self.capture_value(cmd, **kwargs)
 
         self.env = env
