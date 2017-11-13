@@ -31,7 +31,7 @@ setup(
     license = 'MIT',
     keywords = ['task', 'make', 'yaml'],
     classifiers = [
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
