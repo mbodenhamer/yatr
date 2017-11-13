@@ -8,7 +8,8 @@ from syn.five import STR
 from syn.base_utils import assign
 from syn.type import List, This
 
-from .base import ValidationError, command, get_delete
+from .base import ValidationError, get_delete
+from .base import command as command_
 
 #-------------------------------------------------------------------------------
 
@@ -97,16 +98,6 @@ class Command(Base):
         context = env.resolve(kwargs.get('context', self.context))
         return command, context
 
-    def run_command(self, env, **kwargs):
-        command, context_name = self.resolve_macros(env, **kwargs)
-
-        if not context_name:
-            context = env.default_context
-        else:
-            context = env.contexts[context_name]
-
-        return context.run_command(command, env, **kwargs)
-
     def run(self, env, **kwargs):
         verbose = kwargs.get('verbose', False)
         preview = kwargs.get('preview', False)
@@ -118,13 +109,19 @@ class Command(Base):
         if preview and not run_preview:
             pre = kwargs.get('preview_pre', '')
 
-        cmd = self.run_command(env, **kwargs)
+        command, context_name = self.resolve_macros(env, **kwargs)
+        if not context_name:
+            context = env.default_context
+        else:
+            context = env.contexts[context_name]
+        cmd = context.run_command(command, env, **kwargs)
+
         if verbose:
             sys.stdout.write(pre + cmd + '\n')
             sys.stdout.flush()
         
         if not preview:
-            return command(cmd, silent)
+            return command_(cmd, silent)
 
 
 #-------------------------------------------------------------------------------

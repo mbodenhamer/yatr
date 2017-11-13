@@ -1,5 +1,6 @@
 from jinja2 import UndefinedError
 from nose.tools import assert_raises
+from syn.base_utils import capture
 from yatr import Command, Task, Env, For, ValidationError
 
 #-------------------------------------------------------------------------------
@@ -52,19 +53,24 @@ def test_for():
 #-------------------------------------------------------------------------------
 # Command
 
+def _run_command(c, env):
+    with capture() as (out, err):
+        c.run(env, preview=True, verbose=True, run_preview=True)
+    return out.getvalue().rstrip()
+
 def test_command():
     env = Env()
     c = Command('ls', context='bash')
-    assert c.run_command(env) == 'bash -c "ls"'
+    assert _run_command(c, env) == 'bash -c "ls"'
 
     env = Env()
     c = Command('ls')
-    assert c.run_command(env) == 'ls'
+    assert _run_command(c, env) == 'ls'
 
     env = Env(macros=dict(a='foo', b='bash'))
     env.resolve_macros()
     c = Command('ls {{a}}', context='{{b}}')
-    assert c.run_command(env) == 'bash -c "ls foo"'
+    assert _run_command(c, env) == 'bash -c "ls foo"'
     assert c.command == 'ls {{a}}'
 
 #-------------------------------------------------------------------------------

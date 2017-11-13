@@ -56,7 +56,9 @@ class Context(Base):
             ctx = env.contexts[self.inside]
             command = ctx.run_command(command, env, **kwargs)
         return command
-            
+
+    run = None
+
     def validate(self):
         super(Context, self).validate()
 
