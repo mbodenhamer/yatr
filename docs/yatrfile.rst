@@ -81,8 +81,6 @@ Macros are not fully resolved until task runtime.  The example yatrfile specifie
     bar
 
 
-If no default task is defined, and if yatr is invoked without any arguments, then yatr will exit after printing usage information.
-
 Tasks may also be defined as a list of command strings, to be executed one after the other, as illustrated by ``bar``::
 
     $ yatr bar
@@ -114,6 +112,8 @@ As such, running ``yatr`` at the command line is equivalent to running ``yatr fo
     $ yatr
     bar
 
+
+If no default task is defined, and if yatr is invoked without any arguments, then yatr will exit after printing usage information.
 
 ``capture``
 -----------
@@ -154,8 +154,6 @@ Name                             Description
 ``loop_count_macro``             The name of the macro that contains the current loop iteration number (string)
 ``silent``                       If true, suppress task output; false by default (boolean string)
 ================================ ================================================================================
-
-.. _D.yml: https://github.com/mbodenhamer/yatr/blob/master/tests/example/D.yml
 
 .. _import:
 
@@ -253,9 +251,9 @@ In most use cases, macros will either be plain strings or Jinja2 templates.  How
 .. literalinclude:: ../tests/test7.yml
    :language: yaml
 
-The macro ``a`` is a plain string, but both ``b`` and ``c`` are list macros.  List macros are not all that useful on their own, but can be used for iteration via for loops, as is illustrated by the definitions of the tasks named ``foo`` and ``bar``.
+The macro ``a`` is a plain string, but both ``b`` and ``c`` are list macros.  List macros can be used for iteration via for loops, as is illustrated by the definitions of the tasks named ``foo`` and ``bar``.
 
-The ``for`` key requires two sub-keys, ``var`` and ``in``.  The ``var`` sub-key defines the iteration variable(s), while the ``in`` sub-key specifies the lists or list macros over which to iterate.  In the case that ``var`` is a string value, then ``for`` specifies a simple and intuitive for loop over the values specified by ``in``.  The value of ``in`` may either be the name of a list macro, as in the task named ``foo``, or a list literal, as in the task named ``bar``.  In the case that ``var`` is a list, then ``for`` specifies a loop over the Cartesian product of the lists specified by ``in``.  The task named ``foo`` illustrates a 2x2 Cartesian product, while the task named ``bar`` illustrates a simple for loop.
+The ``for`` key requires two sub-keys, ``var`` and ``in``.  The ``var`` sub-key defines the iteration variable(s), while the ``in`` sub-key specifies the lists or list macros over which to iterate.  In the case that ``var`` is a string value, ``for`` specifies a simple and intuitive for loop over the values specified by ``in``.  The value of ``in`` may either be the name of a list macro, as in the task named ``foo``, or a list literal, as in the task named ``bar``.  In the case that ``var`` is a list, ``for`` specifies a loop over the Cartesian product of the lists specified by ``in``.  The task named ``foo`` illustrates a 2x2 Cartesian product, while the task named ``bar`` illustrates a simple for loop.
 
 It should be noted that the local variables defined by ``var`` only exist in the context of the execution of the loop.  It should also be noted that the for loop defines a special local variable named ``_n``, which contains the current iteration number.  Note that the task named ``foo`` is defined in terms of ``_n``.  As such::
 
@@ -278,3 +276,5 @@ The name of ``_n`` may be changed if desired via the ``loop_count_macro`` settin
 .. _Jinja2 templates: http://jinja.pocoo.org/docs/latest/templates/
 .. _example working directory: https://github.com/mbodenhamer/yatr/tree/master/tests/example
 .. _test2.yml: https://github.com/mbodenhamer/yatrfiles/blob/master/yatrfiles/test/test2.yml
+.. _D.yml: https://github.com/mbodenhamer/yatr/blob/master/tests/example/D.yml
+

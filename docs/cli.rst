@@ -19,8 +19,6 @@ Certain yatr features make use of a cache directory to increase the efficiency o
     $ yatr --cache-dir /path/to/cache/dir <some task or command>
 
 
-Cache files may be deleted at any time between yatr invocations with no deleterious effects, save for a potential increase in execution time during the next yatr invocation.
-
 ``-f`` (``--yatrfile``)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -55,6 +53,8 @@ Any setting value may be set or overridden at the command line by supplying the 
     bar
 
 
+(See :ref:`D.yml <settings>`)
+
 ``-v`` and ``-p``
 ~~~~~~~~~~~~~~~~~
 
@@ -73,6 +73,8 @@ If the ``-p`` option is supplied, yatr will simply print the commands without ru
     echo bar
     echo bar baz foo
 
+
+(See :ref:`main example <main_example>`)
 
 Commands
 --------
@@ -93,7 +95,7 @@ Name                            Description
 ``--version``                   Print version information to ``stdout``
 =============================== =========================================================================
 
-A discussion of each command is given below.
+A discussion of each command is provided below.
 
 ``--dump``
 ~~~~~~~~~~
@@ -129,7 +131,7 @@ Downloads all URL includes and imports defined in the loaded yatrfile.  If inclu
 ``--render``
 ~~~~~~~~~~~~
 
-The ``--render`` command renders a Jinja2 template file using the macros defined by a yatrfile.  This can be useful in certain cases where it is desirable to have scripts or configuration files that always contain the latest values for things such as version numbers whenever a task is run, which can be stored and modified in one central location whenever they need to be updated.  For example, suppose you have the following template for a Dockerfile named ``Dockerfile.j2``:
+The ``--render`` command renders a Jinja2 template file using the macros defined by a yatrfile.  For example, suppose one has the following template for a Dockerfile named ``Dockerfile.j2``:
 
 .. literalinclude:: ../tests/example/render/Dockerfile.j2
 		    
@@ -145,7 +147,7 @@ One could then run::
     $ yatr build
 
 
-to generate the desired Dockerfile (i.e. resolve the ``{{version}}`` macro in the Dockerfile template to ``0.0.14``) and then build the desired Docker image.  The generated Dockerfile would look like:
+to generate the desired Dockerfile and then build the desired Docker image.  The generated Dockerfile would look like:
 
 .. literalinclude:: ../tests/example/render/Dockerfile
 
@@ -157,4 +159,4 @@ Validates the loaded yatrfile.  A number of validation tasks are performed durin
 ``--version``
 ~~~~~~~~~~~~~
 
-Prints the program name and current version number to ``stdout``.
+Prints the program name and current version to ``stdout``.

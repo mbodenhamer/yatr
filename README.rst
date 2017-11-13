@@ -10,7 +10,7 @@ yatr
 .. image:: https://readthedocs.org/projects/yatr/badge/?version=latest
     :target: http://yatr.readthedocs.org/en/latest/?badge=latest
 
-Yet Another Task Runner.  Or alternatively, YAml Task Runner.  Yatr is a YAML-based task runner that attempts to implement and extend the best features of GNU Make for 21st-century software development contexts that are not centered around the compilation of C/C++ code.  The project is in the preliminary stages development, but is nonetheless functional for a number of applications.
+Yet Another Task Runner.  Or alternatively, YAml Task Runner.  Yatr is a YAML-based task runner designed for 21st-century software-development contexts.  The project is in the preliminary stages of development, but is nonetheless functional for a number of applications.
 
 To install, run::
 
