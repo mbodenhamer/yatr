@@ -114,6 +114,10 @@ class Command(Base):
             context = env.default_context
         else:
             context = env.contexts[context_name]
+            
+        if callable(context.run):
+            return context.run(command, env, **kwargs)
+        
         cmd = context.run_command(command, env, **kwargs)
 
         if verbose:

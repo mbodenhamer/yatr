@@ -1,7 +1,8 @@
 from nose.tools import assert_raises
+from syn.base_utils import capture
 
 from yatr import Context, Env, ValidationError
-from yatr.context import Null, Bash
+from yatr.context import Null, Bash, Python
 
 #-------------------------------------------------------------------------------
 # Context
@@ -32,6 +33,22 @@ def test_bash():
     assert opts == dict(v=True, foo='4')
     
     assert b.run_command('ls', env) == 'bash -c "ls"'
+
+#-------------------------------------------------------------------------------
+# Python
+
+def test_python():
+    env = Env()
+    p = Context.from_yaml('foo', dict(instanceof='python'))
+    assert type(p) is Python
+
+    assert p.run_command('1/1', env) == '1/1'
+    assert p.run('1/1', env) == 0
+
+    with capture() as (out, err):
+        assert p.run('1/0', env) == 1
+    assert out.getvalue() == ''
+    assert 'zero' in err.getvalue()
 
 #-------------------------------------------------------------------------------
 # SSH

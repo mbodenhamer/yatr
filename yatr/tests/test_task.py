@@ -97,6 +97,13 @@ def test_task():
     t = Task(commands=[Command('ls', context='bash')])
     assert t == Task.from_yaml('foo', dict(command='ls', context='bash'))
 
+    env = Env()
+    t = Task(commands=[Command('1/1', context='python')])
+    assert t.run(env) == [0]
+    t = Task(commands=[Command('1/0', context='python')])
+    with capture():
+        assert t.run(env) == [1]
+
     assert_raises(ValidationError, Task.from_yaml, 'foo', 1)
 
 #-------------------------------------------------------------------------------

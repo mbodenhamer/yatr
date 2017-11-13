@@ -1,8 +1,9 @@
 from syn.base import Base, Attr, create_hook
+from syn.base_utils import message
 from syn.type import Dict
 from syn.five import STR
 
-from .base import ValidationError
+from .base import ValidationError, eprint
 
 #-------------------------------------------------------------------------------
 
@@ -112,6 +113,22 @@ class Docker(Context):
 
 
 #-----------------------------------------------------------
+# Python
+
+
+class Python(Context):
+    context_name = 'python'
+
+    def run(self, command, env, **kwargs):
+        try:
+            eval(command)
+            return 0
+        except Exception as e:
+            eprint(message(e))
+            return 1
+
+
+#-----------------------------------------------------------
 # SSH
 
 
@@ -132,6 +149,7 @@ BUILTIN_CONTEXTS = dict(null = Null(),
                         bash = Bash(),
                         cd = CD(),
                         docker = Docker(),
+                        python = Python(),
                         ssh = SSH(_skip_validation=True)) # TODO: need a better way of handling this
 
 #-------------------------------------------------------------------------------
