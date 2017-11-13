@@ -6,7 +6,7 @@ from six.moves import cStringIO
 from syn.base import Base, Attr
 from syn.five import STR
 from syn.base_utils import assign
-from syn.type import List, This
+from syn.type import Dict, List, This
 
 from .base import ValidationError, get_delete
 from .base import command as command_
@@ -136,6 +136,8 @@ class Task(Base):
     _attrs = dict(commands = Attr(List(Command)),
                   condition = Attr(This, optional=True),
                   loop = Attr(For, optional=True),
+                  args = Attr(List((STR, int)), init=lambda self: list()),
+                  kwargs = Attr(Dict((STR, int)), init=lambda self: dict()),
                   condition_type = Attr(bool, True))
     _opts = dict(init_validate = True,
                  optional_none = True)
@@ -157,6 +159,12 @@ class Task(Base):
                     for cmd in ret.commands:
                         cmd.context = dct['context']
 
+                if 'args' in dct:
+                    ret.args = dct['args']
+
+                if 'kwargs' in dct:
+                    ret.kwargs = dct['kwargs']
+
                 if 'for' in dct:
                     ret.loop = For.from_yaml(dct['for'])
 
@@ -166,6 +174,8 @@ class Task(Base):
                 elif 'ifnot' in dct:
                     ret.condition = Task.from_yaml(name + '-ifnot', dct['ifnot'])
                     ret.condition_type = False
+
+                ret.validate()
                 return ret
 
         raise ValidationError('Invalid data for task: {}'.format(name))
@@ -174,16 +184,31 @@ class Task(Base):
         codes = []
         looping = kwargs.get('looping', False)
         exit_on_error = kwargs.get('exit_on_error', True)
+        preview_conditionals = kwargs.get('preview_conditionals',
+            env.settings.get('preview_conditionals', True))
 
         if self.condition and not looping:
-            kwargs['preview_pre'] = 'if: ' if self.condition_type else 'ifnot: '
+            if preview_conditionals:
+                kwargs['preview_pre'] = 'if: ' if self.condition_type else 'ifnot: '
             codes_ = self.condition.run(env, **kwargs)
             code = max(codes_)
             if (((self.condition_type is True and code != 0) or
                  (self.condition_type is False and code == 0)) and 
                 code is not None):
                 return []
-            kwargs['preview_pre'] = '\t'
+            if preview_conditionals:
+                kwargs['preview_pre'] = '\t'
+
+        if (self.args or self.kwargs) and not looping:
+            env = env.copy(**kwargs)
+
+            if self.args:
+                for k, arg in enumerate(self.args):
+                    env.env['_{}'.format(k + 1)] = arg
+
+            if self.kwargs:
+                for name, value in self.kwargs.items():
+                    env.env[name] = value
 
         if self.loop and not looping:
             n = 0

@@ -24,6 +24,7 @@ TEST8 = os.path.join(DIR, 'test8.yml')
 TEST8_IN = os.path.join(DIR, 'test8.j2')
 TEST8_OUT = os.path.join(DIR, 'test8.bash')
 TEST9 = os.path.join(DIR, 'test9.yml')
+TEST10 = os.path.join(DIR, 'test10.yml')
 DOCKERFILE = os.path.join(DIR, 'example/render/Dockerfile')
 OUT = os.path.join(DIR, 'output')
 URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
@@ -338,6 +339,31 @@ def test_main():
             with capture() as (out, err):
                 _main('-f', TEST9, '-p', 'bar', d)
             assert out.getvalue() == 'cat "{}/test1.txt"\n'.format(d)
+
+        # Test task calling with arguments
+        with capture() as (out, err):
+            _main('-f', TEST10, '-p', 'x')
+        assert out.getvalue() == 'echo 5 3\n'
+
+        with capture() as (out, err):
+            _main('-f', TEST10, '-p', 'x', '4')
+        assert out.getvalue() == 'echo 5 4\n'
+
+        with capture() as (out, err):
+            _main('-f', TEST10, '-p', 'y', '4')
+        assert out.getvalue() == 'echo 7 1\n'
+
+        with capture() as (out, err):
+            _main('-f', TEST10, '-p', 'z', '4')
+        assert out.getvalue() == 'echo 1 5\n' \
+            'echo 2 5\n' \
+            'echo 3 5\n'
+
+        with capture() as (out, err):
+            _main('-f', TEST10, '-p', 'w', '4')
+        assert out.getvalue() == 'echo 5 4\n' \
+            'echo 7 1\n' \
+            'echo 5 4\n'
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):

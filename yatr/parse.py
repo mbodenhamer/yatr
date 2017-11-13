@@ -158,6 +158,8 @@ class Document(Base):
             str_to_bool(self.settings.get('silent', False))
         self.settings['loop_count_macro'] = \
             self.settings.get('loop_count_macro', '_n')
+        self.settings['preview_conditionals'] = \
+            str_to_bool(self.settings.get('preview_conditionals', True))
 
     def run(self, name, **kwargs):
         try:
