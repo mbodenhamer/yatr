@@ -75,11 +75,11 @@ def test_task():
                        Command('{{b}}')])
 
     env = Env()
-    assert_raises(UndefinedError, t.run_commands, env)
+    assert_raises(UndefinedError, t.run_preview, env)
 
     env = Env(macros=dict(a='ls', b='pwd'))
     env.resolve_macros()
-    assert t.run_commands(env) == ['ls', 'pwd']
+    assert t.run_preview(env) == 'ls\npwd\n'
 
     
     t = Task(commands=[Command('ls')])

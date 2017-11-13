@@ -360,7 +360,7 @@ def _main(*args):
     if opts.validate:
         # Check that there are no undefined macros in task definitions
         for task in doc.env.tasks.values():
-            task.run_commands(doc.env)
+            task.run_preview(doc.env)
 
         print("Validation successful")
         return

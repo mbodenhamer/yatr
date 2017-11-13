@@ -1,10 +1,12 @@
 import re
 import sys
 from itertools import product
+from six.moves import cStringIO
 
 from syn.base import Base, Attr
-from syn.type import List, This
 from syn.five import STR
+from syn.base_utils import assign
+from syn.type import List, This
 
 from .base import ValidationError, command, get_delete
 
@@ -108,10 +110,12 @@ class Command(Base):
     def run(self, env, **kwargs):
         verbose = kwargs.get('verbose', False)
         preview = kwargs.get('preview', False)
+        # Called from Task.run_preview()
+        run_preview = kwargs.get('run_preview', False)
         silent = kwargs.get('silent', env.settings.get('silent', False))
 
         pre = ''
-        if preview:
+        if preview and not run_preview:
             pre = kwargs.get('preview_pre', '')
 
         cmd = self.run_command(env, **kwargs)
@@ -165,9 +169,6 @@ class Task(Base):
 
         raise ValidationError('Invalid data for task: {}'.format(name))
 
-    def run_commands(self, env, **kwargs):
-        return [cmd.run_command(env, **kwargs) for cmd in self.commands]
-
     def run(self, env, **kwargs):
         codes = []
         looping = kwargs.get('looping', False)
@@ -206,6 +207,16 @@ class Task(Base):
                 break
 
         return codes
+
+    def run_preview(self, env, **kwargs):
+        kwargs['preview'] = True
+        kwargs['verbose'] = True
+        kwargs['run_preview'] = True
+        
+        with assign(sys, 'stdout', cStringIO()):
+            self.run(env, **kwargs)
+            ret = sys.stdout.getvalue()
+        return ret
 
 
 #-------------------------------------------------------------------------------

@@ -30,8 +30,8 @@ DEFAULT_JINJA_FILTERS = dict()
 def jfunc_commands(name, **kwargs):
     env = kwargs.pop('env')
     task = env.tasks[name]
-    lines = task.run_commands(env, **kwargs)
-    return '\n'.join(lines)
+    ret = task.run_preview(env, **kwargs)
+    return ret
 
 def jfunc_env(name, value=None, **kwargs):
     if value is not None:

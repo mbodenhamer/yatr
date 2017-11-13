@@ -306,7 +306,7 @@ def test_main():
             _main('-f', TEST8, '-i', TEST8_IN, '-o', TEST8_OUT, '--render')
         with open(TEST8_OUT, 'r') as f:
             txt = f.read()
-            assert txt == '#!/bin/bash\necho foo\necho bar\necho baz'
+            assert txt == '#!/bin/bash\necho foo\necho bar\necho baz\n'
 
         # Test env function
         with capture() as (out, err):
