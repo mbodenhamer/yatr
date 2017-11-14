@@ -1,0 +1,2 @@
+tasks:
+  err: yatr --render -i /foo/bar/baz -o /foo/bar/bazz

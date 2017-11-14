@@ -25,6 +25,7 @@ TEST8_IN = os.path.join(DIR, 'test8.j2')
 TEST8_OUT = os.path.join(DIR, 'test8.bash')
 TEST9 = os.path.join(DIR, 'test9.yml')
 TEST10 = os.path.join(DIR, 'test10.yml')
+TEST11 = os.path.join(DIR, 'test11.yml')
 DOCKERFILE = os.path.join(DIR, 'example/render/Dockerfile')
 OUT = os.path.join(DIR, 'output')
 URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
@@ -364,6 +365,12 @@ def test_main():
         assert out.getvalue() == 'echo 5 4\n' \
             'echo 7 1\n' \
             'echo 5 4\n'
+
+        # Test _main() calls
+        with capture() as (out, err):
+            _main('-f', TEST11, 'err')
+        assert out.getvalue() == ''
+        assert 'does not exist' in err.getvalue()
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):

@@ -1,14 +1,15 @@
 import re
 import sys
+import shlex
 from itertools import product
 from six.moves import cStringIO
 
 from syn.base import Base, Attr
 from syn.five import STR
-from syn.base_utils import assign
+from syn.base_utils import assign, message
 from syn.type import Dict, List, This
 
-from .base import ValidationError, get_delete
+from .base import ValidationError, get_delete, eprint
 from .base import command as command_
 
 #-------------------------------------------------------------------------------
@@ -125,6 +126,15 @@ class Command(Base):
             sys.stdout.flush()
         
         if not preview:
+            args = shlex.split(cmd)
+            if args[0] == 'yatr':
+                try:
+                    from .main import _main
+                    _main(*args[1:])
+                    return 0
+                except Exception as e:
+                    eprint(message(e))
+                    return 1
             return command_(cmd, silent)
 
 
