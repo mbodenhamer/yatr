@@ -309,11 +309,10 @@ def _main(*args):
                                .format(opts.infile))
 
     # Populate position arg macros
-    for key in list(INITIAL_MACROS.keys()):
-        del INITIAL_MACROS[key]
+    init_macros = {}
     for k, arg in enumerate(opts.args):
         key = '_{}'.format(k+1)
-        INITIAL_MACROS[key] = arg
+        init_macros[key] = arg
 
     # Process settings
     settings = {}
@@ -325,7 +324,7 @@ def _main(*args):
     # Load yatrfile
     path = find_yatrfile_path(opts.yatrfile)
     doc = Document.from_path(path, pull=opts.pull, cachedir=opts.cachedir,
-                             settings=settings)
+                             settings=settings, initial_macros=init_macros)
     
     # If we executed --pull, then exit
     if opts.pull:

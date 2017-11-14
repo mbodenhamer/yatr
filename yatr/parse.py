@@ -58,6 +58,11 @@ class Document(Base):
         get_delete(dct, kwargs, 'tasks', {})
         get_delete(dct, kwargs, 'default', '', 'default_task')
 
+        init_macros = kwargs.get('initial_macros', {})
+        for name, value in init_macros.items():
+            if name not in kwargs['macros']:
+                kwargs['macros'][name] = value
+
         settings = dict(dct.get('settings', {}))
         settings.update(kwargs.get('settings', {}))
         kwargs['settings'] = settings
