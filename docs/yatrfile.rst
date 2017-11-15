@@ -10,7 +10,7 @@ Suppose you have the following ``yatrfile.yml`` in your `current working directo
 .. literalinclude:: ../tests/example/yatrfile.yml
    :language: yaml
 
-As illustrated in this example, yatr currently supports five top-level keys in the yatrfile: ``include``, ``capture``, ``macros``, ``tasks``, and ``default``.  Two other sections, ``settings`` and ``import``, are also supported (see :ref:`settings` and :ref:`import`, respectively).
+As this example demonstrates, the primary functionality of a yatrfile is found in five top-level sections: ``include``, ``capture``, ``macros``, ``tasks``, and ``default``.  Three other sections, ``files``, ``settings`` and ``import``, are also supported (see :ref:`files`, :ref:`settings`, and :ref:`import`, respectively).
 
 ``macros``
 ----------
@@ -120,6 +120,27 @@ If no default task is defined, and if yatr is invoked without any arguments, the
 
 The ``capture`` section defines a special type of macro, specifying a mapping from a macro name to a system command whose captured output is to be the value of the macro.  Values of ``capture`` mappings cannot contain task references, though they may contain references to other macros.  In the main example above, the yatrfile defines a capture macro named ``baz``, whose definition is ``ls {{glob}}``.  In the macro section, ``glob`` is defined as ``*.yml``.  Thus, if yatr is invoked in the `example working directory`_, the value of ``baz`` will resolve to ``A.yml  B.yml  C.yml  D.yml  yatrfile.yml``.
 
+.. _files:
+
+``files``
+---------
+
+The ``files`` section defines another special type of macro, associating names with filesystem paths.  Each associated path must either be a filesystem path or a URL specifying the location of a file.  As with the :ref:`include` and :ref:`import` sections, if the path is a URL, the file will be downloaded to the cache directory and the associated name will contain the path of the cached file.  If the file already exists in the cache directory, no download will be performed, unless ``yatr --pull`` is run.  The ``files`` section has the same limited support for macros as the :ref:`include` and :ref:`import` sections.
+
+For example, consider the following yatrfile:
+
+.. literalinclude:: ../tests/test9.yml
+   :language: yaml
+
+Invoking yatr will cause `test1.txt`_ to be downloaded to the cache directory.  Running the tasks defined in this yatrfile produces the following behavior::
+
+    $ yatr foo /tmp
+    $ yatr bar /tmp
+    foo
+
+
+The first invocation of yatr downloads `test1.txt`_ to the cache directory, and copies the file to ``/tmp``.  The second invocation dumps the contents of the copied file to ``stdout``.
+
 .. _settings:
 
 ``settings``
@@ -148,12 +169,14 @@ For boolean-type settings, such as ``silent``, any of the following strings may 
 
 The following table lists the available settings:
 
-================================ ================================================================================
+================================ ====================================================================================================================
 Name                             Description
-================================ ================================================================================
+================================ ====================================================================================================================
+``exit_on_error``                If true, halt execution if task command exits with non-zero status; true by default (boolean string)
 ``loop_count_macro``             The name of the macro that contains the current loop iteration number (string)
+``preview_conditionals``         If true, specially demarcate ``if`` and ``ifnot`` commands when ``-p`` is supplied; true by default (boolean string)
 ``silent``                       If true, suppress task output; false by default (boolean string)
-================================ ================================================================================
+================================ ====================================================================================================================
 
 .. _import:
 
@@ -272,9 +295,95 @@ The name of ``_n`` may be changed if desired via the ``loop_count_macro`` settin
     3 2
     4 3
 
+Calling Tasks with Arguments
+----------------------------
+
+Tasks can be called from other tasks by providing the name of a task as the value to the ``command`` key.  When a task is called in this manner, its macros can also be overridden using the ``args`` and ``kwargs`` keys.  Values in ``args`` will override ``_1``, ``_2``, and so on, while values in ``kwargs`` will override named macros.  These macro overrides only take effect for that specific task call, and do not change macro values globally.
+
+Consider the following example yatrfile:
+
+.. literalinclude:: ../tests/test10.yml
+   :language: yaml
+
+The task ``y`` shows how macro values may be overridden in a task definition::
+
+    $ yatr x
+    5 3 10
+
+    $ yatr x 4
+    5 4 4
+
+    $ yatr y 4
+    7 1 4
+
+
+In calling ``x``, ``y`` overrides ``_1`` and ``_2`` (which is not used by ``x``), but does not affect the builtin macro ``ARGS`` (see :ref:`builtin_macros`).  Note that ``ARGS[0]`` is equivalent to ``_1``, unless ``_1`` is overridden locally through a task call.
+
+The task ``z`` shows that calling tasks in this manner is compatible with for loop functionality::
+
+    $ yatr z 4
+    1 6 4
+    2 6 4
+    3 6 4
+
+
+The task ``w`` shows that calling tasks in this manner does not change global macro values::
+
+    $ yatr w 4
+    5 4 4
+    7 1 4
+    5 4 4
+
+
+.. _builtin_macros:
+
+Builtin Macros
+--------------
+
+The following macros are defined by default:
+
+================= ===============================================================================================================================
+Name              Description
+================= ===============================================================================================================================
+``ARGS``          Command-line task arguments (list of strings)
+``CURDIR``        Yatrfile directory path (string)
+``YATR``          Invocation of yatr on current yatrfile (string)
+``YATRFILE``      Yatrfile path (string)
+================= ===============================================================================================================================
+
+The use of these macros is illustrated in the following yatrfile (`test11.yml`_):
+
+.. literalinclude:: ../tests/test11.yml
+   :language: yaml
+
+For example, suppose ``bar`` is invoked in the following manner on an empty file ``/tmp/foo``::
+
+    $ yatr bar b /tmp/foo
+
+
+The file ``/tmp/foo`` will now contain the following::
+
+    b
+    a
+    c
+    d
+    b
+
+
+The other tasks illustrate the use of the ``exit_on_error`` setting (see :ref:`settings`).  Supposing that neither ``/foo/bar/baz`` or ``/foo/bar/bazz`` exist on the filesystem, attempting to run ``baz`` with default settings will result in an error and ``foo`` will not be run.  On the other hand, ``foo`` will run if ``baz`` is invoked like so::
+
+    $ yatr -s exit_on_error=false baz a /tmp/baz
+
+
+If ``/tmp/baz`` was an empty file, it will now contain::
+
+    a
+
+
 .. _current working directory: https://github.com/mbodenhamer/yatr/tree/master/tests/example
 .. _Jinja2 templates: http://jinja.pocoo.org/docs/latest/templates/
 .. _example working directory: https://github.com/mbodenhamer/yatr/tree/master/tests/example
 .. _test2.yml: https://github.com/mbodenhamer/yatrfiles/blob/master/yatrfiles/test/test2.yml
+.. _test1.txt: https://github.com/mbodenhamer/yatrfiles/blob/master/yatrfiles/test/test1.txt
 .. _D.yml: https://github.com/mbodenhamer/yatr/blob/master/tests/example/D.yml
-
+.. _test11.yml: https://github.com/mbodenhamer/yatr/blob/master/tests/test11.yml

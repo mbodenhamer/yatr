@@ -1,13 +1,14 @@
 Changelog
 ---------
 
-0.0.7 (2017-11-20)
+0.0.7 (2017-11-15)
 ~~~~~~~~~~~~~~~~~~
 
 * Added ``files`` section and functionality.
 * Refactored ``Command.run()``; removed ``Task.run_commands()`` and ``Command.run_command()``.
 * Added arguments for calling tasks.
 * Added more efficient ``yatr`` calls within yatrfiles.
+* Added some builtin macros.
 
 0.0.6 (2017-11-13)
 ~~~~~~~~~~~~~~~~~~
