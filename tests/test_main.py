@@ -357,9 +357,9 @@ def test_main():
 
         with capture() as (out, err):
             _main('-f', TEST10, '-p', 'z', '4')
-        assert out.getvalue() == 'echo 1 5 4\n' \
-            'echo 2 5 4\n' \
-            'echo 3 5 4\n'
+        assert out.getvalue() == 'echo 1 6 4\n' \
+            'echo 2 6 4\n' \
+            'echo 3 6 4\n'
 
         with capture() as (out, err):
             _main('-f', TEST10, '-p', 'w', '4')

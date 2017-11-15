@@ -15,7 +15,7 @@ tasks:
   z:
     command: x
     args:
-      - 5
+      - 6
     for:
       var: x
       in: [1, 2, 3]
