@@ -4,5 +4,6 @@ tasks:
   foo: "echo {{_1}} >> {{_2}}"
   bar:
     - foo
-    - "yatr -f test11.yml foo a {{_2}}"
+    - "yatr -f {{YATRFILE}} foo a {{_2}}"
+    - "{{YATR}} foo c {{_2}}"
     - foo

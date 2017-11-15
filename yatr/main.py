@@ -323,6 +323,9 @@ def _main(*args):
 
     # Load yatrfile
     path = find_yatrfile_path(opts.yatrfile)
+    init_macros['YATRFILE'] = path
+    init_macros['YATR'] = "yatr -f {{YATRFILE}}"
+    init_macros['CURDIR'] = os.path.abspath(os.path.dirname(path))
     doc = Document.from_path(path, pull=opts.pull, cachedir=opts.cachedir,
                              settings=settings, initial_macros=init_macros)
     

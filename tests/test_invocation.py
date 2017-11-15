@@ -33,7 +33,7 @@ def test_invocation():
 
         # Test nested include
         out, code = get_output('yatr -f C.yml --dump')
-        assert out == 'a = baz\nb = ghi\nc = xyz\n'
+        assert 'a = baz\nb = ghi\nc = xyz\n' in out
 
         # Test included task
         out, code = get_output('yatr foo')

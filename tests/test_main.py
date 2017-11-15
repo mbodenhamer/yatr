@@ -222,8 +222,8 @@ def test_main():
         with chdir(os.path.join(DIR, 'foo')):
             with capture() as (out, err):
                 _main('--dump')
-            assert out.getvalue() == ('a = abc\nb = abcdef\nc = abcdefghi\n'
-                                      'pwd = {}\n'.format(DIR))
+            assert ('a = abc\nb = abcdef\nc = abcdefghi\n'
+                    'pwd = {}\n'.format(DIR)) in out.getvalue()
 
             _main('print', '5')
             assert read(OUT) == 'abcdefghi 5\n'
@@ -377,7 +377,7 @@ def test_main():
             _main('-f', TEST11, 'bar', 'b', f)
             with open(f, 'r') as f_:
                 txt = f_.read().rstrip()
-            assert txt == 'b\na\nb'
+            assert txt == 'b\na\nc\nb'
 
         # Test command-line arg validation
         assert_raises(Exception, _main, '-f', TEST12, '--validate')
@@ -405,12 +405,12 @@ def test_main():
             # Test --dump
             with capture() as (out, err):
                 _main('-f', 'C.yml', '--dump')
-            assert out.getvalue() == 'a = baz\nb = ghi\nc = xyz\n'
+            assert 'a = baz\nb = ghi\nc = xyz\n' in out.getvalue()
             
             # Test -m
             with capture() as (out, err):
                 _main('-f', 'C.yml', '-m' 'a=zab', '-m', 'd=jkl', '--dump')
-            assert out.getvalue() == 'a = zab\nb = ghi\nc = xyz\nd = jkl\n'
+            assert 'a = zab\nb = ghi\nc = xyz\nd = jkl\n' in out.getvalue()
 
             # Cover settings
             _main('-f', 'D.yml', '-s', 'silent=false')
