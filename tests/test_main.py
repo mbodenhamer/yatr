@@ -26,6 +26,7 @@ TEST8_OUT = os.path.join(DIR, 'test8.bash')
 TEST9 = os.path.join(DIR, 'test9.yml')
 TEST10 = os.path.join(DIR, 'test10.yml')
 TEST11 = os.path.join(DIR, 'test11.yml')
+TEST12 = os.path.join(DIR, 'test12.yml')
 DOCKERFILE = os.path.join(DIR, 'example/render/Dockerfile')
 OUT = os.path.join(DIR, 'output')
 URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
@@ -371,6 +372,12 @@ def test_main():
             _main('-f', TEST11, 'err')
         assert out.getvalue() == ''
         assert 'does not exist' in err.getvalue()
+
+        # Test command-line arg validation
+        assert_raises(Exception, _main, '-f', TEST12, '--validate')
+        with capture() as (out, err):
+            _main('-f', TEST12, '--validate', 'NONE', 'a')
+        assert out.getvalue() == 'Validation successful\n'
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):

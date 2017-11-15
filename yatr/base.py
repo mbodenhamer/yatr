@@ -13,6 +13,7 @@ from syn.base_utils import Precedes, topological_sorting, assign
 from syn.five import STR
 
 DEFAULT_CACHE_DIR = '~/.yatr'
+ARG_MACRO_PATTERN = re.compile('^_[0-9]+$')
 
 #-------------------------------------------------------------------------------
 
@@ -102,8 +103,9 @@ def ordered_macros(macros, lenient=False, funcs=None, jenv=None):
             pass
         else:
             if not lenient:
-                raise ValidationError('Referenced macro {} not defined'
-                                      .format(name))
+                if not re.match(ARG_MACRO_PATTERN, name):
+                    raise ValidationError('Referenced macro {} not defined'
+                                          .format(name))
 
 def get_output(cmd):
     try:

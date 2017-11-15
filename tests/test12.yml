@@ -1,0 +1,7 @@
+macros:
+  a: "{{_1}}a"
+  b: "{{_2|default('c')}}b"
+
+tasks:
+  a: "echo {{_1}}"
+  b: "echo {{_2|default('c')}}"
