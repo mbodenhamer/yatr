@@ -193,7 +193,8 @@ class Task(Base):
     def run(self, env, **kwargs):
         codes = []
         looping = kwargs.get('looping', False)
-        exit_on_error = kwargs.get('exit_on_error', True)
+        exit_on_error = kwargs.get('exit_on_error',
+            env.settings.get('exit_on_error', True))
         preview_conditionals = kwargs.get('preview_conditionals',
             env.settings.get('preview_conditionals', True))
 

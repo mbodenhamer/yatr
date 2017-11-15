@@ -379,6 +379,18 @@ def test_main():
                 txt = f_.read().rstrip()
             assert txt == 'b\na\nc\nd\nb'
 
+        with tempfile() as f:
+            with capture() as (out, err):
+                _main('-f', TEST11, 'baz', 'a', f)
+            assert out.getvalue() == ''
+            assert 'does not exist' in err.getvalue()
+
+            with capture():
+                _main('-f', TEST11, '-s', 'exit_on_error=false', 'baz', 'a', f)
+            with open(f, 'r') as f_:
+                txt = f_.read().rstrip()
+            assert txt == 'a'
+
         # Test command-line arg validation
         assert_raises(Exception, _main, '-f', TEST12, '--validate')
         with capture() as (out, err):

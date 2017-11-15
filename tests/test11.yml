@@ -8,3 +8,7 @@ tasks:
     - "{{YATR}} foo c {{_2}}"
     - "yatr -f {{CURDIR}}/test11.yml foo d {{ARGS[1]}}"
     - foo
+
+  baz:
+    - err
+    - foo

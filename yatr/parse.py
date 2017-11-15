@@ -165,6 +165,8 @@ class Document(Base):
             self.settings.get('loop_count_macro', '_n')
         self.settings['preview_conditionals'] = \
             str_to_bool(self.settings.get('preview_conditionals', True))
+        self.settings['exit_on_error'] = \
+            str_to_bool(self.settings.get('exit_on_error', True))
 
     def run(self, name, **kwargs):
         try:
