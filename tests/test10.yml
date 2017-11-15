@@ -2,7 +2,7 @@ macros:
   x: 5
 
 tasks:
-  x: "echo {{x}} {{_1|default(3)}}"
+  x: "echo {{x}} {{_1|default(3)}} {{ARGS[0]|default(10)}}"
 
   y:
     command: x

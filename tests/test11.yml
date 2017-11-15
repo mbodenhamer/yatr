@@ -6,4 +6,5 @@ tasks:
     - foo
     - "yatr -f {{YATRFILE}} foo a {{_2}}"
     - "{{YATR}} foo c {{_2}}"
+    - "yatr -f {{CURDIR}}/test11.yml foo d {{ARGS[1]}}"
     - foo

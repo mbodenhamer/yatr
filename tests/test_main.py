@@ -345,27 +345,27 @@ def test_main():
         # Test task calling with arguments
         with capture() as (out, err):
             _main('-f', TEST10, '-p', 'x')
-        assert out.getvalue() == 'echo 5 3\n'
+        assert out.getvalue() == 'echo 5 3 10\n'
 
         with capture() as (out, err):
             _main('-f', TEST10, '-p', 'x', '4')
-        assert out.getvalue() == 'echo 5 4\n'
+        assert out.getvalue() == 'echo 5 4 4\n'
 
         with capture() as (out, err):
             _main('-f', TEST10, '-p', 'y', '4')
-        assert out.getvalue() == 'echo 7 1\n'
+        assert out.getvalue() == 'echo 7 1 4\n'
 
         with capture() as (out, err):
             _main('-f', TEST10, '-p', 'z', '4')
-        assert out.getvalue() == 'echo 1 5\n' \
-            'echo 2 5\n' \
-            'echo 3 5\n'
+        assert out.getvalue() == 'echo 1 5 4\n' \
+            'echo 2 5 4\n' \
+            'echo 3 5 4\n'
 
         with capture() as (out, err):
             _main('-f', TEST10, '-p', 'w', '4')
-        assert out.getvalue() == 'echo 5 4\n' \
-            'echo 7 1\n' \
-            'echo 5 4\n'
+        assert out.getvalue() == 'echo 5 4 4\n' \
+            'echo 7 1 4\n' \
+            'echo 5 4 4\n'
 
         # Test _main() calls
         with capture() as (out, err):
@@ -377,7 +377,7 @@ def test_main():
             _main('-f', TEST11, 'bar', 'b', f)
             with open(f, 'r') as f_:
                 txt = f_.read().rstrip()
-            assert txt == 'b\na\nc\nb'
+            assert txt == 'b\na\nc\nd\nb'
 
         # Test command-line arg validation
         assert_raises(Exception, _main, '-f', TEST12, '--validate')

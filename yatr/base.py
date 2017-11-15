@@ -190,6 +190,10 @@ def get_delete(in_, out, key, default, outkey=None):
         del in_[key]
 
 def fix_functions(template, potential_problems, env):
+    if isinstance(template, list):
+        return [fix_functions(elem, potential_problems, env)
+                for elem in template]
+
     fixed = template
     for var in potential_problems:
         test = '(\{\{[^}]*\\b)' + var + '(\([^}]*\)[^}]*\}\})'

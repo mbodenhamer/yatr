@@ -310,6 +310,7 @@ def _main(*args):
 
     # Populate position arg macros
     init_macros = {}
+    init_macros['ARGS'] = list(opts.args)
     for k, arg in enumerate(opts.args):
         key = '_{}'.format(k+1)
         init_macros[key] = arg
