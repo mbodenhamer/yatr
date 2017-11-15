@@ -10,7 +10,7 @@ from yatr.main import _main, main, search_rootward, find_bash_completions,\
     DEFAULT_SETTINGS
 from yatr import __version__ as yver
 from yatr import base as ybase
-from yatr.base import read, tempdir, ValidationError
+from yatr.base import read, tempdir, ValidationError, tempfile
 
 DIR = os.path.abspath(os.path.dirname(__file__))
 TEST1 = os.path.join(DIR, 'test1.yml')
@@ -372,6 +372,12 @@ def test_main():
             _main('-f', TEST11, 'err')
         assert out.getvalue() == ''
         assert 'does not exist' in err.getvalue()
+
+        with tempfile() as f:
+            _main('-f', TEST11, 'bar', 'b', f)
+            with open(f, 'r') as f_:
+                txt = f_.read().rstrip()
+            assert txt == 'b\na\nb'
 
         # Test command-line arg validation
         assert_raises(Exception, _main, '-f', TEST12, '--validate')

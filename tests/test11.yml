@@ -1,2 +1,8 @@
 tasks:
   err: yatr --render -i /foo/bar/baz -o /foo/bar/bazz
+
+  foo: "echo {{_1}} >> {{_2}}"
+  bar:
+    - foo
+    - "yatr -f test11.yml foo a {{_2}}"
+    - foo
