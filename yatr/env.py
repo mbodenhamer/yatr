@@ -64,7 +64,9 @@ class Updateable(object):
 
 class Env(Base, Copyable, Updateable):
     _groups = (UP, AUP)
-    _attrs = dict(macros = Attr(Dict((STR, int, List((STR, int, list)))), 
+    _attrs = dict(macros = Attr(Dict((STR, int, float, 
+                                      List((STR, int, float, list, dict)),
+                                      Dict((STR, int, float, list, dict)))), 
                                 init=lambda self: dict(),
                                 doc='Macro definitions', groups=(UP, CP)),
                   contexts = Attr(Dict(Context), init=lambda self: dict(),
@@ -96,7 +98,9 @@ class Env(Base, Copyable, Updateable):
                   function_aliases = Attr(Dict(STR), init=lambda self: dict(),
                                           internal=True, groups=(UP, CP),
                                           doc='Jinja function aliases'),
-                  env = Attr(Dict(((STR, List(STR)), int)), 
+                  env = Attr(Dict((STR, int, float, 
+                                   List((STR, int, float, list, dict)),
+                                   Dict((STR, int, float, list, dict)))),
                              init=lambda self: dict(),
                              doc='Current name resolution environment', 
                              groups=(UP, CP)),

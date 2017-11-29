@@ -1,0 +1,9 @@
+macros:
+  a: abc
+  b:
+    a: def
+    b: "{{a}}"
+  c: "{{b.a}} {{b.b}}"
+
+tasks:
+  foo: "echo {{c}}"

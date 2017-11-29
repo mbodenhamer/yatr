@@ -20,6 +20,10 @@ def test_resolve():
     # list macros
     assert resolve(['{{a}}', '{{b}}', 'c'], dict(a='d', b='e')) == ['d', 'e', 'c']
 
+    # dict macros
+    assert resolve(dict(a='{{b}}', b='1'), dict(b='2')) == dict(a='2', b='1')
+    assert resolve('{{a.b}}', dict(a=dict(b='c'))) == 'c'
+
 def test_variables():
     assert variables('{{a}} {{b}}') == {'a', 'b'}
     assert variables(['{{a}}', '{{b}}', 'c']) == {'a', 'b'}

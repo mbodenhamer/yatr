@@ -51,8 +51,12 @@ def eprint(out, flush=True):
         sys.stderr.flush()
 
 def resolve(template, env, lenient=False, jenv=None):
+    if isinstance(template, dict):
+        return {key: resolve(item, env, lenient, jenv)
+                for key, item in template.items()}
+
     if isinstance(template, list):
-        return [resolve(elem, env, lenient) for elem in template]
+        return [resolve(elem, env, lenient, jenv) for elem in template]
 
     if isinstance(template, STR):
         if '{{' in template:
@@ -68,10 +72,16 @@ def resolve(template, env, lenient=False, jenv=None):
     return template
 
 def variables(template, lenient=False, jenv=None):
+    if isinstance(template, dict):
+        ret = set()
+        for key, item in template.items():
+            ret.update(variables(item, lenient, jenv))
+        return ret
+
     if isinstance(template, list):
         ret = set()
         for elem in template:
-            ret.update(variables(elem))
+            ret.update(variables(elem, lenient, jenv))
         return ret
 
     if jenv is None:
