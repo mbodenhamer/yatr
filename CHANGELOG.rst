@@ -5,7 +5,7 @@ Changelog
 ~~~~~~~~~~~~~~~~~~
 
 * Added ``--cache``.
-* Added mapping macros.
+* Added dictionary macros.
 
 0.0.7 (2017-11-15)
 ~~~~~~~~~~~~~~~~~~

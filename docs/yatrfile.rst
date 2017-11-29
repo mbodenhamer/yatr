@@ -295,15 +295,15 @@ The name of ``_n`` may be changed if desired via the ``loop_count_macro`` settin
     3 2
     4 3
 
-Mapping Macros
---------------
+Dictionary Macros
+-----------------
 
-In addition to list macros, yatr also supports the use of mapping macros.  To define such a "mapping macro", simply use YAML dictionary syntax in the macro definition.  For example, consider the following yatrfile:
+In addition to list macros, yatr also supports the use of dictionary macros.  To define such a "dictionary macro", simply use YAML dictionary syntax in the macro definition.  For example, consider the following yatrfile:
 
 .. literalinclude:: ../tests/test13.yml
    :language: yaml
 
-The macro ``b`` is a mapping macro that is defined in terms of ``a``.  A second string macro, ``c``, is defined in terms of the two items in ``b``.  As such::
+The macro ``b`` is a dictionary macro that is defined in terms of ``a``.  A second string macro, ``c``, is defined in terms of the two items in ``b``.  As such::
 
     $ yatr foo
     def abc
