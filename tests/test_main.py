@@ -10,7 +10,7 @@ from yatr.main import _main, main, search_rootward, find_bash_completions,\
     DEFAULT_SETTINGS
 from yatr import __version__ as yver
 from yatr import base as ybase
-from yatr.base import read, tempdir, ValidationError, tempfile
+from yatr.base import cached_path, read, tempdir, ValidationError, tempfile
 
 DIR = os.path.abspath(os.path.dirname(__file__))
 TEST1 = os.path.join(DIR, 'test1.yml')
@@ -396,6 +396,25 @@ def test_main():
         with capture() as (out, err):
             _main('-f', TEST12, '--validate', 'NONE', 'a')
         assert out.getvalue() == 'Validation successful\n'
+
+        # Test --cache
+        with tempdir() as d:
+            txt = 'abc123'
+            url = 'http://foo.com'
+            tmpfile = os.path.join(d, 'temp.txt')
+            cached = cached_path(url, d)
+
+            with open(tmpfile, 'w') as f:
+                f.write(txt)
+
+            _main('--cache-dir', d, '--cache', '-i', tmpfile, '-o', url)
+
+            with open(cached, 'r') as f:
+                out = f.read()
+            assert out == txt
+
+            assert_raises(RuntimeError, _main, '--cache')
+            assert_raises(RuntimeError, _main, '--cache', '-i', tmpfile)
 
         # Verify example
         with chdir(os.path.join(DIR, 'example')):

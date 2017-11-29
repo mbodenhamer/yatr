@@ -5,10 +5,10 @@ import json
 import shutil
 import hashlib
 from argparse import ArgumentParser
-from .env import INITIAL_MACROS
-from .parse import Document, DEFAULT_SETTINGS
-from .base import DEFAULT_CACHE_DIR, resolve
+
 from . import __version__ as yver
+from .base import DEFAULT_CACHE_DIR, cached_path, resolve
+from .parse import DEFAULT_SETTINGS, Document
 
 DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -51,6 +51,9 @@ add_argument(parser, '-p', '--preview', dest='preview', default=False,
              'without running them (implies -v)')
 
 # Commands
+add_argument(parser, '--cache', dest='cache_file', default=False,
+             action='store_true', help='Cache local input file (-i) as if it '
+             'were a URL (-o)')
 add_argument(parser, '--dump', dest='dump_vars', default=False,
              action='store_true', help='Dump macro values and exit')
 add_argument(parser, '--dump-path', dest='dump_path', default=False,
@@ -271,6 +274,13 @@ def install_bash_completions():
     print(BASH_COMPLETION_MESSAGE)
 
 #-------------------------------------------------------------------------------
+# --cache
+
+def cache_file(infile, outfile, cachedir):
+    path = cached_path(outfile, cachedir)
+    shutil.copyfile(infile, path)
+
+#-------------------------------------------------------------------------------
 # --render
 
 def render(doc, infile, outfile):
@@ -295,6 +305,15 @@ def _main(*args):
     
     if opts.install_bash_completions:
         install_bash_completions()
+        return
+
+    if opts.cache_file:
+        if not opts.infile:
+            raise RuntimeError('Required option -i not given')
+        if not opts.outfile:
+            raise RuntimeError('Required option -o not given')
+
+        cache_file(opts.infile, opts.outfile, opts.cachedir)
         return
 
     # --version

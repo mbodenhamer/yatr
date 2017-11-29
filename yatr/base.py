@@ -133,6 +133,10 @@ def download(url, path):
         for data in req.iter_content():
             f.write(data)
 
+def cached_path(path, cachedir=DEFAULT_CACHE_DIR):
+    fname = hashlib.sha224(path.encode('utf-8')).hexdigest()
+    return os.path.join(cachedir, fname)
+
 def resolve_url(url, cachedir=DEFAULT_CACHE_DIR, force=False):
     if '://' in url:
         cachedir = os.path.expanduser(cachedir)
@@ -140,8 +144,7 @@ def resolve_url(url, cachedir=DEFAULT_CACHE_DIR, force=False):
         if not os.path.isdir(cachedir):
             os.mkdir(cachedir)
 
-        fname = hashlib.sha224(url.encode('utf-8')).hexdigest()
-        fpath = os.path.join(cachedir, fname)
+        fpath = cached_path(url, cachedir)
 
         if not os.path.isfile(fpath) or force:
             download(url, fpath)
