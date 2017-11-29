@@ -1,7 +1,7 @@
 usage: yatr [-h] [-f <yatrfile>] [-i <file>] [-o <file>] [-m <macro>=<value>]
-            [-s <setting>=<value>] [--cache-dir <DIR>] [-v] [-p] [--dump]
-            [--dump-path] [--pull] [--render] [--version] [--validate]
-            [--install-bash-completions]
+            [-s <setting>=<value>] [--cache-dir <DIR>] [-v] [-p] [--cache]
+            [--dump] [--dump-path] [--pull] [--render] [--version]
+            [--validate] [--install-bash-completions]
             [<task>] [ARGS [ARGS ...]]
 
 Yet Another Task Runner.
@@ -24,6 +24,7 @@ optional arguments:
   -v, --verbose         Print commands to be run
   -p, --preview         Preview commands to be run without running them
                         (implies -v)
+  --cache               Cache local input file (-i) as if it were a URL (-o)
   --dump                Dump macro values and exit
   --dump-path           Print yatrfile path and exit
   --pull                Download all URL includes and imports, then exit

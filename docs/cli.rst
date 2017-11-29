@@ -86,6 +86,7 @@ The following table lists the available commands:
 =============================== =========================================================================
 Name                            Description
 =============================== =========================================================================
+``--cache``                     Cache local input file (``-i``) as if it were a URL (``-o``)
 ``--dump``                      Dump macro values to ``stdout``
 ``--dump-path``                 Print yatrfile path to ``stdout``
 ``--install-bash-completions``  Install bash tab completion script in ``/etc/bash_completions.d/``
@@ -96,6 +97,15 @@ Name                            Description
 =============================== =========================================================================
 
 A discussion of each command is provided below.
+
+``--cache``
+~~~~~~~~~~~
+
+Saves a local file specified by ``-i`` to the cache directory, as if it had been downloaded from a URL specified by ``-o``.  For example::
+
+    $ yatr --cache -i test.txt -o http://foo.com/bar.txt
+
+In this example, the file ``test.txt``  will be copied into the cache directory file with a filename corresponding to the URL ``http://foo.com/bar.txt``.  This command can be useful in yatrfile development, allowing one to test included functionality without having to upload the included yatrfile(s) every time a change is made.
 
 ``--dump``
 ~~~~~~~~~~
