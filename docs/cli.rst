@@ -105,7 +105,7 @@ Saves a local file specified by ``-i`` to the cache directory, as if it had been
 
     $ yatr --cache -i test.txt -o http://foo.com/bar.txt
 
-In this example, the file ``test.txt``  will be copied into the cache directory file with a filename corresponding to the URL ``http://foo.com/bar.txt``.  This command can be useful in yatrfile development, allowing one to test included functionality without having to upload the included yatrfile(s) every time a change is made.
+In this example, the file ``test.txt``  will be copied into the cache directory with a filename corresponding to the URL ``http://foo.com/bar.txt``.  This command can be useful in yatrfile development, allowing one to test included functionality without having to upload the included yatrfile(s) every time a change is made.
 
 ``--dump``
 ~~~~~~~~~~

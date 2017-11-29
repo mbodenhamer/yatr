@@ -298,7 +298,7 @@ The name of ``_n`` may be changed if desired via the ``loop_count_macro`` settin
 Mapping Macros
 --------------
 
-In addition to list macros, yatr also supports the use of mapping macros.  To define such a "mapping macro", simply use YAML mapping syntax in the macro definition.  For example, consider the following yatrfile:
+In addition to list macros, yatr also supports the use of mapping macros.  To define such a "mapping macro", simply use YAML dictionary syntax in the macro definition.  For example, consider the following yatrfile:
 
 .. literalinclude:: ../tests/test13.yml
    :language: yaml
