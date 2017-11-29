@@ -295,6 +295,19 @@ The name of ``_n`` may be changed if desired via the ``loop_count_macro`` settin
     3 2
     4 3
 
+Mapping Macros
+--------------
+
+In addition to list macros, yatr also supports the use of mapping macros.  To define such a "mapping macro", simply use YAML mapping syntax in the macro definition.  For example, consider the following yatrfile:
+
+.. literalinclude:: ../tests/test13.yml
+   :language: yaml
+
+The macro ``b`` is a mapping macro that is defined in terms of ``a``.  A second string macro, ``c``, is defined in terms of the two items in ``b``.  As such::
+
+    $ yatr foo
+    def abc
+
 Calling Tasks with Arguments
 ----------------------------
 

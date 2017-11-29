@@ -5,6 +5,7 @@ Changelog
 ~~~~~~~~~~~~~~~~~~
 
 * Added ``--cache`` command.
+* Added mapping macros.
 
 0.0.7 (2017-11-15)
 ~~~~~~~~~~~~~~~~~~
