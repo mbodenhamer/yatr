@@ -44,6 +44,14 @@ yatr\.tests\.test\_env module
     :undoc-members:
     :show-inheritance:
 
+yatr\.tests\.test\_env\_decorators module
+-----------------------------------------
+
+.. automodule:: yatr.tests.test_env_decorators
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 yatr\.tests\.test\_parse module
 -------------------------------
 

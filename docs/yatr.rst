@@ -35,6 +35,14 @@ yatr\.env module
     :undoc-members:
     :show-inheritance:
 
+yatr\.env\_decorators module
+----------------------------
+
+.. automodule:: yatr.env_decorators
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 yatr\.main module
 -----------------
 
