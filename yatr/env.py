@@ -143,6 +143,10 @@ class Env(Base, Copyable, Updateable):
         # white space probably aren't desirable
         return out.strip() 
 
+    def jinja_filter(self, name, *args, **kwargs):
+        from .env_decorators import JinjaFilter
+        return JinjaFilter(self, name, *args, **kwargs)
+
     def macro_env(self, **kwargs):
         dct = dict(self.macros)
         dct.update(self.secret_values)
