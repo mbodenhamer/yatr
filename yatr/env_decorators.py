@@ -27,6 +27,16 @@ class JinjaFilter(EnvDecorator):
 
 
 #-------------------------------------------------------------------------------
+# JinjaFunction
+
+
+class JinjaFunction(EnvDecorator):
+    def __call__(self, func):
+        self.parent.jinja_functions[self.name] = func
+        return func
+
+
+#-------------------------------------------------------------------------------
 # __all__
 
 __all__ = ()

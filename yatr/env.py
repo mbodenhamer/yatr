@@ -147,6 +147,10 @@ class Env(Base, Copyable, Updateable):
         from .env_decorators import JinjaFilter
         return JinjaFilter(self, name, *args, **kwargs)
 
+    def jinja_function(self, name, *args, **kwargs):
+        from .env_decorators import JinjaFunction
+        return JinjaFunction(self, name, *args, **kwargs)
+
     def macro_env(self, **kwargs):
         dct = dict(self.macros)
         dct.update(self.secret_values)
