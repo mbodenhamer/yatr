@@ -4,7 +4,7 @@ import:
 macros:
   shebang: "#!/bin/bash"
   bar: "{{env('YATR_BAR', 'baz')}}"
-  home: "{{env('PATH')}}"
+  path: "{{env('PATH')}}"
   baz1: "{{'baz'|foo}}"
   baz2: "{{bar('foo')}}"
 
@@ -17,7 +17,7 @@ tasks:
   bar:
     - "echo {{bar}}"
 
-  home:
-    - "echo {{home}}"
+  path:
+    - "echo {{path}}"
 
   baz: "echo {{baz1}} {{baz2}}"

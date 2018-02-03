@@ -12,4 +12,4 @@ def bar(value, **kwargs):
 
 @env.task('barfoo')
 def barfoo(env, *args, **kwargs):
-    print(os.path.join(kwargs['home'], kwargs['baz1']))
+    print(os.path.join(kwargs['path'], kwargs['baz1']))

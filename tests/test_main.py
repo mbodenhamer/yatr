@@ -314,7 +314,7 @@ def test_main():
 
         # Test env function
         with capture() as (out, err):
-            _main('-f', TEST8, '-p', 'home')
+            _main('-f', TEST8, '-p', 'path')
         assert out.getvalue() == 'echo {}\n'.format(os.environ['PATH'])
 
         with capture() as (out, err):
