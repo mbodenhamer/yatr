@@ -348,7 +348,7 @@ The task ``w`` shows that calling tasks in this manner does not change global ma
     5 4 4
 
 
-Tasks can also be defined anonymously within task list definitions, as illustrated by the task ``u``::
+Tasks can also be defined anonymously within task list definitions using the ``task`` keyword, as illustrated by the task ``u``::
 
     $ yatr u
     foo
