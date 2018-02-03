@@ -368,6 +368,12 @@ def test_main():
             'echo 7 1 4\n' \
             'echo 5 4 4\n'
 
+        # Test anonymous tasks
+        with capture() as (out, err):
+            _main('-f', TEST10, '-p', 'u')
+        assert out.getvalue() == 'echo foo\n' \
+            'echo 30 20 10\n'
+
         # Test _main() calls
         with capture() as (out, err):
             _main('-f', TEST11, 'err')

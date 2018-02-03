@@ -3,6 +3,7 @@ import sys
 import shlex
 from itertools import product
 from six.moves import cStringIO
+from uuid import uuid4
 
 from syn.base import Base, Attr
 from syn.five import STR
@@ -157,8 +158,21 @@ class Task(Base):
         if isinstance(dct, STR):
             return cls(commands=[Command(dct)])
 
-        elif List(STR).query(dct):
-            cmds = [Command(s) for s in dct]
+        elif List((STR, dict)).query(dct):
+            cmds = []
+            for s in dct:
+                if isinstance(s, STR):
+                    cmds.append(Command(s))
+
+                # s is dict at this point
+                elif list(s.keys()) == ['task']:
+                    # TODO: replace with real gensym
+                    name_ = uuid4().hex
+                    cmds.append(Task.from_yaml(name_, s['task']))
+
+                else:
+                    raise ValidationError('Bad task definition element: {}'
+                                          .format(s))
             return cls(commands=cmds)
 
         elif isinstance(dct, dict):
@@ -232,7 +246,12 @@ class Task(Base):
             return codes
 
         for cmd in self.commands:
-            if cmd.command in env.tasks:
+            if isinstance(cmd, Task):
+                codes_ = cmd.run(env, **kwargs)
+                codes.extend(codes_)
+
+            # cmd is type Command at this point
+            elif cmd.command in env.tasks:
                 codes_ = env.tasks[cmd.command].run(env, **kwargs)
                 codes.extend(codes_)
 
@@ -255,6 +274,8 @@ class Task(Base):
             ret = sys.stdout.getvalue()
         return ret
 
+
+Task._attrs.types['commands'] = List((Command, Task))
 
 #-------------------------------------------------------------------------------
 # __all__

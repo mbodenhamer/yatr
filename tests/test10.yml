@@ -24,3 +24,12 @@ tasks:
     - x
     - "y"
     - x
+
+  u:
+    - echo foo
+    - task:
+        command: x
+        args:
+          - 20
+        kwargs:
+          x: 30

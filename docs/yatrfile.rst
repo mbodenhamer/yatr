@@ -348,6 +348,13 @@ The task ``w`` shows that calling tasks in this manner does not change global ma
     5 4 4
 
 
+Tasks can also be defined anonymously within task list definitions, as illustrated by the task ``u``::
+
+    $ yatr u
+    foo
+    30 20 10
+
+
 .. _builtin_macros:
 
 Builtin Macros

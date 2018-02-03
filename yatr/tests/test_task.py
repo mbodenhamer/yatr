@@ -97,6 +97,12 @@ def test_task():
     t = Task(commands=[Command('ls', context='bash')])
     assert t == Task.from_yaml('foo', dict(command='ls', context='bash'))
 
+    t = Task(commands=[Command('ls'),
+                       Task(commands=[Command('pwd')])])
+    assert t == Task.from_yaml('foo', ['ls', dict(task = 'pwd')])
+    
+    assert_raises(ValidationError, Task.from_yaml, 'foo', [dict(foo='pwd')])
+
     env = Env()
     t = Task(commands=[Command('1/1', context='python')])
     assert t.run(env) == [0]

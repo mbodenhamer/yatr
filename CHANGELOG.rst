@@ -1,9 +1,10 @@
 Changelog
 ---------
 
-0.0.9 (2018-02-01)
+0.0.9 (2018-02-11)
 ~~~~~~~~~~~~~~~~~~
 * Added Env decorators.
+* Added anonymous task definitions.
 
 0.0.8 (2017-11-28)
 ~~~~~~~~~~~~~~~~~~
