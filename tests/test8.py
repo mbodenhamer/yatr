@@ -1,4 +1,3 @@
-import os
 from yatr import Env
 env = Env()
 
@@ -11,5 +10,6 @@ def bar(value, **kwargs):
     return '{}_bar'.format(value)
 
 @env.task('barfoo')
-def barfoo(env, *args, **kwargs):
+def bar_foo(env, *args, **kwargs):
+    import os
     print(os.path.join(kwargs['path'], kwargs['baz1']))
