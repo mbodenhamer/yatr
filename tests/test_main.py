@@ -330,6 +330,10 @@ def test_main():
             _main('-f', TEST8, '-p', 'baz')
         assert out.getvalue() == 'echo baz_foo foo_bar\n'
 
+        with capture() as (out, err):
+            _main('-f', TEST8, 'barfoo')
+        assert out.getvalue() == os.path.join(os.environ['PATH'], 'baz_foo') + '\n'
+
         # Test files
         with tempdir() as d:
             _main('-f', TEST9, 'foo', d)

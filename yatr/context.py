@@ -3,7 +3,7 @@ from syn.base_utils import message
 from syn.type import Dict
 from syn.five import STR
 
-from .base import ValidationError, eprint
+from .base import ValidationError, args_kwargs_from_env, eprint
 
 #-------------------------------------------------------------------------------
 
@@ -130,6 +130,19 @@ class Python(Context):
 
 
 #-----------------------------------------------------------
+# PythonFunction
+
+
+class PythonCallable(Context):
+    context_name = 'python_callable'
+
+    def run(self, command, env, **kwargs_):
+        env_ = dict(env.env)
+        args, kwargs = args_kwargs_from_env(env_)
+        return command(env, *args, **kwargs)
+
+
+#-----------------------------------------------------------
 # SSH
 
 
@@ -151,6 +164,7 @@ BUILTIN_CONTEXTS = dict(null = Null(),
                         cd = CD(),
                         docker = Docker(),
                         python = Python(),
+                        python_callable = PythonCallable(),
                         ssh = SSH(_skip_validation=True)) # TODO: need a better way of handling this
 
 #-------------------------------------------------------------------------------

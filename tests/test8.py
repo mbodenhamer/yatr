@@ -1,3 +1,4 @@
+import os
 from yatr import Env
 env = Env()
 
@@ -8,3 +9,7 @@ def foo(value, **kwargs):
 @env.jinja_function('bar')
 def bar(value, **kwargs):
     return '{}_bar'.format(value)
+
+@env.task('barfoo')
+def barfoo(env, *args, **kwargs):
+    print(os.path.join(kwargs['home'], kwargs['baz1']))

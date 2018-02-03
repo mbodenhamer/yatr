@@ -3,7 +3,7 @@ from nose.tools import assert_raises
 from syn.base_utils import assign, capture
 import yatr.base as ybase
 from yatr.base import resolve, variables, ordered_macros, get_output,\
-    str_to_bool, fix_functions
+    str_to_bool, fix_functions, args_kwargs_from_env
 
 #-------------------------------------------------------------------------------
 # Utilities
@@ -107,6 +107,15 @@ def test_fix_functions():
             out = fix_functions("{{abc('ghi')}}", {'abc'}, env)
             assert out == "{{abc_foo('ghi')}}"
             assert resolve(out, env.macros, jenv=env.jenv) == 'ghi'
+
+def test_args_kwargs_from_env():
+    assert list(args_kwargs_from_env({})) == [(), {}]
+    assert list(args_kwargs_from_env(dict(_1='a',
+                                          _2='b',
+                                          _3='c',
+                                          a='aa',
+                                          b='bb'))) == \
+        [('a', 'b', 'c'), dict(a='aa', b='bb')]
 
 #-------------------------------------------------------------------------------
 

@@ -226,6 +226,12 @@ def fix_functions(template, potential_problems, env):
 
     return fixed
 
+def args_kwargs_from_env(env):
+    arg_macros = [name for name in env if re.match(ARG_MACRO_PATTERN, name)]
+    args = tuple([env[name] for name in sorted(arg_macros)])
+    kwargs = {name: env[name] for name in env if name not in arg_macros}
+    return args, kwargs
+
 #-------------------------------------------------------------------------------
 # __all__
 

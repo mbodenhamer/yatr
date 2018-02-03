@@ -179,6 +179,10 @@ class Env(Base, Copyable, Updateable):
     def resolve(self, template):
         return resolve(template, self.env, jenv=self.jenv)
 
+    def task(self, name, *args, **kwargs):
+        from .env_decorators import Task
+        return Task(self, name, *args, **kwargs)
+
     def validate(self):
         super(Env, self).validate()
         

@@ -8,7 +8,7 @@ from uuid import uuid4
 from syn.base import Base, Attr
 from syn.five import STR
 from syn.base_utils import assign, message
-from syn.type import Dict, List, This
+from syn.type import Callable, Dict, List, This
 
 from .base import ValidationError, get_delete, eprint
 from .base import command as command_
@@ -90,7 +90,7 @@ class For(Base):
 
 
 class Command(Base):
-    _attrs = dict(command = Attr(STR),
+    _attrs = dict(command = Attr((STR, Callable)),
                   context = Attr(STR, '')) # string used to look up context object in env
     _opts = dict(init_validate = True,
                  args = ('command',))
