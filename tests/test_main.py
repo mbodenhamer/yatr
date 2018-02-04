@@ -336,8 +336,8 @@ def test_main():
 
         with capture() as (out, err):
             _main('-f', TEST8, '-p', 'barfoo')
-        assert out.getvalue() == ('bar_foo(baz1=baz_foo, path={})\n'.
-                                  format(os.environ['PATH']))
+        assert out.getvalue() == ('bar_foo(baz1=baz_foo, path={})\n'
+                                  .format(os.environ['PATH']))
 
         # Test files
         with tempdir() as d:
