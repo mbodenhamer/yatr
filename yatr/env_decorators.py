@@ -46,6 +46,9 @@ class JinjaFunction(EnvDecorator):
 
 
 class Task(EnvDecorator):
+    _attrs = dict(display = Attr(tuple, (), 
+                                 'Names of kwargs to display in verbose'))
+
     def __call__(self, f):
         @wraps(f)
         def func(env, *args, **kwargs):
@@ -57,6 +60,7 @@ class Task(EnvDecorator):
                 eprint(message(e))
                 return 1
 
+        func.display = self.display
         task = Task_(commands=[Command(func, context='python_callable')],
                      name=self.name)
         self.parent.tasks[self.name] = task

@@ -216,6 +216,13 @@ In this example, suppose the value of the environment variable ``PATH`` is set t
 
 When executing extension tasks defined via the ``@env.task`` decorator, yatr will treat any function that does not raise an exeception as executing with return code 0.  Likwise, a function that raises an exception is treated as executing with return code 1.  If extension functions are defined without using the ``@env.task`` decorator, the programmer should ensure that the function returns either 0 or 1, as appropriate.
 
+The preview and verbose options (``-p`` and ``-v``) also work with extension functions.  By default, yatr will print the function name, along with the full contents of ``*args`` and ``**kwargs``.  As many more macros may be defined than are used in the extension function, the optional ``display`` keyword argument is provided in the ``@env.task`` decorator, allowing the programmer to specify only those keyword arguments to be displayed.  In the above example, executing the ``barfoo`` extension task with verbose output would behave as follows::
+
+    $ yatr -v barfoo
+    bar_foo(baz1=baz_foo, path=/foo/bar)
+    /foo/bar/baz_foo  
+
+
 Custom Jinja2 Functions
 -----------------------
 

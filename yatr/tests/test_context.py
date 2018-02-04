@@ -93,6 +93,15 @@ def test_pythoncallable():
             assert p.run(foo, env, verbose=True, preview=True) is None
         assert out.getvalue() == 'foo(a, b)\n'
 
+    def bar(env, *args, **kwargs):
+        return 1
+    bar.display = ('a', 'b')
+
+    with assign(env, 'env', dict(a=1, b=2, c=3)):
+        with capture() as (out, err):
+            assert p.run(bar, env, verbose=True) == 1
+        assert out.getvalue() == 'bar(a=1, b=2)\n'
+
 #-------------------------------------------------------------------------------
 # SSH
 

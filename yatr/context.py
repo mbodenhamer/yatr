@@ -176,9 +176,14 @@ class PythonCallable(Context):
     def verbose(self, command, env, **kwargs):
         args, kwargs = self._args_kwargs(env)
         name = command.__name__
+        display_kwargs = set(getattr(command, 'display', ()))
+        if not display_kwargs:
+            display_kwargs = set(kwargs)
+
         argstr = ', '.join(safe_str(arg) for arg in args)
         kwargstr = ', '.join('{}={}'.format(name, safe_str(value))
-                             for name, value in sorted(kwargs.items()))
+                             for name, value in sorted(kwargs.items())
+                             if name in display_kwargs)
         
         out = name + '('
         if argstr:

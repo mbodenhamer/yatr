@@ -9,7 +9,7 @@ def foo(value, **kwargs):
 def bar(value, **kwargs):
     return '{}_bar'.format(value)
 
-@env.task('barfoo')
+@env.task('barfoo', display=('path', 'baz1'))
 def bar_foo(env, *args, **kwargs):
     import os
     print(os.path.join(kwargs['path'], kwargs['baz1']))
