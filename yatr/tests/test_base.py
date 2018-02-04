@@ -60,9 +60,10 @@ def test_get_output():
     assert out == ''
     assert code == 1
 
-    out, code = get_output('python -c "raise Exception(\\"Test\\")"')
-    assert 'Exception' in out
-    assert code == 1
+    with capture() as (out_, err):
+        out, code = get_output('python -c "raise Exception(\\"Test\\")"')
+        assert 'Exception' in out
+        assert code == 1
 
 def test_str_to_bool():
     assert str_to_bool(1) is True

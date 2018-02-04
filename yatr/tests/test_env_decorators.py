@@ -1,4 +1,5 @@
 import yatr.env_decorators as yed
+from syn.base_utils import capture
 from nose.tools import assert_raises
 from yatr import Env
 
@@ -37,6 +38,32 @@ def test_jinjafunction():
 
     assert foofunc('bar') == 'bar_foo'
     assert env.jinja_functions['foo'] is foofunc
+
+#-------------------------------------------------------------------------------
+# Task
+
+def test_task():
+    env = Env()
+    assert 'foo' not in env.tasks
+
+    @env.task('foo')
+    def footask(env, *args, **kwargs):
+        pass
+
+    assert footask(env) == 0
+    assert env.tasks['foo'].run(env) == [0]
+
+    @env.task('bar')
+    def bartask(env, *args, **kwargs):
+        raise Exception('bartask exception')
+
+    with capture() as (out, err):
+        assert bartask(env) == 1
+    assert out.getvalue() == ''
+    assert err.getvalue() == 'bartask exception\n'
+
+    with capture() as (out, err):
+        assert env.tasks['bar'].run(env) == [1]
 
 #-------------------------------------------------------------------------------
 
