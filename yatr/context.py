@@ -178,7 +178,7 @@ class PythonCallable(Context):
         name = command.__name__
         argstr = ', '.join(safe_str(arg) for arg in args)
         kwargstr = ', '.join('{}={}'.format(name, safe_str(value))
-                             for name, value in kwargs.items())
+                             for name, value in sorted(kwargs.items()))
         
         out = name + '('
         if argstr:

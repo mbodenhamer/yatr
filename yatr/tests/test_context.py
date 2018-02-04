@@ -1,8 +1,8 @@
 from nose.tools import assert_raises
-from syn.base_utils import capture
+from syn.base_utils import assign, capture
 
 from yatr import Context, Env, ValidationError
-from yatr.context import Null, Bash, Python
+from yatr.context import Bash, Null, Python, PythonCallable
 
 #-------------------------------------------------------------------------------
 # Context
@@ -13,6 +13,7 @@ def test_context():
     assert type(c) is Null
     
     assert c.run_command('ls', env) == 'ls'
+    assert_raises(NotImplementedError, c.verbose, 'ls', env)
 
 #-------------------------------------------------------------------------------
 # Bash
@@ -46,9 +47,51 @@ def test_python():
     assert p.run('1/1', env) == 0
 
     with capture() as (out, err):
+        assert p.run('1/1', env, verbose=True, preview=True) is None
+    assert out.getvalue() == 'Python eval: 1/1\n'
+
+    with capture() as (out, err):
+        assert p.run('1/1', env, verbose=True) == 0
+    assert out.getvalue() == 'Python eval: 1/1\n'
+
+    with capture() as (out, err):
         assert p.run('1/0', env) == 1
     assert out.getvalue() == ''
     assert 'zero' in err.getvalue()
+
+#-------------------------------------------------------------------------------
+# PythonCallable
+
+def test_pythoncallable():
+    env = Env()
+    p = Context.from_yaml('foo', dict(instanceof='python_callable'))
+    assert type(p) is PythonCallable
+
+    def foo(env, *args, **kwargs):
+        return 0
+
+    with capture() as (out, err):
+        assert p.run(foo, env, verbose=True) == 0
+    assert out.getvalue() == 'foo()\n'
+
+    with assign(env, 'env', dict(a=1, b=2)):
+        with capture() as (out, err):
+            assert p.run(foo, env, verbose=True, preview=True) is None
+        assert out.getvalue() == 'foo(a=1, b=2)\n'
+
+        env.env['_1'] = 'a'
+        env.env['_2'] = 'b'
+
+        with capture() as (out, err):
+            assert p.run(foo, env, verbose=True, preview=True) is None
+        assert out.getvalue() == 'foo(a, b, a=1, b=2)\n'
+
+        del env.env['a']
+        del env.env['b']
+
+        with capture() as (out, err):
+            assert p.run(foo, env, verbose=True, preview=True) is None
+        assert out.getvalue() == 'foo(a, b)\n'
 
 #-------------------------------------------------------------------------------
 # SSH
