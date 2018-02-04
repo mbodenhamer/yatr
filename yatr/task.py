@@ -119,7 +119,7 @@ class Command(Base):
             
         if callable(context.run):
             return context.run(command, env, **kwargs)
-        
+
         cmd = context.run_command(command, env, **kwargs)
 
         if verbose:

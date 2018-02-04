@@ -1,5 +1,7 @@
+import sys
+from functools import wraps
 from syn.base import Base, Attr, create_hook
-from syn.base_utils import message
+from syn.base_utils import message, safe_str
 from syn.type import Dict
 from syn.five import STR
 
@@ -8,6 +10,24 @@ from .base import ValidationError, args_kwargs_from_env, eprint
 #-------------------------------------------------------------------------------
 
 CONTEXT_REGISTRY = {}
+
+#-------------------------------------------------------------------------------
+
+def verbose(f):
+    @wraps(f)
+    def func(self, command, env, **kwargs):
+        verbose = kwargs.get('verbose', False)
+        preview = kwargs.get('preview', False)
+        pre = kwargs.get('preview_pre', '')
+
+        if verbose:
+            sys.stdout.write(pre + self.verbose(command, env, **kwargs) + '\n')
+            sys.stdout.flush()
+            
+        if not preview:
+            return f(self, command, env, **kwargs)
+
+    return func
 
 #-------------------------------------------------------------------------------
 # Context
@@ -71,6 +91,9 @@ class Context(Base):
                 raise ValidationError('Required option "{}" not defined'
                                       .format(opt))
 
+    def verbose(self, command, env, **kwargs):
+        raise NotImplementedError
+
 
 #-------------------------------------------------------------------------------
 # Builtins
@@ -120,6 +143,7 @@ class Docker(Context):
 class Python(Context):
     context_name = 'python'
 
+    @verbose
     def run(self, command, env, **kwargs):
         try:
             eval(command)
@@ -127,6 +151,9 @@ class Python(Context):
         except Exception as e:
             eprint(message(e))
             return 1
+
+    def verbose(self, command, env, **kwargs):
+        return 'Python eval: {}'.format(command)
 
 
 #-----------------------------------------------------------
@@ -136,10 +163,32 @@ class Python(Context):
 class PythonCallable(Context):
     context_name = 'python_callable'
 
-    def run(self, command, env, **kwargs_):
+    def _args_kwargs(self, env):
         env_ = dict(env.env)
         args, kwargs = args_kwargs_from_env(env_)
+        return args, kwargs
+
+    @verbose
+    def run(self, command, env, **kwargs_):
+        args, kwargs = self._args_kwargs(env)
         return command(env, *args, **kwargs)
+
+    def verbose(self, command, env, **kwargs):
+        args, kwargs = self._args_kwargs(env)
+        name = command.__name__
+        argstr = ', '.join(safe_str(arg) for arg in args)
+        kwargstr = ', '.join('{}={}'.format(name, safe_str(value))
+                             for name, value in kwargs.items())
+        
+        out = name + '('
+        if argstr:
+            out += argstr
+            if kwargstr:
+                out += ', ' + kwargstr
+        elif kwargstr:
+            out += kwargstr
+        out += ')'
+        return out
 
 
 #-----------------------------------------------------------
