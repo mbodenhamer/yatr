@@ -165,17 +165,17 @@ However, any setting can be set or overridden at the command line by supplying t
     bar
 
 
-For boolean-type settings, such as ``silent``, any of the following strings may be used to denote True, regardless of capitalization:  ``yes``, ``true``, ``1``.  Likewise, any of the following strings may be used to denote False, regardless of capitalization:  ``no``, ``false``, ``0``.
+For Boolean-type settings, such as ``silent``, any of the following strings may be used to denote True, regardless of capitalization:  ``yes``, ``true``, ``1``.  Likewise, any of the following strings may be used to denote False, regardless of capitalization:  ``no``, ``false``, ``0``.
 
 The following table lists the available settings:
 
 ================================ ====================================================================================================================
 Name                             Description
 ================================ ====================================================================================================================
-``exit_on_error``                If true, halt execution if task command exits with non-zero status; true by default (boolean string)
+``exit_on_error``                If true, halt execution if task command exits with non-zero status; true by default (Boolean string)
 ``loop_count_macro``             The name of the macro that contains the current loop iteration number (string)
-``preview_conditionals``         If true, specially demarcate ``if`` and ``ifnot`` commands when ``-p`` is supplied; true by default (boolean string)
-``silent``                       If true, suppress task output; false by default (boolean string)
+``preview_conditionals``         If true, specially demarcate ``if`` and ``ifnot`` commands when ``-p`` is supplied; true by default (Boolean string)
+``silent``                       If true, suppress task output; false by default (Boolean string)
 ================================ ====================================================================================================================
 
 .. _import:
@@ -183,7 +183,7 @@ Name                             Description
 ``import``
 ----------
 
-The ``import`` feature enables the functionality of yatr to be extended when necessary, while preserving the simplicity of the default YAML specification for the majority of use cases for which the default capabilities of yatr are sufficient.
+The ``import`` feature enables the functionality of yatr to be extended when necessary, while preserving the simplicity of the default YAML specification for the majority of use cases in which yatr's default capabilities are sufficient.
 
 The ``import`` section must be a list of strings, each of which must be either a filesystem path or a URL specifying the location of a Python module.  Strings containing Python module names (such as would be found in a Python ``import`` statement) are also supported.  Each module so imported must contain a top-level variable named ``env``, which must be an instance of the ``Env`` class (see :ref:`yatr\.env module`).  Modules to be imported in this manner are called "extension modules" (not to be confused with Python extension modules written in C/C++).
 
@@ -192,9 +192,9 @@ The following is an example of a yatr extension module:
 .. literalinclude:: ../tests/test8.py
    :language: python
 
-This particular extension module defines a custom Jinja2 function (see :ref:`Custom Jinja2 Functions`) and a custom Jinja2 filter (see :ref:`Custom Jinja2 Filters`).  Macros and tasks can theoretically be defined in an extension module through use of the yatr API, but the straightforward macro and task declaration facilitated by the standard yatrfile YAML syntax makes the use of ``include`` directives a much more efficient and user-friendly alternative.
+This particular extension module defines a custom Jinja2 function (see :ref:`Custom Jinja2 Functions`) and a custom Jinja2 filter (see :ref:`Custom Jinja2 Filters`).  A task is also defined in terms of a Python function.  Macros can theoretically be defined in an extension module through use of the yatr API, but the straightforward manner of macro declaration facilitated by the standard yatrfile YAML syntax makes the use of ``include`` directives a much more efficient and user-friendly alternative.
 
-In this example extension module, a Jinja2 function ``bar`` is defined that appends ``_bar`` to its first argument.  Likewise, a Jinja2 filter ``foo`` is defined that appends ``_foo`` to its first argument.  Because yatr supplies the current yatr definition environment to custom Jinja 2 filters and functions, all such filters and functions defined in extension modules should accept ``**kwargs`` as the final argument, even if the ``kwargs`` variable is not used within the body of the filter or function itself.
+In this example extension module, a Jinja2 function ``bar`` is defined that appends "_bar" to its first argument.  Likewise, a Jinja2 filter ``foo`` is defined that appends "_foo" to its first argument.  Because yatr supplies the current execution environment to custom Jinja 2 filters and functions by way of a keyword argument named ``env``, all such filters and functions defined in extension modules should accept ``**kwargs`` as the final argument, even if the ``kwargs`` variable is not used within the body of the filter or function itself.
 
 Here is an example yatrfile that uses the extension module defined above:
 
@@ -206,7 +206,7 @@ In addition to ``bar`` and ``foo``, this yatrfile also makes use of the built-in
     $ yatr baz
     baz_foo foo_bar
 
-In addition to custom Jinja2 functions and filters, extension modules can also be used to define tasks that execute as Python callables.  In this example, the extension module defines a function named ``bar_foo`` that will be defined in the yatr execution environment as a task named ``barfoo``.  Like any other yatr task, extension tasks have access to all defined macro values through the first parameter, ``env`` (see :ref:`yatr\.env module`).  Moreover, any extension tasks defined using the ``@env.task`` decorator will also receive all defined macros through the ``*args`` and ``**kwargs`` arguments:  ``*args`` will be populated with any positional argument macros that are defined (i.e., ``_1``, ``_2``, ``_3``, etc.), and ``**kwargs`` will be populated with all defined macro values that are not positional argument macros.  While these values can also be accessed via ``env``, the ``*args`` and ``**kwargs`` parameters are notable in that they represent the current execution environment.  In cases where macros in different sections are defined with the same name, using ``**kwargs`` enables the programmer to access the actual execution value for that name without having to replicate yatr's macro precedence logic in the extension function.
+In addition to custom Jinja2 functions and filters, extension modules can also be used to define tasks that execute as Python callables.  In this example, the extension module defines a function named ``bar_foo`` that will be defined in the yatr execution environment as a task named ``barfoo``.  Extension tasks have access to all defined macro values through the first parameter, ``env`` (see :ref:`yatr\.env module`).  Moreover, any extension tasks defined using the ``@env.task`` decorator will also receive all defined macros through the ``*args`` and ``**kwargs`` arguments:  ``*args`` will be populated with any positional argument macros that are defined (i.e., ``_1``, ``_2``, ``_3``, etc.), and ``**kwargs`` will be populated with all defined macro values that are not positional argument macros.  While these values can also be accessed via ``env``, the ``*args`` and ``**kwargs`` parameters are notable in that they represent the current execution environment.  In cases where macros in different sections are defined with the same name, using ``**kwargs`` enables the programmer to access the actual execution value for that name without having to replicate yatr's macro precedence logic in the extension function.
 
 In this example, suppose the value of the environment variable ``PATH`` is set to ``/foo/bar``.  In such case, executing the extension task ``barfoo`` produces the following output::
 
@@ -214,9 +214,9 @@ In this example, suppose the value of the environment variable ``PATH`` is set t
     /foo/bar/baz_foo
 
 
-When executing extension tasks defined via the ``@env.task`` decorator, yatr will treat any function that does not raise an exeception as executing with return code 0.  Likwise, a function that raises an exception is treated as executing with return code 1.  If extension functions are defined without using the ``@env.task`` decorator, the programmer should ensure that the function returns either 0 or 1, as appropriate.
+When executing extension tasks defined via the ``@env.task`` decorator, yatr will treat any function that does not raise an exception as exiting with return code 0.  Likewise, a function that raises an exception is treated as exiting with return code 1.  If extension functions are defined without using the ``@env.task`` decorator, the programmer should ensure that the function returns either 0 or 1, as appropriate.
 
-The preview and verbose options (``-p`` and ``-v``) also work with extension functions.  By default, yatr will print the function name, along with the full contents of ``*args`` and ``**kwargs``.  As many more macros may be defined than are used in the extension function, the optional ``display`` keyword argument is provided in the ``@env.task`` decorator, allowing the programmer to specify only those keyword arguments to be displayed.  In the above example, executing the ``barfoo`` extension task with verbose output would produce the following behavior::
+The preview and verbose options (``-p`` and ``-v``) also work with extension functions.  By default, yatr will print the function name, along with the full contents of ``*args`` and ``**kwargs``.  As many more macros may be defined than are used in the extension function, the optional ``display`` keyword argument may be provided in the ``@env.task`` decorator, allowing the programmer to specify only those keyword arguments to be displayed.  In the above example, executing the ``barfoo`` extension task with verbose output would produce the following behavior::
 
     $ yatr -v barfoo
     bar_foo(baz1=baz_foo, path=/foo/bar)
