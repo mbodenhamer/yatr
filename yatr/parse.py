@@ -1,7 +1,7 @@
 import os
 import imp
 import yaml
-from syn.base_utils import chdir
+from syn.base_utils import chdir, import_module
 from syn.base import Base, Attr, init_hook
 from syn.type import List, Dict
 from syn.five import STR
@@ -110,9 +110,6 @@ class Document(Base):
 
         with chdir(self.dirname):
             for path in map(process, self.imports):
-                if not os.path.exists(path):
-                    raise ValidationError("Module path does not exist: {}"
-                                          .format(path))
                 self.process_import(path, **kwargs)
 
             for path in map(process, self.includes):
@@ -144,7 +141,15 @@ class Document(Base):
             self.validate()
 
     def process_import(self, path, **kwargs):
-        mod = imp.load_source('yatr_module_import', path)
+        if os.path.exists(path):
+            mod = imp.load_source('yatr_module_import', path)
+
+        else:
+            try:
+                mod = import_module(path)
+            except ImportError:
+                raise ValidationError("Module path does not exist: {}"
+                                      .format(path))
         
         if not hasattr(mod, 'env'):
             raise ImportError("yatr extension module '{}' has no env"

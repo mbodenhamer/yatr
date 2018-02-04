@@ -1,0 +1,23 @@
+import:
+  - test8
+
+macros:
+  shebang: "#!/bin/bash"
+  bar: "{{env('YATR_BAR', 'baz')}}"
+  path: "{{env('PATH')}}"
+  baz1: "{{'baz'|foo}}"
+  baz2: "{{bar('foo')}}"
+
+tasks:
+  foo:
+    - echo foo
+    - echo bar
+    - echo baz
+
+  bar:
+    - "echo {{bar}}"
+
+  path:
+    - "echo {{path}}"
+
+  baz: "echo {{baz1}} {{baz2}}"

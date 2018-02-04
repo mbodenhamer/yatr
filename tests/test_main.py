@@ -21,6 +21,7 @@ TEST5 = os.path.join(DIR, 'test5.yml')
 TEST6 = os.path.join(DIR, 'test6.yml')
 TEST7 = os.path.join(DIR, 'test7.yml')
 TEST8 = os.path.join(DIR, 'test8.yml')
+TEST8_2 = os.path.join(DIR, 'test8_2.yml')
 TEST8_IN = os.path.join(DIR, 'test8.j2')
 TEST8_OUT = os.path.join(DIR, 'test8.bash')
 TEST9 = os.path.join(DIR, 'test9.yml')
@@ -338,6 +339,10 @@ def test_main():
             _main('-f', TEST8, '-p', 'barfoo')
         assert out.getvalue() == ('bar_foo(baz1=baz_foo, path={})\n'
                                   .format(os.environ['PATH']))
+
+        with capture() as (out, err):
+            _main('-f', TEST8_2, '-p', 'bar')
+        assert out.getvalue() == 'echo baz\n'
 
         # Test files
         with tempdir() as d:
