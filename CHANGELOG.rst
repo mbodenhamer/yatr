@@ -5,6 +5,7 @@ Changelog
 ~~~~~~~~~~~~~~~~~~
 * Added Env decorators.
 * Added anonymous task definitions.
+* Added support for importing extension modules with Python ``import`` statement-style names.
 
 0.0.8 (2017-11-28)
 ~~~~~~~~~~~~~~~~~~

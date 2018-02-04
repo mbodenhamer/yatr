@@ -185,7 +185,7 @@ Name                             Description
 
 The ``import`` feature enables the functionality of yatr to be extended when necessary, while preserving the simplicity of the default YAML specification for the majority of use cases for which the default capabilities of yatr are sufficient.
 
-The ``import`` section must be a list of strings, each of which must be either a filesystem path or a URL specifying the location of a Python module.  Each module so imported must contain a top-level variable named ``env``, which must be an instance of the ``Env`` class (see :ref:`yatr\.env module`).  Modules to be imported in this manner are called "extension modules" (not to be confused with Python extension modules written in C/C++).
+The ``import`` section must be a list of strings, each of which must be either a filesystem path or a URL specifying the location of a Python module.  Strings containing Python module names (such as would be found in a Python ``import`` statement) are also supported.  Each module so imported must contain a top-level variable named ``env``, which must be an instance of the ``Env`` class (see :ref:`yatr\.env module`).  Modules to be imported in this manner are called "extension modules" (not to be confused with Python extension modules written in C/C++).
 
 The following is an example of a yatr extension module:
 
