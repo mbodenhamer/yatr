@@ -197,10 +197,7 @@ def get_delete(in_, out, key, default, outkey=None):
     if outkey is None:
         outkey = key
 
-    out[outkey] = in_.get(key, default)
-    
-    if key in in_:
-        del in_[key]
+    out[outkey] = in_.pop(key, default)
 
 def fix_functions(template, potential_problems, env):
     if isinstance(template, list):
