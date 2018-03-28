@@ -96,7 +96,7 @@ class Command(Base):
                  args = ('command',))
 
     def resolve_macros(self, env, **kwargs):
-        command = env.resolve(self.command)
+        command = env.resolve(self.command, **kwargs)
         context = env.resolve(kwargs.get('context', self.context))
         return command, context
 

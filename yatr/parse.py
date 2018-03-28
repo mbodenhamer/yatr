@@ -20,6 +20,7 @@ STRList = List(STR)
 class Document(Base):
     _attrs = dict(imports = Attr(List(STR), init=lambda self:list()),
                   includes = Attr(List(STR), init=lambda self: list()),
+                  declares = Attr(List(STR), init=lambda self:list()),
                   secrets = Attr(List(STR), init=lambda self: list()),
                   macros = Attr(Dict((STR, int, float, 
                                       List((STR, int, float, list, dict)),
@@ -52,6 +53,7 @@ class Document(Base):
     def from_yaml(cls, dct, dirname, **kwargs):
         get_delete(dct, kwargs, 'import', [], 'imports')
         get_delete(dct, kwargs, 'include', [], 'includes')
+        get_delete(dct, kwargs, 'declare', [], 'declares')
         get_delete(dct, kwargs, 'capture', {}, 'captures')
         get_delete(dct, kwargs, 'files', {})
         get_delete(dct, kwargs, 'secrets', [])
@@ -132,12 +134,12 @@ class Document(Base):
         env = Env(macros=self.macros, contexts=self.contexts, tasks=self.tasks,
                   secret_values=self.secret_values, captures=self.captures,
                   settings=self.settings, default_task=self.default_task,
-                  files=files)
+                  files=files, declares=set(self.declares))
         self.env.update(env, **kwargs)
 
     def post_process(self, **kwargs):
         with chdir(self.dirname):
-            self.env.resolve_macros()
+            self.env.resolve_macros(**kwargs)
             self.validate()
 
     def process_import(self, path, **kwargs):

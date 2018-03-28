@@ -1,3 +1,6 @@
+declare:
+  - count
+
 macros:
   a: x
   b: 

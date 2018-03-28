@@ -1,12 +1,14 @@
+import re
+
 from copy import copy
 from functools import partial
 from jinja2 import Environment, StrictUndefined
 from syn.base import Base, Attr, init_hook
-from syn.type import Dict, List, Callable
+from syn.type import Dict, List, Callable, Set
 from syn.five import STR
 
 from .base import resolve, ordered_macros, get_output, DEFAULT_JINJA_FILTERS, \
-    DEFAULT_JINJA_FUNCTIONS, fix_functions
+    DEFAULT_JINJA_FUNCTIONS, fix_functions, variables
 from .context import Context, BUILTIN_CONTEXTS
 from .task import Task
 
@@ -15,6 +17,11 @@ from .task import Task
 CP = 'copy_copy'
 UP = 'dict_update'
 AUP = 'assign_update'
+SUP = 'set_update'
+
+#-------------------------------------------------------------------------------
+
+BUILTIN_PATTERNS = {'_n', '_[0-9]+'} # Conditionally defined builtin macros
 
 #-------------------------------------------------------------------------------
 
@@ -46,6 +53,9 @@ class Updateable(object):
         for attr in self._groups.dict_update:
             getattr(self, attr).update(getattr(other, attr, {}))
 
+        for attr in self._groups.set_update:
+            getattr(self, attr).update(getattr(other, attr, set()))
+
         for attr in self._groups.assign_update:
             value = getattr(other, attr)
             if not value:
@@ -75,6 +85,9 @@ class Env(Base, Copyable, Updateable):
                   contexts = Attr(Dict(Context), init=lambda self: dict(),
                                   doc='Execution context definitions', 
                                   groups=(UP, CP)),
+                  declares = Attr(set, init=lambda self: set(),
+                                  doc='Declared runtime-defined macros',
+                                  groups=(SUP, CP)),
                   tasks = Attr(Dict(Task), init=lambda self: dict(),
                                doc='Task definitions', groups=(UP, CP)),
                   secret_values = Attr(Dict(STR), init=lambda self: dict(),
@@ -172,7 +185,8 @@ class Env(Base, Copyable, Updateable):
                                              funcs=self.jinja_functions):
             if name in self.macros or name in self.commandline_macros:
                 fixed = fix_functions(template, potential_problems, self)
-                env[name] = resolve(fixed, env, jenv=self.jenv)
+                #env[name] = resolve(fixed, env, jenv=self.jenv)
+                env[name] = self.resolve(fixed, env=env, **kwargs)
 
             if name in self.captures:
                 cmd = resolve(template, env, jenv=self.jenv)
@@ -180,8 +194,26 @@ class Env(Base, Copyable, Updateable):
 
         self.env = env
 
-    def resolve(self, template):
-        return resolve(template, self.env, jenv=self.jenv)
+    def resolve(self, template, **kwargs):
+        env = kwargs.get('env', dict(self.env))
+
+        if kwargs.get('from_validate', False):
+            names = variables(template, jenv=self.jenv)
+
+            patterns = set(BUILTIN_PATTERNS)
+            patterns.update(set(self.declares))
+            patterns = [re.compile(p) for p in patterns]
+
+            # If the builtin/declared macro isn't defined, set it to ''
+            # so that it can validate
+            for name in names:
+                if name not in env:
+                    for p in patterns:
+                        if re.match(p, name):
+                            env[name] = ''
+                            break
+
+        return resolve(template, env, jenv=self.jenv)
 
     def task(self, name, *args, **kwargs):
         from .env_decorators import Task

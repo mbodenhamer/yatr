@@ -369,7 +369,7 @@ def _main(*args):
             macro, value = s.split('=')
             doc.env.commandline_macros[macro] = value
     
-    doc.post_process()
+    doc.post_process(from_validate=opts.validate)
 
     # --dump-path
     if opts.dump_path:
@@ -393,7 +393,7 @@ def _main(*args):
     if opts.validate:
         # Check that there are no undefined macros in task definitions
         for task in doc.env.tasks.values():
-            task.run_preview(doc.env)
+            task.run_preview(doc.env, from_validate=True)
 
         print("Validation successful")
         return

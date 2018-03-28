@@ -454,7 +454,10 @@ def test_main():
             assert txt == 'a'
 
         # Test command-line arg validation
-        assert_raises(Exception, _main, '-f', TEST12, '--validate')
+        with capture() as (out, err):
+            _main('-f', TEST12, '--validate')
+        assert out.getvalue() == 'Validation successful\n'
+
         with capture() as (out, err):
             _main('-f', TEST12, '--validate', 'NONE', 'a')
         assert out.getvalue() == 'Validation successful\n'
@@ -557,7 +560,32 @@ def test_main():
             assert out.getvalue() == \
                 ('yatr --render -i Dockerfile.j2 -o Dockerfile\n'
                  'docker build -t foo:latest .\n')
-            
+
+        # Validate all test yatrfiles
+        with capture() as (out, err):
+            _main('-f', TEST1, '--validate')
+            _main('-f', TEST2, '--validate')
+            _main('-f', TEST3, '--validate')
+            # NOTE: TEST4 is intentionally a file that doesn't validate
+            _main('-f', TEST5, '--validate')
+            _main('-f', TEST6, '--validate')
+            _main('-f', TEST7, '--validate')
+            _main('-f', TEST8, '--validate')
+            _main('-f', TEST8_2, '--validate')
+            _main('-f', TEST9, '--validate')
+            _main('-f', TEST10, '--validate')
+            # _main('-f', TEST11, '--validate')
+            _main('-f', TEST12, '--validate')
+            _main('-f', TEST13, '--validate')
+            _main('-f', os.path.join(DIR, 'yatrfile.yml'), '--validate')
+            _main('-f', os.path.join(DIR, 'yatrfile1.yml'), '--validate')
+            _main('-f', os.path.join(os.path.join(DIR, 'example'), 
+                                     'yatrfile.yml'), 
+                  '--validate')
+            _main('-f', os.path.join(os.path.join(DIR, 'example/render'), 
+                                     'yatrfile.yml'), 
+                  '--validate')
+
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__': # pragma: no cover

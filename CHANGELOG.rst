@@ -5,6 +5,7 @@ Changelog
 ~~~~~~~~~~~~~~~~~~~
 * Fixed issue where ``-m``-defined macros didn't override ``capture`` macros.
 * Fixed issue where ``~`` and environment variables are not expanded in some paths.
+* Added ``declare`` section, and fixed issue of yatrfiles with runtime-defined macros not validating.
 
 0.0.9 (2018-02-03)
 ~~~~~~~~~~~~~~~~~~
