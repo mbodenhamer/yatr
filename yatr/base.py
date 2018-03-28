@@ -50,6 +50,9 @@ def eprint(out, flush=True):
     if flush:
         sys.stderr.flush()
 
+def expand_path(path):
+    return os.path.expanduser(os.path.expandvars(path))
+
 def resolve(template, env, lenient=False, jenv=None):
     if isinstance(template, dict):
         return {key: resolve(item, env, lenient, jenv)

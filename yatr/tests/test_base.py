@@ -1,12 +1,23 @@
+import os
+import yatr.base as ybase
+
 from jinja2 import UndefinedError
 from nose.tools import assert_raises
-from syn.base_utils import assign, capture
-import yatr.base as ybase
+from syn.base_utils import assign, capture, setitem
 from yatr.base import resolve, variables, ordered_macros, get_output,\
-    str_to_bool, fix_functions, args_kwargs_from_env
+    str_to_bool, fix_functions, args_kwargs_from_env, expand_path
 
 #-------------------------------------------------------------------------------
 # Utilities
+
+def test_expand_path():
+    assert expand_path('/foo/bar') == '/foo/bar'
+
+    home = os.environ['HOME']
+    assert expand_path('~/foo/bar') == '{}/foo/bar'.format(home)
+
+    with setitem(os.environ, 'FOO_BAR', 'baz'):
+        assert expand_path('~/foo/$FOO_BAR') == '{}/foo/baz'.format(home)
 
 def test_resolve():
     assert resolve('abc', {}) == 'abc'
