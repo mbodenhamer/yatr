@@ -33,6 +33,8 @@ DOCKERFILE = os.path.join(DIR, 'example/render/Dockerfile')
 OUT = os.path.join(DIR, 'output')
 URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
 HOME = os.path.expanduser('~')
+TEST1_HOME_J2 = os.path.join(HOME, 'BAZ_test1.j2')
+TEST1_HOME_TXT = os.path.join(HOME, 'BAZ_test1.txt')
 TEST2_HOME = os.path.join(HOME, 'BAZ_test2.yml')
 
 def listify(s):
@@ -225,6 +227,7 @@ def test_main():
         # Test -f path expansion
         assert not os.path.isfile(TEST2_HOME), \
             "Run these tests in a Docker container to avoid file clobbering"
+
         shutil.copyfile(TEST2, TEST2_HOME)
         with setitem(os.environ, 'FOO_BAR', 'BAZ'):
             with capture() as (out, err):
@@ -270,6 +273,31 @@ def test_main():
             assert_raises(RuntimeError, _main, '--render', '-i', '/foo/bar/baz')
             assert_raises(RuntimeError, _main, '--render', '-i', 
                           os.path.join(DIR, 'test1.j2'))
+
+        # Test -i and -o path expansion
+        assert not (os.path.isfile(TEST1_HOME_J2) or 
+                    os.path.isfile(TEST1_HOME_TXT)), \
+            "Run these tests in a Docker container to avoid file clobbering"
+
+        with chdir(DIR):
+            shutil.copyfile(os.path.join(DIR, 'test1.j2'), TEST1_HOME_J2)
+            shutil.copyfile(os.path.join(DIR, 'test1.txt'), TEST1_HOME_TXT)
+
+            with setitem(os.environ, 'FOO_BAR', 'BAZ'):
+                with capture() as (out, err):
+                    _main('--render',
+                          '-i', '~/${FOO_BAR}_test1.j2',
+                          '-o', '~/${FOO_BAR}_test1.txt')
+
+            assert out.getvalue() == ''
+            assert err.getvalue() == ''
+
+            with open(TEST1_HOME_TXT, 'r') as f:
+                txt = f.read()
+            assert txt == 'First abc, then abcdef, then abcdefghi.'
+
+            os.remove(TEST1_HOME_J2)
+            os.remove(TEST1_HOME_TXT)
 
         # Test --pull
         ybase.resolve_url(URL)
