@@ -18,6 +18,8 @@ def test_expand_path():
 
     with setitem(os.environ, 'FOO_BAR', 'baz'):
         assert expand_path('~/foo/$FOO_BAR') == '{}/foo/baz'.format(home)
+        assert expand_path('~/foo/${FOO_BAR}_fix.yml') == \
+            '{}/foo/baz_fix.yml'.format(home)
 
 def test_resolve():
     assert resolve('abc', {}) == 'abc'

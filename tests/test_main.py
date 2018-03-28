@@ -32,6 +32,8 @@ TEST13 = os.path.join(DIR, 'test13.yml')
 DOCKERFILE = os.path.join(DIR, 'example/render/Dockerfile')
 OUT = os.path.join(DIR, 'output')
 URL = 'https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles/test/test1.yml'
+HOME = os.path.expanduser('~')
+TEST2_HOME = os.path.join(HOME, 'BAZ_test2.yml')
 
 def listify(s):
     return [o.strip() for o in s.strip().split()]
@@ -219,6 +221,16 @@ def test_main():
         with capture() as (out, err):
             _main('-f', TEST2, '-p')
         assert out.getvalue() == 'true\n'
+
+        # Test -f path expansion
+        assert not os.path.isfile(TEST2_HOME), \
+            "Run these tests in a Docker container to avoid file clobbering"
+        shutil.copyfile(TEST2, TEST2_HOME)
+        with setitem(os.environ, 'FOO_BAR', 'BAZ'):
+            with capture() as (out, err):
+                _main('-f', '~/${FOO_BAR}_test2.yml', '-p')
+            assert out.getvalue() == 'true\n'
+        os.remove(TEST2_HOME)
 
         # Test --dump and task command-line arg passing
         with chdir(os.path.join(DIR, 'foo')):
