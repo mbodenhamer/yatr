@@ -152,7 +152,7 @@ def cached_path(path, cachedir=DEFAULT_CACHE_DIR):
 
 def resolve_url(url, cachedir=DEFAULT_CACHE_DIR, force=False):
     if '://' in url:
-        cachedir = os.path.expanduser(cachedir)
+        cachedir = expand_path(cachedir)
 
         if not os.path.isdir(cachedir):
             os.mkdir(cachedir)

@@ -7,7 +7,7 @@ import hashlib
 from argparse import ArgumentParser
 
 from . import __version__ as yver
-from .base import DEFAULT_CACHE_DIR, cached_path, resolve
+from .base import DEFAULT_CACHE_DIR, cached_path, expand_path, resolve
 from .parse import DEFAULT_SETTINGS, Document
 
 DIR = os.path.abspath(os.path.dirname(__file__))
@@ -80,12 +80,20 @@ add_argument(parser, 'args', metavar='ARGS', nargs='*',
 USAGE = parser.format_usage().strip()
 OPTION_STRINGS.sort()
 
+EXPAND_OPTS = ['yatrfile', 'infile', 'outfile', 'cachedir']
+
 #-------------------------------------------------------------------------------
 
 def print_(s, flush=True):
     sys.stdout.write(s + '\n')
     if flush:
         sys.stdout.flush()
+
+#-------------------------------------------------------------------------------
+
+def expand_paths(opts):
+    for opt in EXPAND_OPTS:
+        setattr(opts, opt, expand_path(getattr(opts, opt)))
 
 #-------------------------------------------------------------------------------
 # Yatrfile search
@@ -149,7 +157,7 @@ def compile_completion_data(path, cachedir, outpath):
     return data
 
 def load_completion_data(yatrfile, cachedir):
-    cachedir = os.path.expanduser(cachedir)
+    cachedir = expand_path(cachedir)
     try:
         path = find_yatrfile_path(yatrfile)
     except:
@@ -306,6 +314,8 @@ def _main(*args):
     if opts.install_bash_completions:
         install_bash_completions()
         return
+
+    expand_paths(opts)
 
     if opts.cache_file:
         if not opts.infile:

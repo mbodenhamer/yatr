@@ -13,7 +13,7 @@ from yatr.base import resolve, variables, ordered_macros, get_output,\
 def test_expand_path():
     assert expand_path('/foo/bar') == '/foo/bar'
 
-    home = os.environ['HOME']
+    home = os.path.expanduser('~')
     assert expand_path('~/foo/bar') == '{}/foo/bar'.format(home)
 
     with setitem(os.environ, 'FOO_BAR', 'baz'):
