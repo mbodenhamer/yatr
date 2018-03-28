@@ -357,7 +357,7 @@ def _main(*args):
     if opts.macros:
         for s in opts.macros:
             macro, value = s.split('=')
-            doc.env.macros[macro] = value
+            doc.env.commandline_macros[macro] = value
     
     doc.post_process()
 
@@ -371,6 +371,7 @@ def _main(*args):
         # TODO: add support for filtering out unwanted variables
         # TODO: add support for not including possible secrets in output
         displayable = (set(doc.env.macros) | 
+                       set(doc.env.commandline_macros) | 
                        set(doc.env.captures) | 
                        set(doc.env.files))
         for name in sorted(doc.env.env):

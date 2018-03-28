@@ -69,6 +69,9 @@ class Env(Base, Copyable, Updateable):
                                       Dict((STR, int, float, list, dict)))), 
                                 init=lambda self: dict(),
                                 doc='Macro definitions', groups=(UP, CP)),
+                  commandline_macros = Attr(Dict(STR), init=lambda self: dict(),
+                                            doc='Macros defined with -m',
+                                            groups=(UP, CP)),
                   contexts = Attr(Dict(Context), init=lambda self: dict(),
                                   doc='Execution context definitions', 
                                   groups=(UP, CP)),
@@ -161,12 +164,13 @@ class Env(Base, Copyable, Updateable):
         env = self.macro_env(**kwargs)
         macros = dict(self.macros)
         macros.update(self.captures)
+        macros.update(self.commandline_macros)
 
         # TODO: better error message if there is a cycle
         potential_problems = set(env) & set(self.jinja_functions)
         for name, template in ordered_macros(macros, jenv=self.jenv,
                                              funcs=self.jinja_functions):
-            if name in self.macros:
+            if name in self.macros or name in self.commandline_macros:
                 fixed = fix_functions(template, potential_problems, self)
                 env[name] = resolve(fixed, env, jenv=self.jenv)
 

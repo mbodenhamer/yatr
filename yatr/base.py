@@ -196,7 +196,6 @@ def str_to_bool(value):
 def get_delete(in_, out, key, default, outkey=None):
     if outkey is None:
         outkey = key
-
     out[outkey] = in_.pop(key, default)
 
 def fix_functions(template, potential_problems, env):

@@ -1,8 +1,10 @@
 Changelog
 ---------
 
-0.0.10 (2018-02-24)
+0.0.10 (2018-03-30)
 ~~~~~~~~~~~~~~~~~~~
+* Fixed issue where ``-m``-defined macros didn't override ``capture`` macros.
+
 
 0.0.9 (2018-02-03)
 ~~~~~~~~~~~~~~~~~~
