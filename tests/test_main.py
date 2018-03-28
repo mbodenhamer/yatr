@@ -36,6 +36,7 @@ HOME = os.path.expanduser('~')
 TEST1_HOME_J2 = os.path.join(HOME, 'BAZ_test1.j2')
 TEST1_HOME_TXT = os.path.join(HOME, 'BAZ_test1.txt')
 TEST2_HOME = os.path.join(HOME, 'BAZ_test2.yml')
+CACHEDIR_HOME = os.path.join(HOME, 'BAZ_cachedir')
 
 def listify(s):
     return [o.strip() for o in s.strip().split()]
@@ -225,7 +226,7 @@ def test_main():
         assert out.getvalue() == 'true\n'
 
         # Test -f path expansion
-        assert not os.path.isfile(TEST2_HOME), \
+        assert not os.path.exists(TEST2_HOME), \
             "Run these tests in a Docker container to avoid file clobbering"
 
         shutil.copyfile(TEST2, TEST2_HOME)
@@ -275,8 +276,8 @@ def test_main():
                           os.path.join(DIR, 'test1.j2'))
 
         # Test -i and -o path expansion
-        assert not (os.path.isfile(TEST1_HOME_J2) or 
-                    os.path.isfile(TEST1_HOME_TXT)), \
+        assert not (os.path.exists(TEST1_HOME_J2) or 
+                    os.path.exists(TEST1_HOME_TXT)), \
             "Run these tests in a Docker container to avoid file clobbering"
 
         with chdir(DIR):
@@ -476,6 +477,32 @@ def test_main():
 
             assert_raises(RuntimeError, _main, '--cache')
             assert_raises(RuntimeError, _main, '--cache', '-i', tmpfile)
+
+        # Test --cache-dir path expansion
+        assert not os.path.exists(CACHEDIR_HOME), \
+            "Run these tests in a Docker container to avoid file clobbering"
+        
+        os.mkdir(CACHEDIR_HOME)
+        d = CACHEDIR_HOME
+        txt = 'abc123'
+        url = 'http://foo.com'
+        tmpfile = os.path.join(d, 'temp.txt')
+        cached = cached_path(url, d)
+        
+        with open(tmpfile, 'w') as f:
+            f.write(txt)
+
+        with setitem(os.environ, 'FOO_BAR', 'BAZ'):
+            _main('--cache-dir', '~/${FOO_BAR}_cachedir',
+                  '--cache', 
+                  '-i', '~/${FOO_BAR}_cachedir/temp.txt', 
+                  '-o', url)
+
+        with open(cached, 'r') as f:
+            out = f.read()
+        assert out == txt
+
+        shutil.rmtree(CACHEDIR_HOME)
 
         # Test dict macros
         with capture() as (out, err):
