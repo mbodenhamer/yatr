@@ -33,6 +33,7 @@ INITIAL_MACROS = {}
 
 
 class DefaultList(list):
+    '''List wrapper that returns a default value for invalid indices.'''
     def __init__(self, lst=[], default=0):
         super(DefaultList, self).__init__(lst)
         self.default_value = default
@@ -218,13 +219,13 @@ class Env(Base, Copyable, Updateable):
         self.env = env
 
     def resolve(self, template, **kwargs):
-        env = kwargs.get('env', dict(self.env))
+        env = dict(kwargs.get('env', self.env))
 
         if kwargs.get('from_validate', False):
             names = variables(template, jenv=self.jenv)
 
             patterns = set(BUILTIN_PATTERNS)
-            patterns.update(set(self.declares))
+            patterns.update(self.declares)
             patterns = [re.compile(p) for p in patterns]
 
             # If the builtin/declared macro isn't defined, set it to ''
