@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-0.0.10 (2018-03-30)
+0.0.10 (2018-03-28)
 ~~~~~~~~~~~~~~~~~~~
 * Fixed issue where ``-m``-defined macros didn't override ``capture`` macros.
 * Fixed issue where ``~`` and environment variables are not expanded in some paths.

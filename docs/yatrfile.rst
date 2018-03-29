@@ -10,7 +10,7 @@ Suppose you have the following ``yatrfile.yml`` in your `current working directo
 .. literalinclude:: ../tests/example/yatrfile.yml
    :language: yaml
 
-As this example demonstrates, the primary functionality of a yatrfile is found in five top-level sections: ``include``, ``capture``, ``macros``, ``tasks``, and ``default``.  Three other sections, ``files``, ``settings`` and ``import``, are also supported (see :ref:`files`, :ref:`settings`, and :ref:`import`, respectively).
+As this example demonstrates, the primary functionality of a yatrfile is found in five top-level sections: ``include``, ``capture``, ``macros``, ``tasks``, and ``default``.  Four other sections, ``files``, ``settings``, ``import``, and ``declare``, are also supported (see :ref:`files`, :ref:`settings`, :ref:`import`, and :ref:`declare`, respectively).
 
 ``macros``
 ----------
@@ -223,6 +223,15 @@ The preview and verbose options (``-p`` and ``-v``) also work with extension fun
     /foo/bar/baz_foo  
 
 
+.. _declare:
+
+``declare``
+-----------
+
+The ``declare`` section must be a list of strings, each of which must be the name of a macro.  The function of this section is best explained by example.  Suppose a macro named ``foo`` is included as part of the definition of either a macro or a task.  If ``foo`` is not defined in the yatrfile (or any included yatrfiles), the yatrfile will fail validation (see :ref:`Commands`, particularly :ref:`--validate <validate>`).  If ``foo`` is included in the ``declare`` section, however, yatr will effectively ignore the macro and allow the yatrfile to validate.
+
+The ``declare`` section is necessary for validating yatrfiles that make use of certain macros that are only defined at runtime.  Yatr will automatically handle cases of builtin runtime-defined macros (such as ``_1``), and these do not need to be included in the ``declare`` section.  However, any runtime-defined macros that are not builtin to yatr will need to be included in the ``declare`` section in order for the yatrfile to validate successfully.  An example of using the ``declare`` section is included in :ref:`List Macros and For Loops<for_loops>`.
+
 Custom Jinja2 Functions
 -----------------------
 
@@ -283,6 +292,8 @@ Tasks may be defined to execute conditionally upon the successful execution of a
 
 The values supplied to ``if`` and ``ifnot`` may be anything that would otherwise constitute a valid task definition.  If a value is supplied for ``if``, the command will be executed only if the return code of the test command is zero.  Likewise, if a value is supplied for ``ifnot``, the command will be executed only if the return code of the test command is non-zero.
 
+.. _for_loops:
+
 List Macros and For Loops
 -------------------------
 
@@ -311,6 +322,9 @@ The name of ``_n`` may be changed if desired via the ``loop_count_macro`` settin
     2 1
     3 2
     4 3
+
+
+Note that the macro ``count`` is included in the ``declare`` section (see :ref:`declare`) to allow the yatrfile to validate successfully.
 
 Dictionary Macros
 -----------------

@@ -76,6 +76,8 @@ If the ``-p`` option is supplied, yatr will simply print the commands without ru
 
 (See :ref:`main example <main_example>`)
 
+.. _Commands:
+
 Commands
 --------
 
@@ -160,6 +162,8 @@ One could then run::
 to generate the desired Dockerfile and then build the desired Docker image.  The generated Dockerfile would look like:
 
 .. literalinclude:: ../tests/example/render/Dockerfile
+
+.. _validate:
 
 ``--validate``
 ~~~~~~~~~~~~~~
