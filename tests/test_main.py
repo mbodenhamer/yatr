@@ -574,7 +574,7 @@ def test_main():
             _main('-f', TEST8_2, '--validate')
             _main('-f', TEST9, '--validate')
             _main('-f', TEST10, '--validate')
-            # _main('-f', TEST11, '--validate')
+            _main('-f', TEST11, '--validate')
             _main('-f', TEST12, '--validate')
             _main('-f', TEST13, '--validate')
             _main('-f', os.path.join(DIR, 'yatrfile.yml'), '--validate')

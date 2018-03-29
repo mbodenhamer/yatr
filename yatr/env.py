@@ -21,11 +21,34 @@ SUP = 'set_update'
 
 #-------------------------------------------------------------------------------
 
-BUILTIN_PATTERNS = {'_n', '_[0-9]+'} # Conditionally defined builtin macros
+BUILTIN_PATTERNS = {'_n', '_[0-9]+'} # Conditionally-defined builtin macros
+BUILTIN_LISTS = {'ARGS'} # Conditionally-defined builtin list macros
 
 #-------------------------------------------------------------------------------
 
 INITIAL_MACROS = {}
+
+#-------------------------------------------------------------------------------
+# DefaultList
+
+
+class DefaultList(list):
+    def __init__(self, lst=[], default=0):
+        super(DefaultList, self).__init__(lst)
+        self.default_value = default
+
+    def __delitem__(self, idx):
+        try:
+            super(DefaultList, self).__delitem__(idx)
+        except IndexError:
+            pass
+
+    def __getitem__(self, idx):
+        try:
+            return super(DefaultList, self).__getitem__(idx)
+        except IndexError:
+            return self.default_value
+
 
 #-------------------------------------------------------------------------------
 # Copyable
@@ -212,6 +235,10 @@ class Env(Base, Copyable, Updateable):
                         if re.match(p, name):
                             env[name] = ''
                             break
+
+                if name in BUILTIN_LISTS:
+                    lst = list(env.get(name, []))
+                    env[name] = DefaultList(lst)
 
         return resolve(template, env, jenv=self.jenv)
 

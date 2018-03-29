@@ -3,8 +3,31 @@ from nose.tools import assert_raises
 
 from yatr import Env
 from yatr import env as ye
-from yatr.env import Updateable
+from yatr.env import Updateable, DefaultList
 from syn.base_utils import assign, assert_equivalent
+
+#-------------------------------------------------------------------------------
+# DefaultList
+
+def test_defaultlist():
+    l = DefaultList()
+    assert l[0] == 0
+    assert l[1] == 0
+    
+    l.append(1)
+    assert l[0] == 1
+    assert l[1] == 0
+
+    del l[0]
+    del l[0]
+    assert l[0] == 0
+    assert l[1] == 0
+
+    l = DefaultList([1, 2, 3], default=42)
+    assert l[0] == 1
+    assert l[1] == 2
+    assert l[2] == 3
+    assert l[3] == 42
 
 #-------------------------------------------------------------------------------
 # Env
