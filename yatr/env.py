@@ -4,7 +4,7 @@ from copy import copy
 from functools import partial
 from jinja2 import Environment, StrictUndefined
 from syn.base import Base, Attr, init_hook
-from syn.type import Dict, List, Callable, Set
+from syn.type import Dict, List, Callable
 from syn.five import STR
 
 from .base import resolve, ordered_macros, get_output, DEFAULT_JINJA_FILTERS, \
@@ -154,6 +154,9 @@ class Env(Base, Copyable, Updateable):
                                          group=AUP))
     _opts = dict(init_validate = True)
 
+    def __getitem__(self, key):
+        return self.env[key]
+
     @init_hook
     def _init_populate(self):
         self.macros.update(INITIAL_MACROS)
@@ -209,7 +212,6 @@ class Env(Base, Copyable, Updateable):
                                              funcs=self.jinja_functions):
             if name in self.macros or name in self.commandline_macros:
                 fixed = fix_functions(template, potential_problems, self)
-                #env[name] = resolve(fixed, env, jenv=self.jenv)
                 env[name] = self.resolve(fixed, env=env, **kwargs)
 
             if name in self.captures:

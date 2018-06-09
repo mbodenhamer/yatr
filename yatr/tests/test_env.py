@@ -79,6 +79,9 @@ def test_env():
                            c='dcc',
                            d='dcce')
 
+    assert e1c['a'] == 'c'
+    assert e1c['b'] == 'cc'
+
     e1c2.update(e3)
     assert_raises(ValueError, e1c2.resolve_macros)
 
