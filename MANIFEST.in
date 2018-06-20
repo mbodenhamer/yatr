@@ -1,4 +1,4 @@
-include MANIFEST.in README.rst CHANGELOG.rst LICENSE Makefile version.txt
+include MANIFEST.in README.rst CHANGELOG.rst LICENSE Makefile version.txt yatrfile.yml
 include requirements.txt requirements.in
 include dev-requirements.txt dev-requirements.in
 include requirements.yml
