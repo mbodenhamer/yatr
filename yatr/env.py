@@ -248,7 +248,7 @@ class Env(Base, Copyable, Updateable):
             # for keys like _1, etc.
             for name, value in env.items():
                 if isinstance(value, dict):
-                    if '' not in value:
+                    if '' not in value and value:
                         dct = dict(value)
                         dct[''] = choice(list(dct.values()))
                         env[name] = dct
