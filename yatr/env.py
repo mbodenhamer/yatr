@@ -3,6 +3,7 @@ import re
 from copy import copy
 from functools import partial
 from jinja2 import Environment, StrictUndefined
+from random import choice
 from syn.base import Base, Attr, init_hook
 from syn.type import Dict, List, Callable
 from syn.five import STR
@@ -242,6 +243,15 @@ class Env(Base, Copyable, Updateable):
                 if name in BUILTIN_LISTS:
                     lst = list(env.get(name, []))
                     env[name] = DefaultList(lst)
+            
+            # Inject value for '' into any dict macros, so that they will validate
+            # for keys like _1, etc.
+            for name, value in env.items():
+                if isinstance(value, dict):
+                    if '' not in value:
+                        dct = dict(value)
+                        dct[''] = choice(list(dct.values()))
+                        env[name] = dct
 
         return resolve(template, env, jenv=self.jenv)
 

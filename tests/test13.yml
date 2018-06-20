@@ -5,5 +5,14 @@ macros:
     b: "{{a}}"
   c: "{{b.a}} {{b.b}}"
 
+  d:
+    a:
+      b: 1
+    b:
+      b: 2
+    c:
+      b: 3
+
 tasks:
   foo: "echo {{c}}"
+  bar: "echo {{d[_1].b}}"
