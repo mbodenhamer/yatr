@@ -222,6 +222,16 @@ class Env(Base, Copyable, Updateable):
 
         self.env = env
 
+    def resolve_arg_macros(self, arg_macros, **kwargs):
+        macros = dict(self.env)
+        macros.update(arg_macros)
+
+        potential_problems = set(macros) & set(self.jinja_functions)
+        for name, template in ordered_macros(macros, jenv=self.jenv,
+                                             funcs=self.jinja_functions):
+            fixed = fix_functions(template, potential_problems, self)
+            self.env[name] = self.resolve(fixed, env=self.env, **kwargs)
+
     def resolve(self, template, **kwargs):
         env = dict(kwargs.get('env', self.env))
 

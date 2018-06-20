@@ -226,14 +226,17 @@ class Task(Base):
 
         if (self.args or self.kwargs) and not looping:
             env = env.copy(**kwargs)
+            arg_macros = {}
 
             if self.args:
                 for k, arg in enumerate(self.args):
-                    env.env['_{}'.format(k + 1)] = arg
+                    arg_macros['_{}'.format(k + 1)] = arg
 
             if self.kwargs:
                 for name, value in self.kwargs.items():
-                    env.env[name] = value
+                    arg_macros[name] = value
+
+            env.resolve_arg_macros(arg_macros, **kwargs)
 
         if self.loop and not looping:
             n = 0

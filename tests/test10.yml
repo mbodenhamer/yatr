@@ -1,5 +1,6 @@
 macros:
   x: 5
+  y: 10
 
 tasks:
   x: "echo {{x}} {{_1|default(3)}} {{ARGS[0]|default(10)}}"
@@ -30,6 +31,6 @@ tasks:
     - task:
         command: x
         args:
-          - 20
+          - "{{y * 2}}"
         kwargs:
-          x: 30
+          x: "{{y * 3}}"
