@@ -4,12 +4,13 @@ from copy import copy
 from functools import partial
 from jinja2 import Environment, StrictUndefined
 from random import choice
-from syn.base import Base, Attr, init_hook
-from syn.type import Dict, List, Callable
+from syn.base import Attr, Base, init_hook
+from syn.base_utils import message
 from syn.five import STR
+from syn.type import Dict, List, Callable
 
 from .base import resolve, ordered_macros, get_output, DEFAULT_JINJA_FILTERS, \
-    DEFAULT_JINJA_FUNCTIONS, fix_functions, variables
+    DEFAULT_JINJA_FUNCTIONS, fix_functions, variables, ValidationError
 from .context import Context, BUILTIN_CONTEXTS
 from .task import Task
 
@@ -253,7 +254,11 @@ class Env(Base, Copyable, Updateable):
                         dct[''] = choice(list(dct.values()))
                         env[name] = dct
 
-        return resolve(template, env, jenv=self.jenv)
+        try:
+            return resolve(template, env, jenv=self.jenv)
+
+        except Exception as e:
+            raise ValidationError('Error validating "{}": {}'.format(template, message(e)))
 
     def task(self, name, *args, **kwargs):
         from .env_decorators import Task

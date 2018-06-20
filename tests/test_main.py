@@ -1,7 +1,6 @@
 import os
 import sys
 import shutil
-from jinja2 import UndefinedError
 from mock import MagicMock
 from nose.tools import assert_raises
 from syn.base_utils import capture, assign, chdir, setitem
@@ -321,7 +320,7 @@ def test_main():
             _main('-f', TEST4)
         assert out.getvalue() == ''
         assert err.getvalue() == ''
-        assert_raises(UndefinedError, _main, '-f', TEST4, '--validate')
+        assert_raises(ValidationError, _main, '-f', TEST4, '--validate')
 
         # Test default_task inheritance
         with capture() as (out, err):

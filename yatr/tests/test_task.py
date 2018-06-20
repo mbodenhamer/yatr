@@ -1,4 +1,3 @@
-from jinja2 import UndefinedError
 from nose.tools import assert_raises
 from syn.base_utils import capture
 from yatr import Command, Task, Env, For, ValidationError
@@ -81,7 +80,7 @@ def test_task():
                        Command('{{b}}')])
 
     env = Env()
-    assert_raises(UndefinedError, t.run_preview, env)
+    assert_raises(ValidationError, t.run_preview, env)
 
     env = Env(macros=dict(a='ls', b='pwd'))
     env.resolve_macros()
