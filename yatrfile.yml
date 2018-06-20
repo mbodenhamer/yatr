@@ -5,13 +5,31 @@ include:
   - "{{urlbase}}/yatrfiles/python/exec_project.yml"
 
 #-------------------------------------------------------------------------------
+import:
+  - "{{urlbase}}/modules/file.py"
+
+#-------------------------------------------------------------------------------
 macros:
   urlbase: https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master
   package: yatr
 
-  version: 0.0.11a
+  version_pattern: "[0-9]+.[0-9]+(.[0-9a-zA-Z]+)?"
 
 #-------------------------------------------------------------------------------
-tasks: {}
+tasks:
+  set-version:
+    - task:
+        command: replace-in-file
+        kwargs:
+          path: version.txt
+          pattern: "{{version_pattern}}"
+          repl: "{{version}}"
+
+    - task:
+        command: replace-in-file
+        kwargs:
+          path: yatr/__init__.py
+          pattern: "__version__ = '{{version_pattern}}'"
+          repl: "__version__ = '{{version}}'"
 
 #-------------------------------------------------------------------------------
