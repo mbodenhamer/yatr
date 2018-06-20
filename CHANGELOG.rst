@@ -7,6 +7,7 @@ Changelog
 * Added [] read-only access to ``env.Env``.
 * Added validation support for dict macros indexed by runtime-defined macros.
 * Added better error messages for validation failures.
+* Added macro resolution for task ``args`` and ``kwargs``.
 
 0.0.10 (2018-03-28)
 ~~~~~~~~~~~~~~~~~~~

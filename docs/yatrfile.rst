@@ -385,6 +385,7 @@ Tasks can also be defined anonymously within task list definitions using the ``t
     foo
     30 20 10
 
+Note also that the ``args`` and ``kwargs`` of the task ``u`` are defined in terms of the macro ``y``.
 
 .. _builtin_macros:
 
