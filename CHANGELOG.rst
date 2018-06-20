@@ -4,7 +4,9 @@ Changelog
 0.0.11 (2018-xx-xx)
 ~~~~~~~~~~~~~~~~~~~
 
-* Added [] read-only access to ``env.Env``
+* Added [] read-only access to ``env.Env``.
+* Added validation support for dict macros indexed by runtime-defined macros.
+* Added better error messages for validation failures.
 
 0.0.10 (2018-03-28)
 ~~~~~~~~~~~~~~~~~~~
