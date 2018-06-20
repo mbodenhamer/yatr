@@ -1,13 +1,15 @@
 #-------------------------------------------------------------------------------
 include:
-  - "{{urlbase}}/docker/install.yml"
-  - "{{urlbase}}/git/operations.yml"
-  - "{{urlbase}}/python/exec_project.yml"
+  - "{{urlbase}}/yatrfiles/docker/install.yml"
+  - "{{urlbase}}/yatrfiles/git/operations.yml"
+  - "{{urlbase}}/yatrfiles/python/exec_project.yml"
 
 #-------------------------------------------------------------------------------
 macros:
-  urlbase: https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master/yatrfiles
+  urlbase: https://raw.githubusercontent.com/mbodenhamer/yatrfiles/master
   package: yatr
+
+  version: 0.0.11a
 
 #-------------------------------------------------------------------------------
 tasks: {}
