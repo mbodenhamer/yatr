@@ -4,20 +4,46 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-backports.ssl-match-hostname==3.5.0.1  # via docker
-certifi==2017.7.27.1      # via requests
-chardet==3.0.4            # via requests
-docker-pycreds==0.2.1     # via docker
-docker==2.5.1             # via dockerman
+backports.ssl-match-hostname==3.5.0.1
+    # via docker
+certifi==2017.7.27.1
+    # via requests
+chardet==3.0.4
+    # via requests
+docker-pycreds==0.2.1
+    # via docker
+docker==2.5.1
+    # via dockerman
 dockerman==0.1.2
-idna==2.6                 # via requests
-ipaddress==1.0.18         # via docker
-jinja2==2.9.6             # via syn
-markupsafe==1.0           # via jinja2
-pyyaml==3.12              # via syn
+    # via -r requirements.in
+idna==2.6
+    # via requests
+ipaddress==1.0.18
+    # via docker
+jinja2==2.9.6
+    # via syn
+markupsafe==1.0
+    # via jinja2
+pyyaml==5.4
+    # via syn
 requests==2.18.4
-six==1.11.0               # via docker, docker-pycreds, syn, syn.utils, websocket-client
-syn.utils==0.0.1          # via dockerman
-syn==0.0.14               # via dockerman, syn.utils
-urllib3==1.22             # via requests
-websocket-client==0.44.0  # via docker
+    # via
+    #   -r requirements.in
+    #   docker
+six==1.11.0
+    # via
+    #   docker
+    #   docker-pycreds
+    #   syn
+    #   syn.utils
+    #   websocket-client
+syn.utils==0.0.1
+    # via dockerman
+syn==0.0.14
+    # via
+    #   dockerman
+    #   syn.utils
+urllib3==1.22
+    # via requests
+websocket-client==0.44.0
+    # via docker
