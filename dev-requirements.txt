@@ -4,61 +4,146 @@
 #
 #    pip-compile --output-file dev-requirements.txt dev-requirements.in
 #
-alabaster==0.7.10         # via sphinx
-babel==2.5.1              # via sphinx
-backports.shutil-get-terminal-size==1.0.0  # via ipython
-certifi==2017.7.27.1      # via requests
-chardet==3.0.4            # via requests
+alabaster==0.7.10
+    # via sphinx
+babel==2.5.1
+    # via sphinx
+backports.shutil-get-terminal-size==1.0.0
+    # via ipython
+certifi==2017.7.27.1
+    # via requests
+chardet==3.0.4
+    # via requests
 check-manifest==0.35
-click==6.7                # via pip-tools
+    # via -r dev-requirements.in
+click==6.7
+    # via pip-tools
 coverage==4.4.1
-decorator==4.1.2          # via ipython, traitlets
+    # via -r dev-requirements.in
+decorator==4.1.2
+    # via
+    #   ipython
+    #   traitlets
 detox==0.11
-docutils==0.14            # via sphinx
-enum-compat==0.0.2        # via eventlet
-enum34==1.1.6             # via enum-compat, traitlets
-eventlet==0.21.0          # via detox
-first==2.0.1              # via pip-tools
+    # via -r dev-requirements.in
+docutils==0.14
+    # via sphinx
+enum-compat==0.0.2
+    # via eventlet
+enum34==1.1.6
+    # via traitlets
+eventlet==0.21.0
+    # via detox
+first==2.0.1
+    # via pip-tools
 fmap==0.1
-funcsigs==1.0.2           # via mock
-greenlet==0.4.12          # via eventlet
-idna==2.6                 # via requests
-imagesize==0.7.1          # via sphinx
+    # via -r dev-requirements.in
+funcsigs==1.0.2
+    # via mock
+greenlet==0.4.12
+    # via eventlet
+idna==2.6
+    # via requests
+imagesize==0.7.1
+    # via sphinx
 ipdb==0.10.3
+    # via -r dev-requirements.in
 ipdbplugin==1.4.5
-ipython-genutils==0.2.0   # via traitlets
+    # via -r dev-requirements.in
+ipython-genutils==0.2.0
+    # via traitlets
 ipython==5.5.0
-jinja2==2.9.6             # via sphinx
+    # via
+    #   -r dev-requirements.in
+    #   ipdb
+    #   ipdbplugin
+jinja2==2.9.6
+    # via sphinx
 lxml==4.0.0
-markupsafe==1.0           # via jinja2
+    # via -r dev-requirements.in
+markupsafe==1.0
+    # via jinja2
 mock==2.0.0
+    # via -r dev-requirements.in
 nose==1.3.7
-pathlib2==2.3.0           # via ipython, pickleshare
-pbr==3.1.1                # via mock
-pexpect==4.2.1            # via ipython
-pickleshare==0.7.4        # via ipython
+    # via
+    #   -r dev-requirements.in
+    #   ipdbplugin
+pathlib2==2.3.0
+    # via
+    #   ipython
+    #   pickleshare
+pbr==3.1.1
+    # via mock
+pexpect==4.2.1
+    # via ipython
+pickleshare==0.7.4
+    # via ipython
 pip-tools==1.10.1
-pkginfo==1.4.1            # via twine
-pluggy==0.5.2             # via tox
-prompt-toolkit==1.0.15    # via ipython
-ptyprocess==0.5.2         # via pexpect
-py==1.4.34                # via detox, tox
-pygments==2.2.0           # via ipython, sphinx
-pytz==2017.2              # via babel
-requests-toolbelt==0.8.0  # via twine
-requests==2.18.4          # via requests-toolbelt, sphinx, twine
-scandir==1.6              # via pathlib2
-simplegeneric==0.8.1      # via ipython
-six==1.11.0               # via fmap, mock, pathlib2, pip-tools, prompt-toolkit, sphinx, tox, traitlets, xunitmerge
-snowballstemmer==1.2.1    # via sphinx
+    # via -r dev-requirements.in
+pkginfo==1.4.1
+    # via twine
+pluggy==0.5.2
+    # via tox
+prompt-toolkit==1.0.15
+    # via ipython
+ptyprocess==0.5.2
+    # via pexpect
+py==1.10.0
+    # via
+    #   detox
+    #   tox
+pygments==2.2.0
+    # via
+    #   ipython
+    #   sphinx
+pytz==2017.2
+    # via babel
+requests-toolbelt==0.8.0
+    # via twine
+requests==2.18.4
+    # via
+    #   requests-toolbelt
+    #   sphinx
+    #   twine
+scandir==1.6
+    # via pathlib2
+simplegeneric==0.8.1
+    # via ipython
+six==1.11.0
+    # via
+    #   fmap
+    #   mock
+    #   pathlib2
+    #   pip-tools
+    #   prompt-toolkit
+    #   sphinx
+    #   tox
+    #   traitlets
+    #   xunitmerge
+snowballstemmer==1.2.1
+    # via sphinx
 sphinx==1.6.4
-sphinxcontrib-websupport==1.0.1  # via sphinx
+    # via -r dev-requirements.in
+sphinxcontrib-websupport==1.0.1
+    # via sphinx
 tox==2.9.1
-tqdm==4.19.1.post1        # via twine
-traitlets==4.3.2          # via ipython
+    # via
+    #   -r dev-requirements.in
+    #   detox
+tqdm==4.19.1.post1
+    # via twine
+traitlets==4.3.2
+    # via ipython
 twine==1.9.1
-typing==3.6.2             # via sphinx
-urllib3==1.22             # via requests
-virtualenv==15.1.0        # via tox
-wcwidth==0.1.7            # via prompt-toolkit
+    # via -r dev-requirements.in
+typing==3.6.2
+    # via sphinx
+urllib3==1.22
+    # via requests
+virtualenv==15.1.0
+    # via tox
+wcwidth==0.1.7
+    # via prompt-toolkit
 xunitmerge==1.0.4
+    # via -r dev-requirements.in
